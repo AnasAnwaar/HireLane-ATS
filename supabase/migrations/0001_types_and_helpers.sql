@@ -83,42 +83,13 @@ $$;
 comment on function public.current_org_id is
   'Active organisation for the current request. Returns null when unauthenticated or with no active membership.';
 
--- The caller's membership row in the active organisation.
-create or replace function public.current_membership_id()
-returns uuid
-language sql
-stable
-security definer
-set search_path = public, pg_temp
-as $$
-  select m.id
-  from public.memberships m
-  where m.user_id = auth.uid()
-    and m.organization_id = public.current_org_id()
-    and m.status = 'active'
-  limit 1;
-$$;
-
--- Owner check. The Owner permission set is immutable and always retains
--- permission-management rights (spec §UC-0 R2), so it short-circuits every
--- permission lookup.
-create or replace function public.is_org_owner()
-returns boolean
-language sql
-stable
-security definer
-set search_path = public, pg_temp
-as $$
-  select coalesce(
-    (select m.is_owner
-     from public.memberships m
-     where m.user_id = auth.uid()
-       and m.organization_id = public.current_org_id()
-       and m.status = 'active'
-     limit 1),
-    false
-  );
-$$;
+-- NOTE: `current_membership_id()` and `is_org_owner()` used to live here, but
+-- both are `language sql` and Postgres validates SQL function bodies at creation
+-- time (check_function_bodies). Referencing `memberships` before 0002 creates it
+-- fails outright. They now live at the end of 0002.
+--
+-- `current_org_id()` above survives here because PL/pgSQL bodies are only
+-- syntax-checked, not resolved against the catalog.
 
 -- -----------------------------------------------------------------------------
 -- Shared trigger: maintain updated_at

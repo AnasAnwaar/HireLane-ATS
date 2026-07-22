@@ -11,6 +11,10 @@ const PUBLIC_ROUTES = [
   "/signup",
   "/forgot-password",
   "/reset-password",
+  // Reached with a session, but before it is fully authenticated / activated,
+  // so they must not be treated as protected app routes.
+  "/set-password",
+  "/mfa",
   "/auth",
   "/invite",
   "/apply",

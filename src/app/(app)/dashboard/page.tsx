@@ -4,6 +4,7 @@ import {
   CalendarClock,
   ClipboardCheck,
   Flag,
+  Rocket,
   Sparkles,
   TrendingDown,
   TrendingUp,
@@ -18,6 +19,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScoreRing } from "@/components/ui/score-ring";
 import { cn } from "@/lib/utils";
+import { requireSession } from "@/server/auth/session";
 
 export const metadata = { title: "Dashboard" };
 
@@ -65,14 +67,16 @@ const INTERVIEWS = [
   { name: "Zoya Iqbal", round: "Screening call", when: "Thu, 10:00 AM" },
 ];
 
-export default function DashboardPage() {
+export default async function DashboardPage() {
+  const session = await requireSession("/dashboard");
   const funnelMax = FUNNEL[0].count;
+  const firstName = session.fullName.split(" ")[0] || "there";
 
   return (
     <>
       <PageHeader
         eyebrow="Overview"
-        title="Good morning, Anas"
+        title={`Welcome, ${firstName}`}
         description="Here's where your hiring pipeline stands today."
         actions={
           <>
@@ -87,6 +91,29 @@ export default function DashboardPage() {
       />
 
       <PageBody className="space-y-6">
+        {/* Onboarding is optional, not a gate — nudge rather than block. */}
+        {!session.onboardingCompleted && (
+          <Card className="border-primary/25 bg-primary-soft/40">
+            <CardContent className="flex flex-wrap items-center gap-4 p-5">
+              <span className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+                <Rocket className="size-5" />
+              </span>
+              <div className="min-w-0 flex-1">
+                <p className="font-medium">Finish setting up {session.organizationName}</p>
+                <p className="mt-0.5 text-sm text-muted-foreground">
+                  Add departments, invite your team and connect your job boards — about two
+                  minutes.
+                </p>
+              </div>
+              <Button asChild>
+                <Link href="/onboarding">
+                  Continue setup <ArrowUpRight />
+                </Link>
+              </Button>
+            </CardContent>
+          </Card>
+        )}
+
         {/* Stat row */}
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
           {STATS.map((stat) => (

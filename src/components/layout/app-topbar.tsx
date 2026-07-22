@@ -1,6 +1,6 @@
 "use client";
 
-import { Bell, LogOut, Menu, Search, Settings, User } from "lucide-react";
+import { Bell, LogOut, Menu, Search, Settings, ShieldCheck, User } from "lucide-react";
 import Link from "next/link";
 
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -93,8 +93,13 @@ export function AppTopbar({
               </Link>
             </DropdownMenuItem>
             <DropdownMenuItem asChild>
-              <Link href="/settings">
-                <Settings /> Settings
+              <Link href="/settings/security">
+                <ShieldCheck /> Security &amp; 2FA
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link href="/admin/users">
+                <Settings /> Users &amp; roles
               </Link>
             </DropdownMenuItem>
             <DropdownMenuSeparator />

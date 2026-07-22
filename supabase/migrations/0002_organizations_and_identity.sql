@@ -219,3 +219,48 @@ create unique index invitations_one_pending_per_email
 create trigger invitations_set_updated_at
   before update on public.invitations
   for each row execute function public.set_updated_at();
+
+-- -----------------------------------------------------------------------------
+-- Session helpers that depend on `memberships`
+--
+-- These are `language sql`, whose bodies Postgres resolves against the catalog
+-- at creation time, so they must come after the table exists. (Their sibling
+-- `current_org_id()` is PL/pgSQL and could live in 0001.)
+-- -----------------------------------------------------------------------------
+
+-- The caller's membership row in the active organisation.
+create or replace function public.current_membership_id()
+returns uuid
+language sql
+stable
+security definer
+set search_path = public, pg_temp
+as $$
+  select m.id
+  from public.memberships m
+  where m.user_id = auth.uid()
+    and m.organization_id = public.current_org_id()
+    and m.status = 'active'
+  limit 1;
+$$;
+
+-- Owner check. The Owner permission set is immutable and always retains
+-- permission-management rights (spec §UC-0 R2), so it short-circuits every
+-- permission lookup.
+create or replace function public.is_org_owner()
+returns boolean
+language sql
+stable
+security definer
+set search_path = public, pg_temp
+as $$
+  select coalesce(
+    (select m.is_owner
+     from public.memberships m
+     where m.user_id = auth.uid()
+       and m.organization_id = public.current_org_id()
+       and m.status = 'active'
+     limit 1),
+    false
+  );
+$$;

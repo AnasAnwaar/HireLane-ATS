@@ -133,6 +133,14 @@ export async function signInAction(
     return { ok: false, error: friendlyAuthError(error.message) };
   }
 
+  // Password accepted, but if the account has 2FA the session is still aal1 —
+  // send them to the challenge before anything else.
+  const { data: aal } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+  if (aal?.currentLevel === "aal1" && aal?.nextLevel === "aal2") {
+    revalidatePath("/", "layout");
+    redirect("/mfa");
+  }
+
   // A user who signed up but never finished provisioning lands here too.
   await ensureOrganization();
 

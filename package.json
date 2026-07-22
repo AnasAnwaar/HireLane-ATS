@@ -8,10 +8,16 @@
     "start": "next start",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
-    "validate:sql": "node scripts/validate-sql.cjs"
+    "validate:sql": "node scripts/validate-sql.cjs",
+    "db:migrate": "node scripts/db.cjs migrate",
+    "db:reset": "node scripts/db.cjs reset && node scripts/db.cjs migrate",
+    "db:query": "node scripts/db.cjs query",
+    "db:test": "node scripts/test-isolation.cjs",
+    "db:pull": "prisma db pull && prisma generate"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.4.0",
+    "@prisma/client": "^7.9.0",
     "@radix-ui/react-avatar": "^1.2.3",
     "@radix-ui/react-checkbox": "^1.3.8",
     "@radix-ui/react-dialog": "^1.1.20",
@@ -43,11 +49,14 @@
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
+    "@types/pg": "^8.20.0",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.2.11",
+    "pg": "^8.22.0",
     "pg-query-emscripten": "^5.1.0",
+    "prisma": "^7.9.0",
     "tailwindcss": "^4",
     "typescript": "^5"
   }

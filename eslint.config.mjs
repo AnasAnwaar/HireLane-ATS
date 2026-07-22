@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Prisma-generated client — machine output, not ours to lint.
+    "src/generated/**",
   ]),
   {
     // Node CommonJS tooling scripts — these run under `node`, not the bundler,

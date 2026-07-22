@@ -24,12 +24,12 @@ export default async function SetupPage() {
   if (!user) redirect("/login");
 
   const existing = await getSessionContext();
-  if (existing) {
-    redirect(existing.onboardingCompleted ? "/dashboard" : "/onboarding");
-  }
+  if (existing) redirect("/dashboard");
 
   const result = await ensureOrganization();
-  if (result.ok) redirect("/onboarding");
+  // Straight to the dashboard once the workspace exists. Onboarding is
+  // optional and reachable from the setup banner there.
+  if (result.ok) redirect("/dashboard");
 
   // Provisioning genuinely failed — show why rather than looping.
   return (
