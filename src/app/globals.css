@@ -1,0 +1,297 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:is(.dark *));
+
+/* ---------------------------------------------------------------------------
+   Hirelane design tokens — brand palette
+
+     Red    #E43A38   primary action / brand
+     Cream  #F4EBD0   canvas
+     Khaki  #E0DDB0   secondary surfaces, chips
+     Black  #000000   type, sidebar chrome
+
+   Two deliberate calls:
+   1. Red is the ACTION colour, so `destructive` is pulled to a deep maroon and
+      always pairs with an icon or explicit label. Red alone never means danger
+      here — it means "the main thing on this screen".
+   2. The sidebar is black against the cream canvas. High contrast chrome reads
+      as editorial rather than templated, and makes the red accents sing.
+   --------------------------------------------------------------------------- */
+
+:root {
+  --radius: 0.7rem;
+
+  /* Canvas is cream; cards are near-white so they lift off it. */
+  --background: oklch(0.958 0.028 92);
+  --foreground: oklch(0.16 0.004 90);
+
+  --card: oklch(0.995 0.006 92);
+  --card-foreground: oklch(0.16 0.004 90);
+
+  --popover: oklch(0.995 0.006 92);
+  --popover-foreground: oklch(0.16 0.004 90);
+
+  /* Brand red */
+  --primary: oklch(0.593 0.204 27.5);
+  --primary-foreground: oklch(0.985 0.014 92);
+  --primary-hover: oklch(0.53 0.2 27.5);
+  --primary-soft: oklch(0.935 0.052 30);
+
+  /* Khaki / sand — the quiet half of the brand */
+  --sand: oklch(0.877 0.062 104);
+  --sand-foreground: oklch(0.3 0.04 100);
+  --sand-soft: oklch(0.935 0.045 100);
+
+  --secondary: oklch(0.925 0.035 96);
+  --secondary-foreground: oklch(0.26 0.012 90);
+
+  --muted: oklch(0.932 0.03 96);
+  --muted-foreground: oklch(0.46 0.018 92);
+
+  --accent: oklch(0.915 0.05 100);
+  --accent-foreground: oklch(0.28 0.038 100);
+
+  /* Semantic — deliberately off the brand red so they stay distinguishable. */
+  --destructive: oklch(0.43 0.155 25);
+  --destructive-foreground: oklch(0.985 0.014 92);
+  --destructive-soft: oklch(0.925 0.05 25);
+
+  --success: oklch(0.53 0.1 138);
+  --success-foreground: oklch(0.985 0.014 92);
+  --success-soft: oklch(0.925 0.045 138);
+
+  --warning: oklch(0.7 0.13 82);
+  --warning-foreground: oklch(0.3 0.05 82);
+  --warning-soft: oklch(0.935 0.055 88);
+
+  --border: oklch(0.875 0.028 96);
+  --input: oklch(0.86 0.028 96);
+  --ring: oklch(0.593 0.204 27.5);
+
+  /* Sidebar — black chrome against the cream canvas. */
+  --sidebar: oklch(0.155 0.004 90);
+  --sidebar-foreground: oklch(0.945 0.026 92);
+  --sidebar-muted: oklch(0.68 0.015 92);
+  --sidebar-accent: oklch(0.255 0.014 70);
+  --sidebar-accent-foreground: oklch(0.975 0.02 92);
+  --sidebar-border: oklch(0.28 0.008 90);
+
+  /* Categorical ramp — drawn from the brand, then extended for separation. */
+  --chart-1: oklch(0.593 0.204 27.5);
+  --chart-2: oklch(0.575 0.09 122);
+  --chart-3: oklch(0.72 0.12 88);
+  --chart-4: oklch(0.36 0.012 90);
+  --chart-5: oklch(0.63 0.14 48);
+
+  --shadow-xs: 0 1px 2px oklch(0.16 0.02 60 / 0.06);
+  --shadow-sm:
+    0 1px 2px oklch(0.16 0.02 60 / 0.06), 0 2px 6px oklch(0.16 0.02 60 / 0.05);
+  --shadow-md:
+    0 2px 4px oklch(0.16 0.02 60 / 0.05), 0 6px 16px oklch(0.16 0.02 60 / 0.08);
+  --shadow-lg:
+    0 4px 8px oklch(0.16 0.02 60 / 0.06), 0 16px 40px oklch(0.16 0.02 60 / 0.12);
+}
+
+.dark {
+  --background: oklch(0.155 0.004 90);
+  --foreground: oklch(0.94 0.026 92);
+
+  --card: oklch(0.198 0.006 88);
+  --card-foreground: oklch(0.94 0.026 92);
+
+  --popover: oklch(0.208 0.006 88);
+  --popover-foreground: oklch(0.94 0.026 92);
+
+  --primary: oklch(0.645 0.195 28);
+  --primary-foreground: oklch(0.985 0.014 92);
+  --primary-hover: oklch(0.7 0.185 28);
+  --primary-soft: oklch(0.29 0.075 28);
+
+  --sand: oklch(0.78 0.075 100);
+  --sand-foreground: oklch(0.93 0.05 100);
+  --sand-soft: oklch(0.29 0.04 100);
+
+  --secondary: oklch(0.26 0.008 88);
+  --secondary-foreground: oklch(0.94 0.026 92);
+
+  --muted: oklch(0.25 0.008 88);
+  --muted-foreground: oklch(0.7 0.016 92);
+
+  --accent: oklch(0.28 0.035 100);
+  --accent-foreground: oklch(0.9 0.055 100);
+
+  --destructive: oklch(0.6 0.18 25);
+  --destructive-foreground: oklch(0.985 0.014 92);
+  --destructive-soft: oklch(0.3 0.08 25);
+
+  --success: oklch(0.66 0.11 138);
+  --success-foreground: oklch(0.16 0.004 90);
+  --success-soft: oklch(0.27 0.05 138);
+
+  --warning: oklch(0.77 0.13 84);
+  --warning-foreground: oklch(0.94 0.04 84);
+  --warning-soft: oklch(0.3 0.05 84);
+
+  --border: oklch(0.3 0.008 90 / 0.85);
+  --input: oklch(0.34 0.008 90 / 0.9);
+  --ring: oklch(0.645 0.195 28);
+
+  --sidebar: oklch(0.12 0.004 90);
+  --sidebar-foreground: oklch(0.94 0.026 92);
+  --sidebar-muted: oklch(0.66 0.015 92);
+  --sidebar-accent: oklch(0.24 0.014 70);
+  --sidebar-accent-foreground: oklch(0.97 0.02 92);
+  --sidebar-border: oklch(0.26 0.008 90);
+
+  --chart-1: oklch(0.645 0.195 28);
+  --chart-2: oklch(0.68 0.1 125);
+  --chart-3: oklch(0.78 0.12 88);
+  --chart-4: oklch(0.62 0.012 90);
+  --chart-5: oklch(0.7 0.13 48);
+
+  --shadow-xs: 0 1px 2px oklch(0 0 0 / 0.4);
+  --shadow-sm: 0 1px 2px oklch(0 0 0 / 0.4), 0 2px 6px oklch(0 0 0 / 0.3);
+  --shadow-md: 0 2px 4px oklch(0 0 0 / 0.35), 0 6px 16px oklch(0 0 0 / 0.4);
+  --shadow-lg: 0 4px 8px oklch(0 0 0 / 0.35), 0 16px 40px oklch(0 0 0 / 0.5);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary-soft: var(--primary-soft);
+  --color-primary-hover: var(--primary-hover);
+
+  --color-sand: var(--sand);
+  --color-sand-foreground: var(--sand-foreground);
+  --color-sand-soft: var(--sand-soft);
+
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-destructive-soft: var(--destructive-soft);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-success-soft: var(--success-soft);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-warning-soft: var(--warning-soft);
+
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-muted: var(--sidebar-muted);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+
+  --font-sans: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-mono), ui-monospace, monospace;
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 10px);
+}
+
+@layer base {
+  * {
+    border-color: var(--border);
+  }
+
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  h1,
+  h2,
+  h3 {
+    letter-spacing: -0.02em;
+  }
+
+  ::selection {
+    background: var(--primary);
+    color: var(--primary-foreground);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+@layer utilities {
+  .shadow-card {
+    box-shadow: var(--shadow-sm);
+  }
+  .shadow-card-md {
+    box-shadow: var(--shadow-md);
+  }
+  .shadow-card-lg {
+    box-shadow: var(--shadow-lg);
+  }
+
+  .bg-dot-grid {
+    background-image: radial-gradient(currentColor 0.85px, transparent 0.85px);
+    background-size: 18px 18px;
+  }
+
+  /* Cream-to-khaki wash with a red bloom, used behind the marketing hero. */
+  .bg-hero-wash {
+    background-image:
+      radial-gradient(58rem 30rem at 8% -12%, var(--primary-soft), transparent 58%),
+      radial-gradient(52rem 30rem at 95% 0%, var(--sand), transparent 62%);
+  }
+
+  .text-gradient-brand {
+    background-image: linear-gradient(
+      100deg,
+      var(--foreground) 42%,
+      var(--primary) 92%
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  /* Four-stripe brand rule, mirroring the palette swatch. */
+  .brand-rule {
+    background-image: linear-gradient(
+      to right,
+      var(--primary) 0 25%,
+      var(--sand-soft) 25% 50%,
+      var(--sand) 50% 75%,
+      var(--foreground) 75% 100%
+    );
+  }
+}

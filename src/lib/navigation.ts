@@ -1,0 +1,101 @@
+import {
+  BarChart3,
+  Briefcase,
+  Building2,
+  ClipboardList,
+  LayoutDashboard,
+  Plug,
+  ShieldCheck,
+  Users,
+  Video,
+  type LucideIcon,
+} from "lucide-react";
+
+/**
+ * Sidebar navigation.
+ *
+ * Every item declares the permission key that will gate it. The keys are the
+ * real ones from the spec's permission catalogue (§9.1) so CP-4 can switch on
+ * enforcement without touching this file. Items with `permission: null` are
+ * visible to any authenticated member.
+ */
+export type NavItem = {
+  label: string;
+  href: string;
+  icon: LucideIcon;
+  permission: string | null;
+  /** Optional count pill (e.g. items awaiting the viewer's action). */
+  badge?: number;
+};
+
+export type NavSection = {
+  label: string;
+  items: NavItem[];
+};
+
+export const NAV_SECTIONS: NavSection[] = [
+  {
+    label: "Recruiting",
+    items: [
+      {
+        label: "Dashboard",
+        href: "/dashboard",
+        icon: LayoutDashboard,
+        permission: null,
+      },
+      {
+        label: "Job Openings",
+        href: "/openings",
+        icon: Briefcase,
+        permission: "job_openings.view",
+      },
+      {
+        label: "Candidates",
+        href: "/candidates",
+        icon: Users,
+        permission: "applicants.view_list",
+      },
+      {
+        label: "Assessments",
+        href: "/assessments",
+        icon: ClipboardList,
+        permission: "assessments.view",
+      },
+      {
+        label: "Interviews",
+        href: "/interviews",
+        icon: Video,
+        permission: "interviews.view_schedule",
+      },
+      {
+        label: "Reports",
+        href: "/reports",
+        icon: BarChart3,
+        permission: "reporting.view_own",
+      },
+    ],
+  },
+  {
+    label: "Administration",
+    items: [
+      {
+        label: "Company",
+        href: "/admin/company",
+        icon: Building2,
+        permission: "administration.manage_company_profile",
+      },
+      {
+        label: "Users & Roles",
+        href: "/admin/users",
+        icon: ShieldCheck,
+        permission: "administration.manage_users",
+      },
+      {
+        label: "Integrations",
+        href: "/admin/integrations",
+        icon: Plug,
+        permission: "integrations.view",
+      },
+    ],
+  },
+];
