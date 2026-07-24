@@ -6,7 +6,7 @@ import { z } from "zod";
 import { clientEnv } from "@/lib/env";
 import { createAdminClient, createClient } from "@/lib/supabase/server";
 import { toFieldErrors, type ActionResult } from "@/lib/validation/auth";
-import { hasPermission } from "@/server/auth/permissions";
+import { can } from "@/server/auth/authorize";
 import { getSessionContext } from "@/server/auth/session";
 
 const inviteSchema = z.object({
@@ -35,7 +35,7 @@ export async function inviteTeamMemberAction(
   const session = await getSessionContext();
   if (!session) return { ok: false, error: "Your session has expired. Please sign in again." };
 
-  if (!(await hasPermission("administration.manage_users"))) {
+  if (!(await can("administration.manage_users"))) {
     return { ok: false, error: "You don't have permission to invite team members." };
   }
 
@@ -147,7 +147,7 @@ export async function resendInvitationAction(membershipId: string): Promise<Acti
   const session = await getSessionContext();
   if (!session) return { ok: false, error: "Your session has expired." };
 
-  if (!(await hasPermission("administration.manage_users"))) {
+  if (!(await can("administration.manage_users"))) {
     return { ok: false, error: "You don't have permission to do that." };
   }
 
@@ -188,7 +188,7 @@ export async function deactivateMemberAction(membershipId: string): Promise<Acti
   const session = await getSessionContext();
   if (!session) return { ok: false, error: "Your session has expired." };
 
-  if (!(await hasPermission("administration.manage_users"))) {
+  if (!(await can("administration.manage_users"))) {
     return { ok: false, error: "You don't have permission to do that." };
   }
 

@@ -12,6 +12,7 @@ export type SessionContext = {
   organizationId: string;
   organizationName: string;
   membershipId: string;
+  departmentId: string | null;
   roleName: string;
   isOwner: boolean;
   onboardingCompleted: boolean;
@@ -55,6 +56,7 @@ export const getSessionContext = cache(async (): Promise<SessionContext | null> 
       id,
       is_owner,
       organization_id,
+      department_id,
       organizations ( name, onboarding_completed_at ),
       roles ( name ),
       profiles ( full_name, email )
@@ -68,29 +70,25 @@ export const getSessionContext = cache(async (): Promise<SessionContext | null> 
 
   if (error || !data) return null;
 
-  // Supabase types embedded relations as arrays or objects depending on the
-  // relationship; normalise both shapes.
-  const one = <T,>(value: T | T[] | null): T | null =>
-    Array.isArray(value) ? (value[0] ?? null) : value;
-
-  const org = one(data.organizations as never);
-  const role = one(data.roles as never);
-  const profile = one(data.profiles as never);
+  // A to-one embedded relation comes back as a single object (or null), now that
+  // the foreign keys are declared in the generated types.
+  const org = data.organizations;
+  const role = data.roles;
+  const profile = data.profiles;
 
   if (!org) return null;
 
   return {
     userId: user.id,
-    email: (profile as { email?: string } | null)?.email ?? user.email ?? "",
-    fullName: (profile as { full_name?: string } | null)?.full_name || "",
+    email: profile?.email ?? user.email ?? "",
+    fullName: profile?.full_name || "",
     organizationId: data.organization_id,
-    organizationName: (org as { name: string }).name,
+    organizationName: org.name,
     membershipId: data.id,
-    roleName: (role as { name?: string } | null)?.name ?? "Member",
+    departmentId: data.department_id,
+    roleName: role?.name ?? "Member",
     isOwner: data.is_owner,
-    onboardingCompleted: Boolean(
-      (org as { onboarding_completed_at: string | null }).onboarding_completed_at,
-    ),
+    onboardingCompleted: Boolean(org.onboarding_completed_at),
   };
 });
 

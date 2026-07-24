@@ -5,6 +5,7 @@ import {
   ClipboardList,
   LayoutDashboard,
   Plug,
+  ScrollText,
   ShieldCheck,
   Users,
   Video,
@@ -85,10 +86,22 @@ export const NAV_SECTIONS: NavSection[] = [
         permission: "administration.manage_company_profile",
       },
       {
-        label: "Users & Roles",
+        label: "Users",
         href: "/admin/users",
-        icon: ShieldCheck,
+        icon: Users,
         permission: "administration.manage_users",
+      },
+      {
+        label: "Roles & Permissions",
+        href: "/admin/roles",
+        icon: ShieldCheck,
+        permission: "administration.manage_roles",
+      },
+      {
+        label: "Audit Log",
+        href: "/admin/audit",
+        icon: ScrollText,
+        permission: "administration.view_audit_log",
       },
       {
         label: "Integrations",

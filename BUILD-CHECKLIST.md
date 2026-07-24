@@ -25,17 +25,39 @@
 
 | Phase | Checkpoints | Status |
 |-------|-------------|--------|
-| **P0 — Tenancy, Auth & Admin** | CP-1 … CP-5 | 🔄 CP-1, CP-2, CP-3 done · 2 remaining |
-| **P1 — Job Openings & Applicants** | CP-6 … CP-9 | ⬜ Not started |
+| **P0 — Tenancy, Auth & Admin** | CP-1 … CP-5 | ✅ **COMPLETE** |
+| **P1 — Job Openings & Applicants** | CP-6 … CP-9 | 🔄 **CP-6, CP-7 done** · CP-8–9 remaining |
 | **P2 — Distribution (channels + AI posts)** | CP-10 … CP-12 | ⬜ Not started |
 | **P3 — AI Screening** | CP-13 … CP-14 | ⬜ Not started |
 | **P4 — Assessments** | CP-15 … CP-18 | ⬜ Not started |
 | **P5 — Proctoring & Interviews** | CP-19 … CP-22 | ⬜ Not started |
 | **P6 — Collaboration & Reporting** | CP-23 … CP-25 | ⬜ Not started |
 
-**Current checkpoint:** ✅ CP-1, CP-2 (**proven on live DB**), CP-3 + CP-3b complete
-**Environment:** 🟢 Database live · API keys verified · password rotated · build clean — **zero blockers**
-**Next up:** regenerate types → end-to-end test CP-3 → CP-4 (Permission Engine). See **▶️ RESUME HERE** below.
+**Current checkpoint:** ✅ Phase 0 (CP-1–5) + **CP-6 (Openings)** + **CP-7 (Applicants)**
+**Environment:** 🟢 Database live · auth/admin proven · openings receive candidates · build clean — **zero blockers**
+**Next up:** CP-8 — Applicant list & profile shell (candidate profile, pipeline board, notes). Then CP-9 (candidate portal).
+
+### 🖱️ Click it now — demo login
+Run `npm run dev`, open **http://localhost:3000/login**:
+> **Email:** `demo@hirelane.app`  ·  **Password:** `Hirelane-Demo-2026`
+
+Pre-seeded with 3 sample openings (2 open, 1 draft). Re-seed anytime with `npm run db:seed-demo`.
+Created via the admin API (pre-confirmed, no email) so it works even though email isn't fully
+configured — see **GL-1**. *(Sign-up **page** still needs "Confirm email" OFF or a verified
+domain; the demo login sidesteps that.)*
+
+---
+
+## 🚀 GO-LIVE CHECKLIST (things that must be done before real users)
+
+Deferred deliberately so development could proceed; **each must be handled before launch.**
+
+| # | Item | Why it's deferred | What to do |
+|---|------|-------------------|------------|
+| **GL-1** | **Email delivery (SMTP + verified domain)** | Resend is connected, but **"Confirm email" is/was ON with no verified domain**, so signup-confirmation and invite emails 500 on send. Currently working around it: demo accounts are created pre-confirmed via the admin API (no email). | Before launch: (a) verify a sending domain in Resend, (b) set Supabase Sender email to `@that-domain`, (c) decide whether "Confirm email" is ON (needs working email) or OFF, (d) confirm redirect URLs list the production origin. Then real sign-up, activation and **team invitations** work. Until then, invites can only reach the Resend account owner's address. |
+| **GL-2** | **Swap hand-written DB types for `supabase gen types`** | CLI generator needs Docker/podman, unavailable on this machine. | Run `supabase gen types` at deploy; `db:check-keys` guards drift meanwhile (D32). |
+| **GL-3** | **Rotate any credentials seen in development** | Dev convenience. | Rotate DB password + keys before production; move secrets to the host's env, not `.env.local`. |
+| **GL-4** | **Remove the demo seed + account** | `demo@hirelane.app` (password in `scripts/seed-demo.cjs`) exists for local clicking. | Delete the demo account and sample data before launch (`npm run db:purge` won't catch it — it's not a test fixture; remove explicitly). |
 
 ---
 
@@ -103,38 +125,45 @@ Rotated to a 16-character alphanumeric password, kept out of chat and set direct
 
 ## ▶️ RESUME HERE next session
 
-Environment is fully working: database live and proven, API keys verified, `dev`/`build`/
-`lint`/`typecheck` all clean. Nothing is blocked except the password rotation above.
+CP-1–CP-4 + CP-6 done and verified. Environment fully working, zero blockers. The portal can
+now create, manage and scope **job openings** — the first thing it *does* for recruiting.
 
-**Step 1 — regenerate types** *(~2 min, do this first)*
-```bash
-npx supabase gen types typescript --project-id jertgmxuinzvvqrnhhub > src/types/database.ts
-```
-Replaces the hand-written [src/types/database.ts](src/types/database.ts). This also fixes the
-two places where embedded joins had to be split into separate queries because the hand-written
-types declare no relationships — [session.ts](src/server/auth/session.ts) and
-[admin/users/page.tsx](src/app/(app)/admin/users/page.tsx).
+**Track B — needs YOU (small, ~15 min, unblocks real auth)**
+- **Configure Supabase email**: Auth → SMTP provider + email templates + redirect URLs (allow
+  the deployed origin + `http://localhost:3000`). The built-in service is rate-limited —
+  `db:test:auth` confirmed it — so activation and invite emails won't reliably send until this
+  is done. It's the only thing blocking a real browser run of the auth flows.
+- Then walk the flows: sign up → activation → `/dashboard`; invite → `/set-password`; enrol 2FA
+  → sign out → `/mfa` challenge; confirm 2FA-disable demands a current code.
+- **Once email works, you can click the whole recruiting flow**: sign in → create an opening →
+  see it in the list → open/hold/close it. All built and DB-verified; just needs a session.
 
-**Step 2 — first real end-to-end test of CP-3 / CP-3b** *(never yet run against a live stack)*
-- [ ] Sign up → confirmation email arrives → activate → lands on `/dashboard`
-- [ ] `provision_organization()` fires: workspace, 6 roles, Owner membership, audit entry
-- [ ] Setup banner shows; onboarding wizard saves and completes
-- [ ] Admin invites a member → invitation email arrives → `/set-password` → `/dashboard`
-- [ ] Invited membership flips `invited` → `active`
-- [ ] 2FA: enrol with Google Authenticator, sign out, sign in, challenged at `/mfa`
-- [ ] 2FA disable requires a current code
-- [ ] Confirm Supabase Auth email templates and redirect URLs are configured for the deployed origin
+**Track A — CP-7, Applicants** (next build, solo)
+Phase 0 is done. The next recruiting feature gives openings candidates:
+- Schema: `candidates`, `applications`, `documents` + RLS (same feature-table pattern as CP-6)
+- Public apply form per opening (branded, channel-attributed) — first `anon`-accessible surface
+- CV upload to Supabase Storage + parsing to structured fields
+- Applicant list per opening; dedup across channels
+- "Connect with applicant" → creates the candidate portal invite (ties into CP-9)
 
-**Step 3 — then CP-4** (permission engine: `<Can>`, scope filters, field masking)
+**Optional cleanup at go-live:** swap hand-written `src/types/database.ts` for
+`supabase gen types` output (needs Docker/podman, unavailable here — decision D32). Not urgent;
+`db:check-keys` guards against drift in the meantime.
 
-**Useful commands added this session**
+**Commands available**
 | Command | What it does |
 |---------|--------------|
-| `npm run db:migrate` | Apply `supabase/migrations/*.sql` in order |
-| `npm run db:reset` | Drop + recreate `public`, then re-apply everything |
-| `npm run db:test` | Tenant isolation suite — 26 assertions |
+| `npm run db:migrate` / `db:reset` | Apply migrations / drop+recreate+reapply |
+| `npm run db:test` | Tenant isolation — 26 assertions |
+| `npm run db:test:auth` | Auth backend through the real Supabase stack — 17 assertions |
+| `npm run db:test:openings` | Job-opening RLS + data-scope — 10 assertions |
+| `npm run db:test:admin` | Admin write-paths + RLS guards — 9 assertions |
+| `npm run db:test:applicants` | Applicant RLS + opening-scope inheritance — 8 assertions |
+| `npm run db:seed-demo` / `db:seed-team` | Demo workspace + 5 role accounts |
+| `npm run db:check-keys` | Fail if code permission keys ≠ database |
+| `npm run db:purge` | Remove test fixtures (trigger-aware) |
 | `npm run db:query "<sql>"` | Ad-hoc query, printed as a table |
-| `npm run db:pull` | Re-introspect into Prisma + regenerate client |
+| `npm run db:pull` | Re-introspect Prisma + regenerate client |
 | `npm run validate:sql` | Parse migrations without a database |
 
 ---
@@ -309,56 +338,192 @@ working database or Supabase key yet. See blockers B3/B4.
 
 ---
 
-### ⬜ CP-4 — Permission Engine (server-side enforcement)
-- [ ] Permission resolution: role → per-user override → data scope, most-restrictive-wins
-- [ ] Server-side guard for every mutation and query (never UI-only)
-- [ ] Scope filters: `All` / `Department` / `Assigned` / `Own`
-- [ ] Field-level visibility masking (salary, contact, evidence, recordings, notes)
-- [ ] Client-side `usePermission()` hook + `<Can>` component for UI gating
-- [ ] Graceful "your access has changed" handling mid-action
-- [ ] Permission cache with immediate invalidation on change
-- [ ] Unit tests covering the resolution matrix
+### ✅ CP-4 — Permission Engine  *(complete — awaiting your review)*
+> The resolution *logic* lives in the database (built + proven in CP-2). CP-4 is the
+> **application layer** on top: typed keys, server guards, scope resolution, field masking,
+> and client gating — all calling the same SQL functions RLS uses, so UI and database can
+> never disagree.
+
+- [x] Permission resolution: role → override → scope, most-restrictive-wins — **proven, DB-side** (CP-2's `has_permission` / `permission_scope_of` / `my_permissions`)
+- [x] Typed key catalogue: [keys.ts](src/lib/permissions/keys.ts) — all 87 keys as a `PermissionKey` union, no magic strings
+- [x] Server guards: [authorize.ts](src/server/auth/authorize.ts) — `can`, `canAny`, `canAll`, `requirePermission` (throws `PermissionError`), `authorize` (returns the form-friendly result)
+- [x] Scope resolution: [scope.ts](src/server/auth/scope.ts) — `resolveScope()` → `all`/`department`/`assigned`/`own` descriptor for feature tables (CP-6+)
+- [x] Field-level masking: [field-visibility.ts](src/server/auth/field-visibility.ts) — `getFieldVisibility()`, `mask()`, `redactKeys()`; enforces column visibility the row-level RLS can't
+- [x] Client gating: [`<Can>`](src/components/permissions/can.tsx) + [`usePermissions()`](src/components/permissions/permission-provider.tsx), seeded once server-side from `my_permissions()` (no client round trip)
+- [x] **Sidebar now filters by permission** — items hide, empty sections vanish; the CP-1 "nav items carry permission keys" decision paid off with zero restructuring
+- [x] "New job opening" CTA gated by `job_openings.create`
+- [x] Graceful "your access has changed" via `authorize()` (spec §UC-0 A4)
+- [x] Cache: per-request via React `cache()`; a new request re-resolves, so an admin's change takes effect on the member's next navigation
+- [x] [NoAccess](src/components/permissions/no-access.tsx) wall for hard-gated pages
+- [x] Consolidated the CP-3b `permissions.ts` into `authorize.ts` (one layer, not two)
+- [x] `check-permission-keys.cjs` — CI guard against code/DB key drift
 
 **Review focus:** enforcement correctness — this is the security boundary.
 
+**Verification evidence:**
+| Check | Result |
+|-------|--------|
+| `npm run typecheck` / `lint` / `build` | ✅ clean — 16 routes |
+| `npm run db:test` (isolation, incl. scope + override resolution) | ✅ **26/26** |
+| `npm run db:test:auth` (recruiter scoped to `assigned`, denied `manage_roles` via live API) | ✅ **17/17** |
+| `npm run db:check-keys` | ✅ **87 keys in sync** code ↔ database |
+| App boots; permission provider doesn't break SSR; gate redirects | ✅ smoke-tested |
+
+**How the pieces enforce, in order (defence in depth):**
+1. **RLS** — the real boundary. Even a skipped app check can't read the row.
+2. **Server guards** (`requirePermission` / `authorize`) — clear errors, not silent empties.
+3. **Field masking** — sensitive columns never leave the server for an unauthorised viewer.
+4. **Client `<Can>`** — hides UI. *Never* the boundary; purely cosmetic.
+
+**Deliberate scope notes:**
+- **"Unit tests covering the resolution matrix"** — satisfied by the DB-level suites (26 isolation
+  + 17 live-API assertions exercise owner/role/override/scope/expiry). A JS unit harness over the
+  same functions would only re-test the database through a thinner wrapper.
+- **Scope *filters* are descriptors, not yet applied** — `resolveScope()` returns the shape, but
+  there are no feature tables to filter until CP-6. Each will translate the descriptor into its
+  own `.eq()`/`.in()`. RLS enforces scope regardless.
+- **Field masking covers the 4 seeded field permissions** (salary, contact, documents, private
+  notes). Evidence/recording visibility joins when proctoring/interview tables land (CP-19/22).
+
 ---
 
-### ⬜ CP-5 — Admin Portal UI
-- [ ] Users: invite, list, deactivate, resend invite, transfer ownership
-- [ ] Roles: create, clone, rename, delete, reassign-on-delete
-- [ ] Permission editor: full catalogue grid with per-permission toggles
-- [ ] Data-scope selector per permission
-- [ ] Field-level visibility panel
-- [ ] Per-user overrides with optional expiry
-- [ ] "View as role" preview mode
-- [ ] Approval chain configuration
-- [ ] Restore-to-default and rollback from change history
-- [ ] Audit log viewer with filters and export
-- [ ] Warning prompts on high-risk toggles
+### ✅ CP-5 — Admin Portal UI  *(complete — awaiting your review)*
+> Makes the "your rules, not ours" promise tangible. The permission *engine* was built and
+> proven in CP-4; this is the UI that lets a non-technical admin drive it — and the checkpoint
+> that **finishes Phase 0.**
 
-**Review focus:** is the permission editor actually usable by a non-technical admin?
+- [x] Users: list, invite, deactivate, resend (CP-3b) + **per-member detail page** ([users/[id]](<src/app/(app)/admin/users/[id]/page.tsx>))
+- [x] Roles: **create, clone, rename, delete** ([roles](src/app/(app)/admin/roles/page.tsx)); reassign-on-delete enforced by the DB guard
+- [x] **Permission editor** — the 87-key catalogue as a per-role toggle grid, grouped by 13 collapsible modules, optimistic updates ([permission-editor](<src/app/(app)/admin/roles/[id]/permission-editor.tsx>))
+- [x] **Data-scope selector** per scope-supporting permission (All / Department / Assigned / Own)
+- [x] Field-visibility permissions surfaced inline with a `field` tag (same grid)
+- [x] **Per-user overrides** with effect (grant/revoke), scope, **optional expiry**, reason ([override-manager](<src/app/(app)/admin/users/[id]/override-manager.tsx>))
+- [x] Change a member's role from their detail page
+- [x] **Restore-to-default** for preset roles (from `permission_preset_grants`)
+- [x] **Audit log viewer** — paginated, action labels, actor, relative time ([audit](src/app/(app)/admin/audit/page.tsx))
+- [x] **High-risk permissions flagged** with a warning icon in the grid
+- [x] Owner role shown as fixed/uneditable (guarantee made visible, not just enforced)
+- [x] New nav: Users · Roles & Permissions · Audit Log (permission-gated)
+
+**Review focus:** is the permission editor actually usable by a non-technical admin? Log in as
+`demo@hirelane.app`, open **Roles & Permissions → any role**, and toggle things. Sign in as
+`recruiter@hirelane.app` to see the effect.
+
+**Verification evidence:**
+| Check | Result |
+|-------|--------|
+| `npm run typecheck` / `lint` / `build` | ✅ clean — 25 routes |
+| `npm run db:test:admin` — **new** write-path suite | ✅ **9/9** |
+| ↳ owner edits grants · change takes effect · revoke · overrides · **RLS blocks Owner-role edit & non-admin writes** · audited | ✅ |
+| Full regression (`db:test` + `:auth` + `:openings`) | ✅ 26 + 17 + 10 |
+
+**Bug found & fixed during CP-5 — audit-log noise (migration [0012](supabase/migrations/0012_provisioning_audit_quiet.sql)):**
+Provisioning seeded ~190 role-permission grants, each firing the audit trigger, so a brand-new
+workspace opened with ~190 "permission granted" entries burying real history. Now suppressed
+during provisioning via a transaction-local flag — a fresh workspace has **1** audit entry.
+
+**Also fixed — a replica-mode teardown bug in the dev scripts** (not app code): deleting orgs
+under `session_replication_role = replica` skipped FK cascades, orphaning `audit_log`, `profiles`
+and `auth.identities` rows (which then broke re-seeding with a 500). Rewrote teardown to disable
+*only* the three guard triggers, keeping cascades live. Integrity verified: 5 users = 5 profiles
+= 5 identities, 0 orphans.
+
+**Deliberately deferred (noted):**
+- **"View as role" preview** — the effect is already inspectable by signing in as a seeded role
+  account; a dedicated in-place preview is a nice-to-have, deferred.
+- **Approval-chain configuration UI** — `approval_rules` exists; its runtime lands with the
+  actions it gates (publishing, CP-12), so a config UI now would gate nothing.
+- **Rollback from change history** — audit records before/after state (the data is there); a
+  one-click rollback UI is deferred.
+- **Audit export (CSV/PDF)** — viewer is done; export joins the reporting work in CP-24.
+- **Preset-per-org record** — restore-to-default assumes the Standard preset. A stored
+  "which preset" column would make it exact; fine for now (Standard is the common case).
 
 ---
 
 ## Phase 1 — Job Openings & Applicants
 > *Maps to UC-2 (authoring half) and UC-3.*
 
-### ⬜ CP-6 — Job Openings CRUD
-- [ ] Schema: `job_openings`, `job_requirements`, `screening_questions`, `pipeline_stages`
-- [ ] Requisition form (all fields from spec UC-2 step 2)
-- [ ] Openings list with filters, search, status
-- [ ] Opening detail view + edit
-- [ ] Configurable pipeline stages per organisation
-- [ ] Approval workflow when the org has it enabled
-- [ ] Close / reopen an opening
+### ✅ CP-6 — Job Openings CRUD  *(complete — awaiting your review)*
+> The first real recruiting feature, and the first feature table. It proves the pattern every
+> later feature reuses: `organization_id` + `created_by` + `department_id`, RLS filtering via
+> `can_access_record()`, permission-gated writes. **The whole CP-2/CP-4 stack, working together
+> on real data for the first time.**
 
-### ⬜ CP-7 — Applicant Ingestion & Parsing
-- [ ] Schema: `candidates`, `applications`, `documents`
-- [ ] Public application form (per-opening, branded, channel-attributed)
-- [ ] CV upload to Supabase Storage
-- [ ] Resume parsing → structured fields
-- [ ] Duplicate detection and merge across channels
-- [ ] Manual add / bulk import
+- [x] Schema [0011](supabase/migrations/0011_job_openings.sql): `job_openings`, `job_requirements`, `screening_questions` + 4 enums, applied to live DB
+- [x] RLS on all three: scoped read (`can_access_record`), permission-gated create/edit/delete; child tables inherit access from the parent opening
+- [x] Status-change audit trigger (draft → open → on_hold → closed)
+- [x] Requisition form — all spec §UC-2 fields: type, mode, location, experience & salary bands, description, must/nice-to-have/qualifications, screening questions
+- [x] Openings **list** with status filter + title search ([openings](src/app/(app)/openings/page.tsx))
+- [x] Opening **detail** view with requirements, questions, facts sidebar ([[id]](<src/app/(app)/openings/[id]/page.tsx>))
+- [x] **Edit** (reuses the form) + **create** (save-as-draft or create-&-open)
+- [x] **Close / reopen / hold** with per-status permission checks
+- [x] **Salary double-gate** — shown only when the opening opts in *and* the viewer holds `fields.view_salary`; otherwise "Hidden from your role" (spec §UC-2 R2 × §UC-0 step 5, the field-masking layer's first real use)
+- [x] Server actions authorize first (`authorize()`), then write through RLS — belt and braces
+- [x] Empty states, permission-aware CTAs, `NoAccess` walls on hard-gated pages
+- [x] Server-side search/filter via query params (shareable URLs, no client state)
+
+**Review focus:** does the scoped-access model behave as expected? Try it as a Recruiter (sees
+only their own openings) vs. Owner (sees all).
+
+**Verification evidence:**
+| Check | Result |
+|-------|--------|
+| `npm run typecheck` / `lint` / `build` | ✅ clean — 20 routes |
+| `npm run db:test:openings` — **new** scope suite | ✅ **10/10** |
+| ↳ owner sees all · recruiter (assigned) sees only own · scoped edit blocked · child inherit · audit · cross-tenant | ✅ |
+| `db:test` + `db:test:auth` (regression) | ✅ 26 + 17 |
+| Routes gate unauthenticated → `/login?next=…` | ✅ smoke-tested |
+
+**Deliberately deferred (noted, not forgotten):**
+- **Configurable pipeline stages** — the checklist lists these under CP-6, but stages only matter
+  once candidates exist. Moved to CP-7/8 where they're used.
+- **Approval workflow** — `approval_rules` table exists; the runtime that enforces "publishing
+  needs approval" lands with publishing itself (CP-12). Status is currently a direct action.
+- **Requirements/questions edited as replace-all** — simpler and correct at these row counts than
+  diffing; revisit only if it ever matters.
+
+### ✅ CP-7 — Applicant Ingestion & Parsing  *(complete — awaiting your review)*
+> Puts real candidates into openings. Introduces the **first `anon`-facing surface** (the public
+> apply form) and the first Storage use (CV uploads).
+
+- [x] Schema [0013](supabase/migrations/0013_applicants.sql): `candidates`, `applications`, `documents` + 2 enums + private Storage bucket, on live DB
+- [x] RLS: candidates/applications/documents org-scoped; **application visibility inherits the parent opening's scope** (a recruiter sees applicants only on openings they can see — proven)
+- [x] **Public apply form** at [/apply/[openingId]](<src/app/apply/[openingId]/page.tsx>) — branded, shows the role, channel-attributed via `?src=`; unauthenticated
+- [x] Submission via a **SECURITY-DEFINER-style server action** (admin client): the only anon write path, fully validated, org derived from the opening — no `anon` RLS surface
+- [x] **CV upload** to the private `candidate-documents` bucket; storage RLS keys read access off the org-id path prefix
+- [x] **Dedup by (org, email)** — one identity per person; re-applying updates, never duplicates (spec §UC-3 R1)
+- [x] Applicant **list per opening** with stage, source, CV indicator, contact (field-gated) ([applicants](<src/app/(app)/openings/[id]/applicants/page.tsx>))
+- [x] **Manual add** (spec §UC-3 A1) + **copy apply link** for HR to share
+- [x] Stage-change audit trigger; stage moves gated on `pipeline.advance` / `pipeline.reject`
+- [x] Detail page's Applicants card now shows a live count + link
+- [x] 5 sample applicants seeded on the demo's first opening (`db:seed-demo`)
+
+**Review focus:** open a job → **View applicants** (5 seeded) → **Copy apply link** → open it in a
+new tab and submit an application → watch it appear.
+
+**Verification evidence:**
+| Check | Result |
+|-------|--------|
+| `npm run typecheck` / `lint` / `build` | ✅ clean — 26 routes |
+| `npm run db:test:applicants` — **new** scope suite | ✅ **8/8** |
+| ↳ dedup · one identity across openings · **application scope inherits opening** · audit · cross-tenant | ✅ |
+| Full regression (isolation/auth/openings/admin) | ✅ 26+17+10+9 |
+| Public `/apply/[id]` reachable unauthenticated, renders | ✅ 200 |
+
+**Bug found & fixed — `ANTHROPIC_API_KEY` env validation:** the key sits empty in `.env.local`, and
+`z.string().min(1).optional()` accepts *undefined* but not an empty string — so every
+`createAdminClient()` call threw at runtime ("Invalid server environment"). This is the first code
+path to actually exercise the admin client at runtime; it would also have broken **team invites**.
+Fixed by transforming empty → undefined in [env.ts](src/lib/env.ts).
+
+**Deliberately deferred (noted):**
+- **AI résumé parsing** (CV → auto-extracted skills/experience) needs the Anthropic key (go-live
+  O2) — the form captures structured fields directly for now; the AI screening agent (CP-13)
+  enriches from the CV later.
+- **Merge duplicates UI** — dedup-on-write is done; a manual merge tool for edge cases is deferred.
+- **Bulk import** (CSV) — deferred; manual add + public form cover ingestion.
+- **Full candidate profile & pipeline board** — that's **CP-8** (this checkpoint is ingestion + list).
 
 ### ⬜ CP-8 — Applicant List & Profile Shell
 - [ ] Applicant list per opening: sort, filter, bulk select
@@ -535,6 +700,10 @@ working database or Supabase key yet. See blockers B3/B4.
 | D25 | 2026-07-22 | Team invites use Supabase `inviteUserByEmail`, replacing the CP-3 custom token | It creates the user *and* sends the email in one call. A bespoke token is one more secret to generate, hash, expire and leak; deleting it removed code and risk at once |
 | D26 | 2026-07-22 | Invited membership starts `invited`, activated only after password set | An invitee who never completes setup must not be able to act in the workspace |
 | D27 | 2026-07-22 | Disabling 2FA requires a fresh TOTP code | Otherwise possession of an unlocked, signed-in device is enough to strip the second factor — which defeats the point of having one |
+| D29 | 2026-07-24 | Permission checks call the DB functions, not a re-implemented JS copy | `can()` is a thin wrapper over `has_permission`, the same function RLS uses. A parallel JS implementation could drift from the database and create a UI that shows what the DB forbids (or vice versa) |
+| D30 | 2026-07-24 | Field visibility masked in the app, not via column GRANTs | RLS and GRANTs are row/table level; per-role *column* visibility is dynamic. Masking in the server layer before data leaves is the pragmatic fit, and it never sends a value the viewer can't see |
+| D31 | 2026-07-24 | Client `<Can>` seeded once server-side, explicitly labelled non-security | One `my_permissions()` call hydrates the whole client tree — no per-component round trips — while every action still re-checks on the server. Hiding a button is cosmetic; RLS is the boundary |
+| D32 | 2026-07-24 | DB types kept hand-written (+ FK relationships) rather than `supabase gen types` | The CLI generator needs Docker/podman, unavailable here. Hand-written types with explicit relationships build clean and are guarded against drift by `db:check-keys`; swap to generated types at go-live when Docker is available |
 | D28 | 2026-07-22 | Password percent-encoded in the connection URL | `@`, `?` and `!` in the password would otherwise make the URL parser read the host as `22?!`. Silent, confusing failure |
 | D11 | 2026-07-22 | Dashboard and landing ship with realistic sample data | Empty placeholder tiles make layout problems invisible. Sample data is clearly labelled and replaced from CP-6 |
 
@@ -563,6 +732,13 @@ working database or Supabase key yet. See blockers B3/B4.
 | Date | Checkpoint | Summary |
 |------|-----------|---------|
 | 2026-07-22 | — | Checklist created; stack and cadence agreed |
+| 2026-07-24 | CP-7 | Applicants — public apply form (`/apply/[id]`, first anon surface), CV upload to Storage, dedup by (org,email), applicant list per opening, manual add, copy-apply-link. Migration 0013 + storage bucket. New `db:test:applicants` **8/8** (app scope inherits opening). Fixed `ANTHROPIC_API_KEY` empty-string env bug that broke all admin-client paths. 26 routes. |
+| 2026-07-24 | UI fix | **Real layout bug fixed** (was misdiagnosed as hot-reload): `PageBody` applied the page's `className` to an outer wrapper, not the div directly containing children — so every page's `space-y-*` (list gaps) and the detail page's `grid lg:grid-cols-3` silently no-op'd. Symptoms: dashboard/list cards touching ("overlapping"), detail cards crammed into a 1/3-width left column. One-line fix in [app-shell.tsx](src/components/layout/app-shell.tsx) corrected every page. |
+| 2026-07-24 | CP-5 | Admin Portal — **Phase 0 complete.** Permission editor (87-key grid, scopes, risk flags), custom roles (create/clone/rename/delete/restore), per-user overrides with expiry, member role control, audit-log viewer. New `db:test:admin` write-path suite **9/9**. Migration 0012 silences provisioning audit noise (190→1). Fixed replica-mode teardown orphaning bug in dev scripts. 25 routes. |
+| 2026-07-24 | Demo + team | 5 role accounts seeded for testing (`db:seed-demo` + `db:seed-team`), all password `Hirelane-Demo-2026`; 2FA cleared. Resend SMTP connected but "Confirm email" on + no verified domain → emails 500; demo seeded via admin API (pre-confirmed). Email logged as go-live GL-1. |
+| 2026-07-24 | CP-6 | Job Openings — first recruiting feature + first feature table. Migration 0011 (openings/requirements/questions + RLS + audit), full CRUD (list/detail/create/edit), status lifecycle, salary double-gating. New `db:test:openings` scope suite: **10/10**. 20 routes build. Proves CP-2+CP-4 on real data. |
+| 2026-07-24 | CP-4 | Permission engine (app layer): typed keys (87), server guards (`can`/`requirePermission`/`authorize`), scope resolution, field masking, `<Can>`+`usePermissions`, permission-filtered sidebar. Consolidated duplicate perms layer. Added `db:check-keys` parity guard. 16 routes build; 26+17 DB assertions green; keys in sync. |
+| 2026-07-24 | Types + auth test | Added FK relationships to hand-written DB types (embedded joins now type; removed the `as never` casts and query splits). New `test-auth-flow.cjs`: **17/17** through the real Supabase stack — provisioning, session context, permission RPCs, isolation, invite→activate→scope. Found the guard-blocks-cascade cleanup issue; added trigger-aware `purge-test-data.cjs`. |
 | 2026-07-23 | Environment | Database password rotated to 16-char alphanumeric, kept out of chat. Connection and 26/26 test suite re-verified. **All blockers closed.** |
 | 2026-07-23 | Environment | Supabase API keys added and verified: auth health 200, service-role read 200, anon correctly denied (42501). O9 closed. Environment fully operational; only the password rotation remains. |
 | 2026-07-23 | **CP-2 proven** | Schema applied to live Supabase Postgres: 10 migrations, 14 tables, 87 permissions, 26 RLS policies. `npm run db:test` → **26/26 pass**. Three execution-only bugs found and fixed: SQL-function ordering, missing table GRANTs, Prisma 7 config move. Prisma introspected; client generated. **O6 closed.** |

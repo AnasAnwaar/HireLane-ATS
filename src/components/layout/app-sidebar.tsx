@@ -5,8 +5,10 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 import { BrandMark } from "@/components/brand-mark";
+import { usePermissions } from "@/components/permissions/permission-provider";
 import { Button } from "@/components/ui/button";
 import { NAV_SECTIONS } from "@/lib/navigation";
+import type { PermissionKey } from "@/lib/permissions/keys";
 import { cn } from "@/lib/utils";
 
 function isActive(pathname: string, href: string) {
@@ -15,6 +17,17 @@ function isActive(pathname: string, href: string) {
 
 export function AppSidebar({ className }: { className?: string }) {
   const pathname = usePathname();
+  const perms = usePermissions();
+
+  // Show a nav item only if the viewer holds its permission. Items with a null
+  // permission (e.g. Dashboard) are always visible. A section with no visible
+  // items disappears entirely, so a limited role sees a tidy menu, not greyed rows.
+  const sections = NAV_SECTIONS.map((section) => ({
+    ...section,
+    items: section.items.filter(
+      (item) => item.permission === null || perms.can(item.permission as PermissionKey),
+    ),
+  })).filter((section) => section.items.length > 0);
 
   return (
     <aside
@@ -29,17 +42,19 @@ export function AppSidebar({ className }: { className?: string }) {
       {/* Brand rule — the four palette stripes as a hairline. */}
       <div aria-hidden className="brand-rule mx-5 h-[3px] rounded-full opacity-90" />
 
-      <div className="px-4 pb-4 pt-4">
-        <Button className="w-full justify-start gap-2" size="sm" asChild>
-          <Link href="/openings/new">
-            <Plus />
-            New job opening
-          </Link>
-        </Button>
-      </div>
+      {perms.can("job_openings.create") && (
+        <div className="px-4 pb-4 pt-4">
+          <Button className="w-full justify-start gap-2" size="sm" asChild>
+            <Link href="/openings/new">
+              <Plus />
+              New job opening
+            </Link>
+          </Button>
+        </div>
+      )}
 
       <nav className="flex-1 overflow-y-auto px-3 pb-3" aria-label="Main">
-        {NAV_SECTIONS.map((section) => (
+        {sections.map((section) => (
           <div key={section.label} className="mb-6 last:mb-0">
             <p className="px-3 pb-2 text-[0.6875rem] font-semibold uppercase tracking-[0.08em] text-sidebar-muted">
               {section.label}

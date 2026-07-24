@@ -23,6 +23,34 @@ export type MembershipStatus = "invited" | "active" | "deactivated";
 export type PermissionRisk = "low" | "medium" | "high";
 export type InvitationStatus = "pending" | "accepted" | "revoked" | "expired";
 
+export type EmploymentType =
+  | "full_time"
+  | "part_time"
+  | "contract"
+  | "internship"
+  | "temporary";
+export type WorkMode = "on_site" | "hybrid" | "remote";
+export type OpeningStatus = "draft" | "pending_approval" | "open" | "on_hold" | "closed";
+export type RequirementKind =
+  | "must_have"
+  | "nice_to_have"
+  | "qualification"
+  | "certification";
+export type ApplicationStage =
+  | "applied"
+  | "screened"
+  | "shortlisted"
+  | "test_assigned"
+  | "test_completed"
+  | "interview_scheduled"
+  | "interviewed"
+  | "offer"
+  | "hired"
+  | "rejected"
+  | "on_hold"
+  | "withdrawn";
+export type DocumentKind = "cv" | "portfolio" | "cover_letter" | "other";
+
 type Timestamps = {
   created_at: string;
   updated_at: string;
@@ -159,9 +187,114 @@ export type PermissionPreset = {
   sort_order: number;
 };
 
+export type PermissionPresetGrant = {
+  preset_key: string;
+  role_key: string;
+  permission_key: string;
+  allowed: boolean;
+  scope: PermissionScope;
+};
+
+export type JobOpening = Timestamps & {
+  id: string;
+  organization_id: string;
+  department_id: string | null;
+  created_by: string | null;
+  title: string;
+  employment_type: EmploymentType;
+  work_mode: WorkMode;
+  location: string | null;
+  experience_min: number | null;
+  experience_max: number | null;
+  salary_min: number | null;
+  salary_max: number | null;
+  salary_currency: string | null;
+  salary_visible: boolean;
+  description: string;
+  positions: number;
+  status: OpeningStatus;
+  application_deadline: string | null;
+  opened_at: string | null;
+  closed_at: string | null;
+};
+
+export type JobRequirement = {
+  id: string;
+  job_opening_id: string;
+  kind: RequirementKind;
+  label: string;
+  sort_order: number;
+  created_at: string;
+};
+
+export type ScreeningQuestion = {
+  id: string;
+  job_opening_id: string;
+  question: string;
+  required: boolean;
+  sort_order: number;
+  created_at: string;
+};
+
+export type Candidate = Timestamps & {
+  id: string;
+  organization_id: string;
+  full_name: string;
+  email: string;
+  phone: string | null;
+  location: string | null;
+  headline: string | null;
+  years_experience: number | null;
+  linkedin_url: string | null;
+  portfolio_url: string | null;
+  github_url: string | null;
+  skills: string[];
+  created_by: string | null;
+};
+
+export type Application = {
+  id: string;
+  organization_id: string;
+  candidate_id: string;
+  job_opening_id: string;
+  stage: ApplicationStage;
+  source: string | null;
+  cover_note: string | null;
+  screening_answers: Json;
+  created_by: string | null;
+  applied_at: string;
+  updated_at: string;
+};
+
+export type DocumentRow = {
+  id: string;
+  organization_id: string;
+  candidate_id: string | null;
+  application_id: string | null;
+  kind: DocumentKind;
+  storage_path: string;
+  file_name: string;
+  file_size: number | null;
+  mime_type: string | null;
+  uploaded_by: string | null;
+  created_at: string;
+};
+
 /** Insert helper: server-defaulted columns are optional. */
 type Insertable<T, TRequired extends keyof T> = Pick<T, TRequired> &
   Partial<Omit<T, TRequired>>;
+
+/**
+ * One foreign-key relationship, in the shape `@supabase/supabase-js` reads to
+ * type embedded selects like `.select("organizations(name)")`.
+ */
+type Rel<Col extends string, RefTable extends string, OneToOne extends boolean = false> = {
+  foreignKeyName: string;
+  columns: [Col];
+  isOneToOne: OneToOne;
+  referencedRelation: RefTable;
+  referencedColumns: ["id"];
+};
 
 /**
  * Table shape expected by `@supabase/supabase-js`.
@@ -169,12 +302,13 @@ type Insertable<T, TRequired extends keyof T> = Pick<T, TRequired> &
  * `Relationships` is required by its generics even when empty — omit it and
  * every table silently resolves to `never`, which surfaces as baffling
  * "not assignable to parameter of type 'never'" errors at each call site.
+ * Populating it is what makes embedded selects type-check.
  */
-type Table<Row, Required extends keyof Row> = {
+type Table<Row, Required extends keyof Row, Rels extends readonly unknown[] = []> = {
   Row: Row;
   Insert: Insertable<Row, Required>;
   Update: Partial<Row>;
-  Relationships: [];
+  Relationships: Rels;
 };
 
 export type Database = {
@@ -182,24 +316,109 @@ export type Database = {
     Tables: {
       organizations: Table<Organization, "name" | "slug">;
       profiles: Table<Profile, "id" | "email">;
-      departments: Table<Department, "organization_id" | "name">;
-      memberships: Table<Membership, "organization_id" | "user_id">;
-      roles: Table<Role, "organization_id" | "key" | "name">;
+      departments: Table<
+        Department,
+        "organization_id" | "name",
+        [Rel<"organization_id", "organizations">, Rel<"head_membership_id", "memberships">]
+      >;
+      memberships: Table<
+        Membership,
+        "organization_id" | "user_id",
+        [
+          Rel<"organization_id", "organizations">,
+          Rel<"user_id", "profiles">,
+          Rel<"role_id", "roles">,
+          Rel<"department_id", "departments">,
+        ]
+      >;
+      roles: Table<
+        Role,
+        "organization_id" | "key" | "name",
+        [Rel<"organization_id", "organizations">]
+      >;
       permissions: Table<Permission, "key" | "module" | "label">;
-      role_permissions: Table<RolePermission, "role_id" | "permission_key">;
+      role_permissions: Table<
+        RolePermission,
+        "role_id" | "permission_key",
+        [Rel<"role_id", "roles">, Rel<"permission_key", "permissions">]
+      >;
       user_permission_overrides: Table<
         UserPermissionOverride,
-        "organization_id" | "membership_id" | "permission_key" | "allowed"
+        "organization_id" | "membership_id" | "permission_key" | "allowed",
+        [
+          Rel<"organization_id", "organizations">,
+          Rel<"membership_id", "memberships">,
+          Rel<"permission_key", "permissions">,
+        ]
       >;
       invitations: Table<
         Invitation,
-        "organization_id" | "email" | "token_hash" | "expires_at"
+        "organization_id" | "email" | "token_hash" | "expires_at",
+        [
+          Rel<"organization_id", "organizations">,
+          Rel<"role_id", "roles">,
+          Rel<"department_id", "departments">,
+        ]
       >;
-      approval_rules: Table<ApprovalRule, "organization_id" | "action_key">;
+      approval_rules: Table<
+        ApprovalRule,
+        "organization_id" | "action_key",
+        [Rel<"organization_id", "organizations">]
+      >;
       // Update is typed permissively here, but the database rejects it outright:
       // audit_log is append-only (see migration 0004).
-      audit_log: Table<AuditLogEntry, "organization_id" | "action" | "entity_type">;
+      audit_log: Table<
+        AuditLogEntry,
+        "organization_id" | "action" | "entity_type",
+        [Rel<"organization_id", "organizations">, Rel<"actor_membership_id", "memberships">]
+      >;
       permission_presets: Table<PermissionPreset, "key" | "name">;
+      permission_preset_grants: Table<
+        PermissionPresetGrant,
+        "preset_key" | "role_key" | "permission_key"
+      >;
+      job_openings: Table<
+        JobOpening,
+        "organization_id" | "title",
+        [
+          Rel<"organization_id", "organizations">,
+          Rel<"department_id", "departments">,
+          Rel<"created_by", "memberships">,
+        ]
+      >;
+      job_requirements: Table<
+        JobRequirement,
+        "job_opening_id" | "kind" | "label",
+        [Rel<"job_opening_id", "job_openings">]
+      >;
+      screening_questions: Table<
+        ScreeningQuestion,
+        "job_opening_id" | "question",
+        [Rel<"job_opening_id", "job_openings">]
+      >;
+      candidates: Table<
+        Candidate,
+        "organization_id" | "full_name" | "email",
+        [Rel<"organization_id", "organizations">, Rel<"created_by", "memberships">]
+      >;
+      applications: Table<
+        Application,
+        "organization_id" | "candidate_id" | "job_opening_id",
+        [
+          Rel<"organization_id", "organizations">,
+          Rel<"candidate_id", "candidates">,
+          Rel<"job_opening_id", "job_openings">,
+        ]
+      >;
+      documents: Table<
+        DocumentRow,
+        "organization_id" | "storage_path" | "file_name",
+        [
+          Rel<"organization_id", "organizations">,
+          Rel<"candidate_id", "candidates">,
+          Rel<"application_id", "applications">,
+        ]
+      >;
     };
     Views: Record<string, never>;
     Functions: {

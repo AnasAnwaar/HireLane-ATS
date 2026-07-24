@@ -229,6 +229,24 @@ export type roles = $Result.DefaultSelection<Prisma.$rolesPayload>
  * This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
  */
 export type user_permission_overrides = $Result.DefaultSelection<Prisma.$user_permission_overridesPayload>
+/**
+ * Model job_openings
+ * This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+ * This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+ */
+export type job_openings = $Result.DefaultSelection<Prisma.$job_openingsPayload>
+/**
+ * Model job_requirements
+ * This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+ * This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+ */
+export type job_requirements = $Result.DefaultSelection<Prisma.$job_requirementsPayload>
+/**
+ * Model screening_questions
+ * This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+ * This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+ */
+export type screening_questions = $Result.DefaultSelection<Prisma.$screening_questionsPayload>
 
 /**
  * Enums
@@ -350,6 +368,47 @@ export const permission_scope: {
 
 export type permission_scope = (typeof permission_scope)[keyof typeof permission_scope]
 
+
+export const employment_type: {
+  full_time: 'full_time',
+  part_time: 'part_time',
+  contract: 'contract',
+  internship: 'internship',
+  temporary: 'temporary'
+};
+
+export type employment_type = (typeof employment_type)[keyof typeof employment_type]
+
+
+export const opening_status: {
+  draft: 'draft',
+  pending_approval: 'pending_approval',
+  open: 'open',
+  on_hold: 'on_hold',
+  closed: 'closed'
+};
+
+export type opening_status = (typeof opening_status)[keyof typeof opening_status]
+
+
+export const requirement_kind: {
+  must_have: 'must_have',
+  nice_to_have: 'nice_to_have',
+  qualification: 'qualification',
+  certification: 'certification'
+};
+
+export type requirement_kind = (typeof requirement_kind)[keyof typeof requirement_kind]
+
+
+export const work_mode: {
+  on_site: 'on_site',
+  hybrid: 'hybrid',
+  remote: 'remote'
+};
+
+export type work_mode = (typeof work_mode)[keyof typeof work_mode]
+
 }
 
 export type aal_level = $Enums.aal_level
@@ -403,6 +462,22 @@ export const permission_risk: typeof $Enums.permission_risk
 export type permission_scope = $Enums.permission_scope
 
 export const permission_scope: typeof $Enums.permission_scope
+
+export type employment_type = $Enums.employment_type
+
+export const employment_type: typeof $Enums.employment_type
+
+export type opening_status = $Enums.opening_status
+
+export const opening_status: typeof $Enums.opening_status
+
+export type requirement_kind = $Enums.requirement_kind
+
+export const requirement_kind: typeof $Enums.requirement_kind
+
+export type work_mode = $Enums.work_mode
+
+export const work_mode: typeof $Enums.work_mode
 
 /**
  * ##  Prisma Client ʲˢ
@@ -894,6 +969,36 @@ export class PrismaClient<
     * ```
     */
   get user_permission_overrides(): Prisma.user_permission_overridesDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.job_openings`: Exposes CRUD operations for the **job_openings** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more Job_openings
+    * const job_openings = await prisma.job_openings.findMany()
+    * ```
+    */
+  get job_openings(): Prisma.job_openingsDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.job_requirements`: Exposes CRUD operations for the **job_requirements** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more Job_requirements
+    * const job_requirements = await prisma.job_requirements.findMany()
+    * ```
+    */
+  get job_requirements(): Prisma.job_requirementsDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.screening_questions`: Exposes CRUD operations for the **screening_questions** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more Screening_questions
+    * const screening_questions = await prisma.screening_questions.findMany()
+    * ```
+    */
+  get screening_questions(): Prisma.screening_questionsDelegate<ExtArgs, ClientOptions>;
 }
 
 export namespace Prisma {
@@ -1377,7 +1482,10 @@ export namespace Prisma {
     profiles: 'profiles',
     role_permissions: 'role_permissions',
     roles: 'roles',
-    user_permission_overrides: 'user_permission_overrides'
+    user_permission_overrides: 'user_permission_overrides',
+    job_openings: 'job_openings',
+    job_requirements: 'job_requirements',
+    screening_questions: 'screening_questions'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -1393,7 +1501,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "audit_log_entries" | "custom_oauth_providers" | "flow_state" | "identities" | "instances" | "mfa_amr_claims" | "mfa_challenges" | "mfa_factors" | "oauth_authorizations" | "oauth_client_states" | "oauth_clients" | "oauth_consents" | "one_time_tokens" | "refresh_tokens" | "saml_providers" | "saml_relay_states" | "schema_migrations" | "sessions" | "sso_domains" | "sso_providers" | "users" | "webauthn_challenges" | "webauthn_credentials" | "approval_rules" | "audit_log" | "departments" | "invitations" | "memberships" | "organizations" | "permission_preset_grants" | "permission_preset_roles" | "permission_presets" | "permissions" | "profiles" | "role_permissions" | "roles" | "user_permission_overrides"
+      modelProps: "audit_log_entries" | "custom_oauth_providers" | "flow_state" | "identities" | "instances" | "mfa_amr_claims" | "mfa_challenges" | "mfa_factors" | "oauth_authorizations" | "oauth_client_states" | "oauth_clients" | "oauth_consents" | "one_time_tokens" | "refresh_tokens" | "saml_providers" | "saml_relay_states" | "schema_migrations" | "sessions" | "sso_domains" | "sso_providers" | "users" | "webauthn_challenges" | "webauthn_credentials" | "approval_rules" | "audit_log" | "departments" | "invitations" | "memberships" | "organizations" | "permission_preset_grants" | "permission_preset_roles" | "permission_presets" | "permissions" | "profiles" | "role_permissions" | "roles" | "user_permission_overrides" | "job_openings" | "job_requirements" | "screening_questions"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -4135,6 +4243,228 @@ export namespace Prisma {
           }
         }
       }
+      job_openings: {
+        payload: Prisma.$job_openingsPayload<ExtArgs>
+        fields: Prisma.job_openingsFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.job_openingsFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$job_openingsPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.job_openingsFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$job_openingsPayload>
+          }
+          findFirst: {
+            args: Prisma.job_openingsFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$job_openingsPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.job_openingsFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$job_openingsPayload>
+          }
+          findMany: {
+            args: Prisma.job_openingsFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$job_openingsPayload>[]
+          }
+          create: {
+            args: Prisma.job_openingsCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$job_openingsPayload>
+          }
+          createMany: {
+            args: Prisma.job_openingsCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.job_openingsCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$job_openingsPayload>[]
+          }
+          delete: {
+            args: Prisma.job_openingsDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$job_openingsPayload>
+          }
+          update: {
+            args: Prisma.job_openingsUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$job_openingsPayload>
+          }
+          deleteMany: {
+            args: Prisma.job_openingsDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.job_openingsUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.job_openingsUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$job_openingsPayload>[]
+          }
+          upsert: {
+            args: Prisma.job_openingsUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$job_openingsPayload>
+          }
+          aggregate: {
+            args: Prisma.Job_openingsAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateJob_openings>
+          }
+          groupBy: {
+            args: Prisma.job_openingsGroupByArgs<ExtArgs>
+            result: $Utils.Optional<Job_openingsGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.job_openingsCountArgs<ExtArgs>
+            result: $Utils.Optional<Job_openingsCountAggregateOutputType> | number
+          }
+        }
+      }
+      job_requirements: {
+        payload: Prisma.$job_requirementsPayload<ExtArgs>
+        fields: Prisma.job_requirementsFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.job_requirementsFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$job_requirementsPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.job_requirementsFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$job_requirementsPayload>
+          }
+          findFirst: {
+            args: Prisma.job_requirementsFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$job_requirementsPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.job_requirementsFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$job_requirementsPayload>
+          }
+          findMany: {
+            args: Prisma.job_requirementsFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$job_requirementsPayload>[]
+          }
+          create: {
+            args: Prisma.job_requirementsCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$job_requirementsPayload>
+          }
+          createMany: {
+            args: Prisma.job_requirementsCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.job_requirementsCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$job_requirementsPayload>[]
+          }
+          delete: {
+            args: Prisma.job_requirementsDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$job_requirementsPayload>
+          }
+          update: {
+            args: Prisma.job_requirementsUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$job_requirementsPayload>
+          }
+          deleteMany: {
+            args: Prisma.job_requirementsDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.job_requirementsUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.job_requirementsUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$job_requirementsPayload>[]
+          }
+          upsert: {
+            args: Prisma.job_requirementsUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$job_requirementsPayload>
+          }
+          aggregate: {
+            args: Prisma.Job_requirementsAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateJob_requirements>
+          }
+          groupBy: {
+            args: Prisma.job_requirementsGroupByArgs<ExtArgs>
+            result: $Utils.Optional<Job_requirementsGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.job_requirementsCountArgs<ExtArgs>
+            result: $Utils.Optional<Job_requirementsCountAggregateOutputType> | number
+          }
+        }
+      }
+      screening_questions: {
+        payload: Prisma.$screening_questionsPayload<ExtArgs>
+        fields: Prisma.screening_questionsFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.screening_questionsFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$screening_questionsPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.screening_questionsFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$screening_questionsPayload>
+          }
+          findFirst: {
+            args: Prisma.screening_questionsFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$screening_questionsPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.screening_questionsFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$screening_questionsPayload>
+          }
+          findMany: {
+            args: Prisma.screening_questionsFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$screening_questionsPayload>[]
+          }
+          create: {
+            args: Prisma.screening_questionsCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$screening_questionsPayload>
+          }
+          createMany: {
+            args: Prisma.screening_questionsCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.screening_questionsCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$screening_questionsPayload>[]
+          }
+          delete: {
+            args: Prisma.screening_questionsDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$screening_questionsPayload>
+          }
+          update: {
+            args: Prisma.screening_questionsUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$screening_questionsPayload>
+          }
+          deleteMany: {
+            args: Prisma.screening_questionsDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.screening_questionsUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.screening_questionsUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$screening_questionsPayload>[]
+          }
+          upsert: {
+            args: Prisma.screening_questionsUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$screening_questionsPayload>
+          }
+          aggregate: {
+            args: Prisma.Screening_questionsAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateScreening_questions>
+          }
+          groupBy: {
+            args: Prisma.screening_questionsGroupByArgs<ExtArgs>
+            result: $Utils.Optional<Screening_questionsGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.screening_questionsCountArgs<ExtArgs>
+            result: $Utils.Optional<Screening_questionsCountAggregateOutputType> | number
+          }
+        }
+      }
     }
   } & {
     other: {
@@ -4295,6 +4625,9 @@ export namespace Prisma {
     role_permissions?: role_permissionsOmit
     roles?: rolesOmit
     user_permission_overrides?: user_permission_overridesOmit
+    job_openings?: job_openingsOmit
+    job_requirements?: job_requirementsOmit
+    screening_questions?: screening_questionsOmit
   }
 
   /* Types for Logging */
@@ -4670,11 +5003,13 @@ export namespace Prisma {
 
   export type DepartmentsCountOutputType = {
     invitations: number
+    job_openings: number
     memberships_memberships_department_idTodepartments: number
   }
 
   export type DepartmentsCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     invitations?: boolean | DepartmentsCountOutputTypeCountInvitationsArgs
+    job_openings?: boolean | DepartmentsCountOutputTypeCountJob_openingsArgs
     memberships_memberships_department_idTodepartments?: boolean | DepartmentsCountOutputTypeCountMemberships_memberships_department_idTodepartmentsArgs
   }
 
@@ -4699,6 +5034,13 @@ export namespace Prisma {
   /**
    * DepartmentsCountOutputType without action
    */
+  export type DepartmentsCountOutputTypeCountJob_openingsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: job_openingsWhereInput
+  }
+
+  /**
+   * DepartmentsCountOutputType without action
+   */
   export type DepartmentsCountOutputTypeCountMemberships_memberships_department_idTodepartmentsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: membershipsWhereInput
   }
@@ -4712,6 +5054,7 @@ export namespace Prisma {
     audit_log: number
     departments_departments_head_membership_idTomemberships: number
     invitations: number
+    job_openings: number
     user_permission_overrides_user_permission_overrides_granted_byTomemberships: number
     user_permission_overrides_user_permission_overrides_membership_idTomemberships: number
   }
@@ -4720,6 +5063,7 @@ export namespace Prisma {
     audit_log?: boolean | MembershipsCountOutputTypeCountAudit_logArgs
     departments_departments_head_membership_idTomemberships?: boolean | MembershipsCountOutputTypeCountDepartments_departments_head_membership_idTomembershipsArgs
     invitations?: boolean | MembershipsCountOutputTypeCountInvitationsArgs
+    job_openings?: boolean | MembershipsCountOutputTypeCountJob_openingsArgs
     user_permission_overrides_user_permission_overrides_granted_byTomemberships?: boolean | MembershipsCountOutputTypeCountUser_permission_overrides_user_permission_overrides_granted_byTomembershipsArgs
     user_permission_overrides_user_permission_overrides_membership_idTomemberships?: boolean | MembershipsCountOutputTypeCountUser_permission_overrides_user_permission_overrides_membership_idTomembershipsArgs
   }
@@ -4759,6 +5103,13 @@ export namespace Prisma {
   /**
    * MembershipsCountOutputType without action
    */
+  export type MembershipsCountOutputTypeCountJob_openingsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: job_openingsWhereInput
+  }
+
+  /**
+   * MembershipsCountOutputType without action
+   */
   export type MembershipsCountOutputTypeCountUser_permission_overrides_user_permission_overrides_granted_byTomembershipsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: user_permission_overridesWhereInput
   }
@@ -4780,6 +5131,7 @@ export namespace Prisma {
     audit_log: number
     departments: number
     invitations: number
+    job_openings: number
     memberships: number
     user_permission_overrides: number
   }
@@ -4789,6 +5141,7 @@ export namespace Prisma {
     audit_log?: boolean | OrganizationsCountOutputTypeCountAudit_logArgs
     departments?: boolean | OrganizationsCountOutputTypeCountDepartmentsArgs
     invitations?: boolean | OrganizationsCountOutputTypeCountInvitationsArgs
+    job_openings?: boolean | OrganizationsCountOutputTypeCountJob_openingsArgs
     memberships?: boolean | OrganizationsCountOutputTypeCountMembershipsArgs
     user_permission_overrides?: boolean | OrganizationsCountOutputTypeCountUser_permission_overridesArgs
   }
@@ -4830,6 +5183,13 @@ export namespace Prisma {
    */
   export type OrganizationsCountOutputTypeCountInvitationsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: invitationsWhereInput
+  }
+
+  /**
+   * OrganizationsCountOutputType without action
+   */
+  export type OrganizationsCountOutputTypeCountJob_openingsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: job_openingsWhereInput
   }
 
   /**
@@ -5053,6 +5413,46 @@ export namespace Prisma {
    */
   export type RolesCountOutputTypeCountRole_permissionsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: role_permissionsWhereInput
+  }
+
+
+  /**
+   * Count Type Job_openingsCountOutputType
+   */
+
+  export type Job_openingsCountOutputType = {
+    job_requirements: number
+    screening_questions: number
+  }
+
+  export type Job_openingsCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    job_requirements?: boolean | Job_openingsCountOutputTypeCountJob_requirementsArgs
+    screening_questions?: boolean | Job_openingsCountOutputTypeCountScreening_questionsArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * Job_openingsCountOutputType without action
+   */
+  export type Job_openingsCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Job_openingsCountOutputType
+     */
+    select?: Job_openingsCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * Job_openingsCountOutputType without action
+   */
+  export type Job_openingsCountOutputTypeCountJob_requirementsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: job_requirementsWhereInput
+  }
+
+  /**
+   * Job_openingsCountOutputType without action
+   */
+  export type Job_openingsCountOutputTypeCountScreening_questionsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: screening_questionsWhereInput
   }
 
 
@@ -34041,6 +34441,7 @@ export namespace Prisma {
     memberships_departments_head_membership_idTomemberships?: boolean | departments$memberships_departments_head_membership_idTomembershipsArgs<ExtArgs>
     organizations?: boolean | organizationsDefaultArgs<ExtArgs>
     invitations?: boolean | departments$invitationsArgs<ExtArgs>
+    job_openings?: boolean | departments$job_openingsArgs<ExtArgs>
     memberships_memberships_department_idTodepartments?: boolean | departments$memberships_memberships_department_idTodepartmentsArgs<ExtArgs>
     _count?: boolean | DepartmentsCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["departments"]>
@@ -34084,6 +34485,7 @@ export namespace Prisma {
     memberships_departments_head_membership_idTomemberships?: boolean | departments$memberships_departments_head_membership_idTomembershipsArgs<ExtArgs>
     organizations?: boolean | organizationsDefaultArgs<ExtArgs>
     invitations?: boolean | departments$invitationsArgs<ExtArgs>
+    job_openings?: boolean | departments$job_openingsArgs<ExtArgs>
     memberships_memberships_department_idTodepartments?: boolean | departments$memberships_memberships_department_idTodepartmentsArgs<ExtArgs>
     _count?: boolean | DepartmentsCountOutputTypeDefaultArgs<ExtArgs>
   }
@@ -34102,6 +34504,7 @@ export namespace Prisma {
       memberships_departments_head_membership_idTomemberships: Prisma.$membershipsPayload<ExtArgs> | null
       organizations: Prisma.$organizationsPayload<ExtArgs>
       invitations: Prisma.$invitationsPayload<ExtArgs>[]
+      job_openings: Prisma.$job_openingsPayload<ExtArgs>[]
       memberships_memberships_department_idTodepartments: Prisma.$membershipsPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
@@ -34509,6 +34912,7 @@ export namespace Prisma {
     memberships_departments_head_membership_idTomemberships<T extends departments$memberships_departments_head_membership_idTomembershipsArgs<ExtArgs> = {}>(args?: Subset<T, departments$memberships_departments_head_membership_idTomembershipsArgs<ExtArgs>>): Prisma__membershipsClient<$Result.GetResult<Prisma.$membershipsPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     organizations<T extends organizationsDefaultArgs<ExtArgs> = {}>(args?: Subset<T, organizationsDefaultArgs<ExtArgs>>): Prisma__organizationsClient<$Result.GetResult<Prisma.$organizationsPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     invitations<T extends departments$invitationsArgs<ExtArgs> = {}>(args?: Subset<T, departments$invitationsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$invitationsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    job_openings<T extends departments$job_openingsArgs<ExtArgs> = {}>(args?: Subset<T, departments$job_openingsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$job_openingsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     memberships_memberships_department_idTodepartments<T extends departments$memberships_memberships_department_idTodepartmentsArgs<ExtArgs> = {}>(args?: Subset<T, departments$memberships_memberships_department_idTodepartmentsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$membershipsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -34987,6 +35391,30 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: InvitationsScalarFieldEnum | InvitationsScalarFieldEnum[]
+  }
+
+  /**
+   * departments.job_openings
+   */
+  export type departments$job_openingsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the job_openings
+     */
+    select?: job_openingsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the job_openings
+     */
+    omit?: job_openingsOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: job_openingsInclude<ExtArgs> | null
+    where?: job_openingsWhereInput
+    orderBy?: job_openingsOrderByWithRelationInput | job_openingsOrderByWithRelationInput[]
+    cursor?: job_openingsWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: Job_openingsScalarFieldEnum | Job_openingsScalarFieldEnum[]
   }
 
   /**
@@ -36522,6 +36950,7 @@ export namespace Prisma {
     audit_log?: boolean | memberships$audit_logArgs<ExtArgs>
     departments_departments_head_membership_idTomemberships?: boolean | memberships$departments_departments_head_membership_idTomembershipsArgs<ExtArgs>
     invitations?: boolean | memberships$invitationsArgs<ExtArgs>
+    job_openings?: boolean | memberships$job_openingsArgs<ExtArgs>
     departments_memberships_department_idTodepartments?: boolean | memberships$departments_memberships_department_idTodepartmentsArgs<ExtArgs>
     organizations?: boolean | organizationsDefaultArgs<ExtArgs>
     roles?: boolean | memberships$rolesArgs<ExtArgs>
@@ -36586,6 +37015,7 @@ export namespace Prisma {
     audit_log?: boolean | memberships$audit_logArgs<ExtArgs>
     departments_departments_head_membership_idTomemberships?: boolean | memberships$departments_departments_head_membership_idTomembershipsArgs<ExtArgs>
     invitations?: boolean | memberships$invitationsArgs<ExtArgs>
+    job_openings?: boolean | memberships$job_openingsArgs<ExtArgs>
     departments_memberships_department_idTodepartments?: boolean | memberships$departments_memberships_department_idTodepartmentsArgs<ExtArgs>
     organizations?: boolean | organizationsDefaultArgs<ExtArgs>
     roles?: boolean | memberships$rolesArgs<ExtArgs>
@@ -36613,6 +37043,7 @@ export namespace Prisma {
       audit_log: Prisma.$audit_logPayload<ExtArgs>[]
       departments_departments_head_membership_idTomemberships: Prisma.$departmentsPayload<ExtArgs>[]
       invitations: Prisma.$invitationsPayload<ExtArgs>[]
+      job_openings: Prisma.$job_openingsPayload<ExtArgs>[]
       departments_memberships_department_idTodepartments: Prisma.$departmentsPayload<ExtArgs> | null
       organizations: Prisma.$organizationsPayload<ExtArgs>
       roles: Prisma.$rolesPayload<ExtArgs> | null
@@ -37029,6 +37460,7 @@ export namespace Prisma {
     audit_log<T extends memberships$audit_logArgs<ExtArgs> = {}>(args?: Subset<T, memberships$audit_logArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$audit_logPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     departments_departments_head_membership_idTomemberships<T extends memberships$departments_departments_head_membership_idTomembershipsArgs<ExtArgs> = {}>(args?: Subset<T, memberships$departments_departments_head_membership_idTomembershipsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$departmentsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     invitations<T extends memberships$invitationsArgs<ExtArgs> = {}>(args?: Subset<T, memberships$invitationsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$invitationsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    job_openings<T extends memberships$job_openingsArgs<ExtArgs> = {}>(args?: Subset<T, memberships$job_openingsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$job_openingsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     departments_memberships_department_idTodepartments<T extends memberships$departments_memberships_department_idTodepartmentsArgs<ExtArgs> = {}>(args?: Subset<T, memberships$departments_memberships_department_idTodepartmentsArgs<ExtArgs>>): Prisma__departmentsClient<$Result.GetResult<Prisma.$departmentsPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     organizations<T extends organizationsDefaultArgs<ExtArgs> = {}>(args?: Subset<T, organizationsDefaultArgs<ExtArgs>>): Prisma__organizationsClient<$Result.GetResult<Prisma.$organizationsPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     roles<T extends memberships$rolesArgs<ExtArgs> = {}>(args?: Subset<T, memberships$rolesArgs<ExtArgs>>): Prisma__rolesClient<$Result.GetResult<Prisma.$rolesPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
@@ -37548,6 +37980,30 @@ export namespace Prisma {
   }
 
   /**
+   * memberships.job_openings
+   */
+  export type memberships$job_openingsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the job_openings
+     */
+    select?: job_openingsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the job_openings
+     */
+    omit?: job_openingsOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: job_openingsInclude<ExtArgs> | null
+    where?: job_openingsWhereInput
+    orderBy?: job_openingsOrderByWithRelationInput | job_openingsOrderByWithRelationInput[]
+    cursor?: job_openingsWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: Job_openingsScalarFieldEnum | Job_openingsScalarFieldEnum[]
+  }
+
+  /**
    * memberships.departments_memberships_department_idTodepartments
    */
   export type memberships$departments_memberships_department_idTodepartmentsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -37876,6 +38332,7 @@ export namespace Prisma {
     audit_log?: boolean | organizations$audit_logArgs<ExtArgs>
     departments?: boolean | organizations$departmentsArgs<ExtArgs>
     invitations?: boolean | organizations$invitationsArgs<ExtArgs>
+    job_openings?: boolean | organizations$job_openingsArgs<ExtArgs>
     memberships?: boolean | organizations$membershipsArgs<ExtArgs>
     roles?: boolean | organizations$rolesArgs<ExtArgs>
     user_permission_overrides?: boolean | organizations$user_permission_overridesArgs<ExtArgs>
@@ -37933,6 +38390,7 @@ export namespace Prisma {
     audit_log?: boolean | organizations$audit_logArgs<ExtArgs>
     departments?: boolean | organizations$departmentsArgs<ExtArgs>
     invitations?: boolean | organizations$invitationsArgs<ExtArgs>
+    job_openings?: boolean | organizations$job_openingsArgs<ExtArgs>
     memberships?: boolean | organizations$membershipsArgs<ExtArgs>
     roles?: boolean | organizations$rolesArgs<ExtArgs>
     user_permission_overrides?: boolean | organizations$user_permission_overridesArgs<ExtArgs>
@@ -37948,6 +38406,7 @@ export namespace Prisma {
       audit_log: Prisma.$audit_logPayload<ExtArgs>[]
       departments: Prisma.$departmentsPayload<ExtArgs>[]
       invitations: Prisma.$invitationsPayload<ExtArgs>[]
+      job_openings: Prisma.$job_openingsPayload<ExtArgs>[]
       memberships: Prisma.$membershipsPayload<ExtArgs>[]
       roles: Prisma.$rolesPayload<ExtArgs> | null
       user_permission_overrides: Prisma.$user_permission_overridesPayload<ExtArgs>[]
@@ -38363,6 +38822,7 @@ export namespace Prisma {
     audit_log<T extends organizations$audit_logArgs<ExtArgs> = {}>(args?: Subset<T, organizations$audit_logArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$audit_logPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     departments<T extends organizations$departmentsArgs<ExtArgs> = {}>(args?: Subset<T, organizations$departmentsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$departmentsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     invitations<T extends organizations$invitationsArgs<ExtArgs> = {}>(args?: Subset<T, organizations$invitationsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$invitationsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    job_openings<T extends organizations$job_openingsArgs<ExtArgs> = {}>(args?: Subset<T, organizations$job_openingsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$job_openingsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     memberships<T extends organizations$membershipsArgs<ExtArgs> = {}>(args?: Subset<T, organizations$membershipsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$membershipsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     roles<T extends organizations$rolesArgs<ExtArgs> = {}>(args?: Subset<T, organizations$rolesArgs<ExtArgs>>): Prisma__rolesClient<$Result.GetResult<Prisma.$rolesPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     user_permission_overrides<T extends organizations$user_permission_overridesArgs<ExtArgs> = {}>(args?: Subset<T, organizations$user_permission_overridesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$user_permission_overridesPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -38893,6 +39353,30 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: InvitationsScalarFieldEnum | InvitationsScalarFieldEnum[]
+  }
+
+  /**
+   * organizations.job_openings
+   */
+  export type organizations$job_openingsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the job_openings
+     */
+    select?: job_openingsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the job_openings
+     */
+    omit?: job_openingsOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: job_openingsInclude<ExtArgs> | null
+    where?: job_openingsWhereInput
+    orderBy?: job_openingsOrderByWithRelationInput | job_openingsOrderByWithRelationInput[]
+    cursor?: job_openingsWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: Job_openingsScalarFieldEnum | Job_openingsScalarFieldEnum[]
   }
 
   /**
@@ -48158,6 +48642,3672 @@ export namespace Prisma {
 
 
   /**
+   * Model job_openings
+   */
+
+  export type AggregateJob_openings = {
+    _count: Job_openingsCountAggregateOutputType | null
+    _avg: Job_openingsAvgAggregateOutputType | null
+    _sum: Job_openingsSumAggregateOutputType | null
+    _min: Job_openingsMinAggregateOutputType | null
+    _max: Job_openingsMaxAggregateOutputType | null
+  }
+
+  export type Job_openingsAvgAggregateOutputType = {
+    experience_min: number | null
+    experience_max: number | null
+    salary_min: Decimal | null
+    salary_max: Decimal | null
+    positions: number | null
+  }
+
+  export type Job_openingsSumAggregateOutputType = {
+    experience_min: number | null
+    experience_max: number | null
+    salary_min: Decimal | null
+    salary_max: Decimal | null
+    positions: number | null
+  }
+
+  export type Job_openingsMinAggregateOutputType = {
+    id: string | null
+    organization_id: string | null
+    department_id: string | null
+    created_by: string | null
+    title: string | null
+    employment_type: $Enums.employment_type | null
+    work_mode: $Enums.work_mode | null
+    location: string | null
+    experience_min: number | null
+    experience_max: number | null
+    salary_min: Decimal | null
+    salary_max: Decimal | null
+    salary_currency: string | null
+    salary_visible: boolean | null
+    description: string | null
+    positions: number | null
+    status: $Enums.opening_status | null
+    application_deadline: Date | null
+    opened_at: Date | null
+    closed_at: Date | null
+    created_at: Date | null
+    updated_at: Date | null
+  }
+
+  export type Job_openingsMaxAggregateOutputType = {
+    id: string | null
+    organization_id: string | null
+    department_id: string | null
+    created_by: string | null
+    title: string | null
+    employment_type: $Enums.employment_type | null
+    work_mode: $Enums.work_mode | null
+    location: string | null
+    experience_min: number | null
+    experience_max: number | null
+    salary_min: Decimal | null
+    salary_max: Decimal | null
+    salary_currency: string | null
+    salary_visible: boolean | null
+    description: string | null
+    positions: number | null
+    status: $Enums.opening_status | null
+    application_deadline: Date | null
+    opened_at: Date | null
+    closed_at: Date | null
+    created_at: Date | null
+    updated_at: Date | null
+  }
+
+  export type Job_openingsCountAggregateOutputType = {
+    id: number
+    organization_id: number
+    department_id: number
+    created_by: number
+    title: number
+    employment_type: number
+    work_mode: number
+    location: number
+    experience_min: number
+    experience_max: number
+    salary_min: number
+    salary_max: number
+    salary_currency: number
+    salary_visible: number
+    description: number
+    positions: number
+    status: number
+    application_deadline: number
+    opened_at: number
+    closed_at: number
+    created_at: number
+    updated_at: number
+    _all: number
+  }
+
+
+  export type Job_openingsAvgAggregateInputType = {
+    experience_min?: true
+    experience_max?: true
+    salary_min?: true
+    salary_max?: true
+    positions?: true
+  }
+
+  export type Job_openingsSumAggregateInputType = {
+    experience_min?: true
+    experience_max?: true
+    salary_min?: true
+    salary_max?: true
+    positions?: true
+  }
+
+  export type Job_openingsMinAggregateInputType = {
+    id?: true
+    organization_id?: true
+    department_id?: true
+    created_by?: true
+    title?: true
+    employment_type?: true
+    work_mode?: true
+    location?: true
+    experience_min?: true
+    experience_max?: true
+    salary_min?: true
+    salary_max?: true
+    salary_currency?: true
+    salary_visible?: true
+    description?: true
+    positions?: true
+    status?: true
+    application_deadline?: true
+    opened_at?: true
+    closed_at?: true
+    created_at?: true
+    updated_at?: true
+  }
+
+  export type Job_openingsMaxAggregateInputType = {
+    id?: true
+    organization_id?: true
+    department_id?: true
+    created_by?: true
+    title?: true
+    employment_type?: true
+    work_mode?: true
+    location?: true
+    experience_min?: true
+    experience_max?: true
+    salary_min?: true
+    salary_max?: true
+    salary_currency?: true
+    salary_visible?: true
+    description?: true
+    positions?: true
+    status?: true
+    application_deadline?: true
+    opened_at?: true
+    closed_at?: true
+    created_at?: true
+    updated_at?: true
+  }
+
+  export type Job_openingsCountAggregateInputType = {
+    id?: true
+    organization_id?: true
+    department_id?: true
+    created_by?: true
+    title?: true
+    employment_type?: true
+    work_mode?: true
+    location?: true
+    experience_min?: true
+    experience_max?: true
+    salary_min?: true
+    salary_max?: true
+    salary_currency?: true
+    salary_visible?: true
+    description?: true
+    positions?: true
+    status?: true
+    application_deadline?: true
+    opened_at?: true
+    closed_at?: true
+    created_at?: true
+    updated_at?: true
+    _all?: true
+  }
+
+  export type Job_openingsAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which job_openings to aggregate.
+     */
+    where?: job_openingsWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of job_openings to fetch.
+     */
+    orderBy?: job_openingsOrderByWithRelationInput | job_openingsOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: job_openingsWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` job_openings from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` job_openings.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned job_openings
+    **/
+    _count?: true | Job_openingsCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: Job_openingsAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: Job_openingsSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: Job_openingsMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: Job_openingsMaxAggregateInputType
+  }
+
+  export type GetJob_openingsAggregateType<T extends Job_openingsAggregateArgs> = {
+        [P in keyof T & keyof AggregateJob_openings]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateJob_openings[P]>
+      : GetScalarType<T[P], AggregateJob_openings[P]>
+  }
+
+
+
+
+  export type job_openingsGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: job_openingsWhereInput
+    orderBy?: job_openingsOrderByWithAggregationInput | job_openingsOrderByWithAggregationInput[]
+    by: Job_openingsScalarFieldEnum[] | Job_openingsScalarFieldEnum
+    having?: job_openingsScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: Job_openingsCountAggregateInputType | true
+    _avg?: Job_openingsAvgAggregateInputType
+    _sum?: Job_openingsSumAggregateInputType
+    _min?: Job_openingsMinAggregateInputType
+    _max?: Job_openingsMaxAggregateInputType
+  }
+
+  export type Job_openingsGroupByOutputType = {
+    id: string
+    organization_id: string
+    department_id: string | null
+    created_by: string | null
+    title: string
+    employment_type: $Enums.employment_type
+    work_mode: $Enums.work_mode
+    location: string | null
+    experience_min: number | null
+    experience_max: number | null
+    salary_min: Decimal | null
+    salary_max: Decimal | null
+    salary_currency: string | null
+    salary_visible: boolean
+    description: string
+    positions: number
+    status: $Enums.opening_status
+    application_deadline: Date | null
+    opened_at: Date | null
+    closed_at: Date | null
+    created_at: Date
+    updated_at: Date
+    _count: Job_openingsCountAggregateOutputType | null
+    _avg: Job_openingsAvgAggregateOutputType | null
+    _sum: Job_openingsSumAggregateOutputType | null
+    _min: Job_openingsMinAggregateOutputType | null
+    _max: Job_openingsMaxAggregateOutputType | null
+  }
+
+  type GetJob_openingsGroupByPayload<T extends job_openingsGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<Job_openingsGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof Job_openingsGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], Job_openingsGroupByOutputType[P]>
+            : GetScalarType<T[P], Job_openingsGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type job_openingsSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    organization_id?: boolean
+    department_id?: boolean
+    created_by?: boolean
+    title?: boolean
+    employment_type?: boolean
+    work_mode?: boolean
+    location?: boolean
+    experience_min?: boolean
+    experience_max?: boolean
+    salary_min?: boolean
+    salary_max?: boolean
+    salary_currency?: boolean
+    salary_visible?: boolean
+    description?: boolean
+    positions?: boolean
+    status?: boolean
+    application_deadline?: boolean
+    opened_at?: boolean
+    closed_at?: boolean
+    created_at?: boolean
+    updated_at?: boolean
+    memberships?: boolean | job_openings$membershipsArgs<ExtArgs>
+    departments?: boolean | job_openings$departmentsArgs<ExtArgs>
+    organizations?: boolean | organizationsDefaultArgs<ExtArgs>
+    job_requirements?: boolean | job_openings$job_requirementsArgs<ExtArgs>
+    screening_questions?: boolean | job_openings$screening_questionsArgs<ExtArgs>
+    _count?: boolean | Job_openingsCountOutputTypeDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["job_openings"]>
+
+  export type job_openingsSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    organization_id?: boolean
+    department_id?: boolean
+    created_by?: boolean
+    title?: boolean
+    employment_type?: boolean
+    work_mode?: boolean
+    location?: boolean
+    experience_min?: boolean
+    experience_max?: boolean
+    salary_min?: boolean
+    salary_max?: boolean
+    salary_currency?: boolean
+    salary_visible?: boolean
+    description?: boolean
+    positions?: boolean
+    status?: boolean
+    application_deadline?: boolean
+    opened_at?: boolean
+    closed_at?: boolean
+    created_at?: boolean
+    updated_at?: boolean
+    memberships?: boolean | job_openings$membershipsArgs<ExtArgs>
+    departments?: boolean | job_openings$departmentsArgs<ExtArgs>
+    organizations?: boolean | organizationsDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["job_openings"]>
+
+  export type job_openingsSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    organization_id?: boolean
+    department_id?: boolean
+    created_by?: boolean
+    title?: boolean
+    employment_type?: boolean
+    work_mode?: boolean
+    location?: boolean
+    experience_min?: boolean
+    experience_max?: boolean
+    salary_min?: boolean
+    salary_max?: boolean
+    salary_currency?: boolean
+    salary_visible?: boolean
+    description?: boolean
+    positions?: boolean
+    status?: boolean
+    application_deadline?: boolean
+    opened_at?: boolean
+    closed_at?: boolean
+    created_at?: boolean
+    updated_at?: boolean
+    memberships?: boolean | job_openings$membershipsArgs<ExtArgs>
+    departments?: boolean | job_openings$departmentsArgs<ExtArgs>
+    organizations?: boolean | organizationsDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["job_openings"]>
+
+  export type job_openingsSelectScalar = {
+    id?: boolean
+    organization_id?: boolean
+    department_id?: boolean
+    created_by?: boolean
+    title?: boolean
+    employment_type?: boolean
+    work_mode?: boolean
+    location?: boolean
+    experience_min?: boolean
+    experience_max?: boolean
+    salary_min?: boolean
+    salary_max?: boolean
+    salary_currency?: boolean
+    salary_visible?: boolean
+    description?: boolean
+    positions?: boolean
+    status?: boolean
+    application_deadline?: boolean
+    opened_at?: boolean
+    closed_at?: boolean
+    created_at?: boolean
+    updated_at?: boolean
+  }
+
+  export type job_openingsOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "organization_id" | "department_id" | "created_by" | "title" | "employment_type" | "work_mode" | "location" | "experience_min" | "experience_max" | "salary_min" | "salary_max" | "salary_currency" | "salary_visible" | "description" | "positions" | "status" | "application_deadline" | "opened_at" | "closed_at" | "created_at" | "updated_at", ExtArgs["result"]["job_openings"]>
+  export type job_openingsInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    memberships?: boolean | job_openings$membershipsArgs<ExtArgs>
+    departments?: boolean | job_openings$departmentsArgs<ExtArgs>
+    organizations?: boolean | organizationsDefaultArgs<ExtArgs>
+    job_requirements?: boolean | job_openings$job_requirementsArgs<ExtArgs>
+    screening_questions?: boolean | job_openings$screening_questionsArgs<ExtArgs>
+    _count?: boolean | Job_openingsCountOutputTypeDefaultArgs<ExtArgs>
+  }
+  export type job_openingsIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    memberships?: boolean | job_openings$membershipsArgs<ExtArgs>
+    departments?: boolean | job_openings$departmentsArgs<ExtArgs>
+    organizations?: boolean | organizationsDefaultArgs<ExtArgs>
+  }
+  export type job_openingsIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    memberships?: boolean | job_openings$membershipsArgs<ExtArgs>
+    departments?: boolean | job_openings$departmentsArgs<ExtArgs>
+    organizations?: boolean | organizationsDefaultArgs<ExtArgs>
+  }
+
+  export type $job_openingsPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "job_openings"
+    objects: {
+      memberships: Prisma.$membershipsPayload<ExtArgs> | null
+      departments: Prisma.$departmentsPayload<ExtArgs> | null
+      organizations: Prisma.$organizationsPayload<ExtArgs>
+      job_requirements: Prisma.$job_requirementsPayload<ExtArgs>[]
+      screening_questions: Prisma.$screening_questionsPayload<ExtArgs>[]
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      organization_id: string
+      department_id: string | null
+      created_by: string | null
+      title: string
+      employment_type: $Enums.employment_type
+      work_mode: $Enums.work_mode
+      location: string | null
+      experience_min: number | null
+      experience_max: number | null
+      salary_min: Prisma.Decimal | null
+      salary_max: Prisma.Decimal | null
+      salary_currency: string | null
+      salary_visible: boolean
+      description: string
+      positions: number
+      status: $Enums.opening_status
+      application_deadline: Date | null
+      opened_at: Date | null
+      closed_at: Date | null
+      created_at: Date
+      updated_at: Date
+    }, ExtArgs["result"]["job_openings"]>
+    composites: {}
+  }
+
+  type job_openingsGetPayload<S extends boolean | null | undefined | job_openingsDefaultArgs> = $Result.GetResult<Prisma.$job_openingsPayload, S>
+
+  type job_openingsCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<job_openingsFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: Job_openingsCountAggregateInputType | true
+    }
+
+  export interface job_openingsDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['job_openings'], meta: { name: 'job_openings' } }
+    /**
+     * Find zero or one Job_openings that matches the filter.
+     * @param {job_openingsFindUniqueArgs} args - Arguments to find a Job_openings
+     * @example
+     * // Get one Job_openings
+     * const job_openings = await prisma.job_openings.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends job_openingsFindUniqueArgs>(args: SelectSubset<T, job_openingsFindUniqueArgs<ExtArgs>>): Prisma__job_openingsClient<$Result.GetResult<Prisma.$job_openingsPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one Job_openings that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {job_openingsFindUniqueOrThrowArgs} args - Arguments to find a Job_openings
+     * @example
+     * // Get one Job_openings
+     * const job_openings = await prisma.job_openings.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends job_openingsFindUniqueOrThrowArgs>(args: SelectSubset<T, job_openingsFindUniqueOrThrowArgs<ExtArgs>>): Prisma__job_openingsClient<$Result.GetResult<Prisma.$job_openingsPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first Job_openings that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {job_openingsFindFirstArgs} args - Arguments to find a Job_openings
+     * @example
+     * // Get one Job_openings
+     * const job_openings = await prisma.job_openings.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends job_openingsFindFirstArgs>(args?: SelectSubset<T, job_openingsFindFirstArgs<ExtArgs>>): Prisma__job_openingsClient<$Result.GetResult<Prisma.$job_openingsPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first Job_openings that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {job_openingsFindFirstOrThrowArgs} args - Arguments to find a Job_openings
+     * @example
+     * // Get one Job_openings
+     * const job_openings = await prisma.job_openings.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends job_openingsFindFirstOrThrowArgs>(args?: SelectSubset<T, job_openingsFindFirstOrThrowArgs<ExtArgs>>): Prisma__job_openingsClient<$Result.GetResult<Prisma.$job_openingsPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more Job_openings that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {job_openingsFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all Job_openings
+     * const job_openings = await prisma.job_openings.findMany()
+     * 
+     * // Get first 10 Job_openings
+     * const job_openings = await prisma.job_openings.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const job_openingsWithIdOnly = await prisma.job_openings.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends job_openingsFindManyArgs>(args?: SelectSubset<T, job_openingsFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$job_openingsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a Job_openings.
+     * @param {job_openingsCreateArgs} args - Arguments to create a Job_openings.
+     * @example
+     * // Create one Job_openings
+     * const Job_openings = await prisma.job_openings.create({
+     *   data: {
+     *     // ... data to create a Job_openings
+     *   }
+     * })
+     * 
+     */
+    create<T extends job_openingsCreateArgs>(args: SelectSubset<T, job_openingsCreateArgs<ExtArgs>>): Prisma__job_openingsClient<$Result.GetResult<Prisma.$job_openingsPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many Job_openings.
+     * @param {job_openingsCreateManyArgs} args - Arguments to create many Job_openings.
+     * @example
+     * // Create many Job_openings
+     * const job_openings = await prisma.job_openings.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends job_openingsCreateManyArgs>(args?: SelectSubset<T, job_openingsCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many Job_openings and returns the data saved in the database.
+     * @param {job_openingsCreateManyAndReturnArgs} args - Arguments to create many Job_openings.
+     * @example
+     * // Create many Job_openings
+     * const job_openings = await prisma.job_openings.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many Job_openings and only return the `id`
+     * const job_openingsWithIdOnly = await prisma.job_openings.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends job_openingsCreateManyAndReturnArgs>(args?: SelectSubset<T, job_openingsCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$job_openingsPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a Job_openings.
+     * @param {job_openingsDeleteArgs} args - Arguments to delete one Job_openings.
+     * @example
+     * // Delete one Job_openings
+     * const Job_openings = await prisma.job_openings.delete({
+     *   where: {
+     *     // ... filter to delete one Job_openings
+     *   }
+     * })
+     * 
+     */
+    delete<T extends job_openingsDeleteArgs>(args: SelectSubset<T, job_openingsDeleteArgs<ExtArgs>>): Prisma__job_openingsClient<$Result.GetResult<Prisma.$job_openingsPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one Job_openings.
+     * @param {job_openingsUpdateArgs} args - Arguments to update one Job_openings.
+     * @example
+     * // Update one Job_openings
+     * const job_openings = await prisma.job_openings.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends job_openingsUpdateArgs>(args: SelectSubset<T, job_openingsUpdateArgs<ExtArgs>>): Prisma__job_openingsClient<$Result.GetResult<Prisma.$job_openingsPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more Job_openings.
+     * @param {job_openingsDeleteManyArgs} args - Arguments to filter Job_openings to delete.
+     * @example
+     * // Delete a few Job_openings
+     * const { count } = await prisma.job_openings.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends job_openingsDeleteManyArgs>(args?: SelectSubset<T, job_openingsDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Job_openings.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {job_openingsUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many Job_openings
+     * const job_openings = await prisma.job_openings.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends job_openingsUpdateManyArgs>(args: SelectSubset<T, job_openingsUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Job_openings and returns the data updated in the database.
+     * @param {job_openingsUpdateManyAndReturnArgs} args - Arguments to update many Job_openings.
+     * @example
+     * // Update many Job_openings
+     * const job_openings = await prisma.job_openings.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more Job_openings and only return the `id`
+     * const job_openingsWithIdOnly = await prisma.job_openings.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends job_openingsUpdateManyAndReturnArgs>(args: SelectSubset<T, job_openingsUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$job_openingsPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one Job_openings.
+     * @param {job_openingsUpsertArgs} args - Arguments to update or create a Job_openings.
+     * @example
+     * // Update or create a Job_openings
+     * const job_openings = await prisma.job_openings.upsert({
+     *   create: {
+     *     // ... data to create a Job_openings
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the Job_openings we want to update
+     *   }
+     * })
+     */
+    upsert<T extends job_openingsUpsertArgs>(args: SelectSubset<T, job_openingsUpsertArgs<ExtArgs>>): Prisma__job_openingsClient<$Result.GetResult<Prisma.$job_openingsPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of Job_openings.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {job_openingsCountArgs} args - Arguments to filter Job_openings to count.
+     * @example
+     * // Count the number of Job_openings
+     * const count = await prisma.job_openings.count({
+     *   where: {
+     *     // ... the filter for the Job_openings we want to count
+     *   }
+     * })
+    **/
+    count<T extends job_openingsCountArgs>(
+      args?: Subset<T, job_openingsCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], Job_openingsCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a Job_openings.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {Job_openingsAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends Job_openingsAggregateArgs>(args: Subset<T, Job_openingsAggregateArgs>): Prisma.PrismaPromise<GetJob_openingsAggregateType<T>>
+
+    /**
+     * Group by Job_openings.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {job_openingsGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends job_openingsGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: job_openingsGroupByArgs['orderBy'] }
+        : { orderBy?: job_openingsGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, job_openingsGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetJob_openingsGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the job_openings model
+   */
+  readonly fields: job_openingsFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for job_openings.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__job_openingsClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    memberships<T extends job_openings$membershipsArgs<ExtArgs> = {}>(args?: Subset<T, job_openings$membershipsArgs<ExtArgs>>): Prisma__membershipsClient<$Result.GetResult<Prisma.$membershipsPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    departments<T extends job_openings$departmentsArgs<ExtArgs> = {}>(args?: Subset<T, job_openings$departmentsArgs<ExtArgs>>): Prisma__departmentsClient<$Result.GetResult<Prisma.$departmentsPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    organizations<T extends organizationsDefaultArgs<ExtArgs> = {}>(args?: Subset<T, organizationsDefaultArgs<ExtArgs>>): Prisma__organizationsClient<$Result.GetResult<Prisma.$organizationsPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    job_requirements<T extends job_openings$job_requirementsArgs<ExtArgs> = {}>(args?: Subset<T, job_openings$job_requirementsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$job_requirementsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    screening_questions<T extends job_openings$screening_questionsArgs<ExtArgs> = {}>(args?: Subset<T, job_openings$screening_questionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$screening_questionsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the job_openings model
+   */
+  interface job_openingsFieldRefs {
+    readonly id: FieldRef<"job_openings", 'String'>
+    readonly organization_id: FieldRef<"job_openings", 'String'>
+    readonly department_id: FieldRef<"job_openings", 'String'>
+    readonly created_by: FieldRef<"job_openings", 'String'>
+    readonly title: FieldRef<"job_openings", 'String'>
+    readonly employment_type: FieldRef<"job_openings", 'employment_type'>
+    readonly work_mode: FieldRef<"job_openings", 'work_mode'>
+    readonly location: FieldRef<"job_openings", 'String'>
+    readonly experience_min: FieldRef<"job_openings", 'Int'>
+    readonly experience_max: FieldRef<"job_openings", 'Int'>
+    readonly salary_min: FieldRef<"job_openings", 'Decimal'>
+    readonly salary_max: FieldRef<"job_openings", 'Decimal'>
+    readonly salary_currency: FieldRef<"job_openings", 'String'>
+    readonly salary_visible: FieldRef<"job_openings", 'Boolean'>
+    readonly description: FieldRef<"job_openings", 'String'>
+    readonly positions: FieldRef<"job_openings", 'Int'>
+    readonly status: FieldRef<"job_openings", 'opening_status'>
+    readonly application_deadline: FieldRef<"job_openings", 'DateTime'>
+    readonly opened_at: FieldRef<"job_openings", 'DateTime'>
+    readonly closed_at: FieldRef<"job_openings", 'DateTime'>
+    readonly created_at: FieldRef<"job_openings", 'DateTime'>
+    readonly updated_at: FieldRef<"job_openings", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * job_openings findUnique
+   */
+  export type job_openingsFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the job_openings
+     */
+    select?: job_openingsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the job_openings
+     */
+    omit?: job_openingsOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: job_openingsInclude<ExtArgs> | null
+    /**
+     * Filter, which job_openings to fetch.
+     */
+    where: job_openingsWhereUniqueInput
+  }
+
+  /**
+   * job_openings findUniqueOrThrow
+   */
+  export type job_openingsFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the job_openings
+     */
+    select?: job_openingsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the job_openings
+     */
+    omit?: job_openingsOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: job_openingsInclude<ExtArgs> | null
+    /**
+     * Filter, which job_openings to fetch.
+     */
+    where: job_openingsWhereUniqueInput
+  }
+
+  /**
+   * job_openings findFirst
+   */
+  export type job_openingsFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the job_openings
+     */
+    select?: job_openingsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the job_openings
+     */
+    omit?: job_openingsOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: job_openingsInclude<ExtArgs> | null
+    /**
+     * Filter, which job_openings to fetch.
+     */
+    where?: job_openingsWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of job_openings to fetch.
+     */
+    orderBy?: job_openingsOrderByWithRelationInput | job_openingsOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for job_openings.
+     */
+    cursor?: job_openingsWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` job_openings from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` job_openings.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of job_openings.
+     */
+    distinct?: Job_openingsScalarFieldEnum | Job_openingsScalarFieldEnum[]
+  }
+
+  /**
+   * job_openings findFirstOrThrow
+   */
+  export type job_openingsFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the job_openings
+     */
+    select?: job_openingsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the job_openings
+     */
+    omit?: job_openingsOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: job_openingsInclude<ExtArgs> | null
+    /**
+     * Filter, which job_openings to fetch.
+     */
+    where?: job_openingsWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of job_openings to fetch.
+     */
+    orderBy?: job_openingsOrderByWithRelationInput | job_openingsOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for job_openings.
+     */
+    cursor?: job_openingsWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` job_openings from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` job_openings.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of job_openings.
+     */
+    distinct?: Job_openingsScalarFieldEnum | Job_openingsScalarFieldEnum[]
+  }
+
+  /**
+   * job_openings findMany
+   */
+  export type job_openingsFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the job_openings
+     */
+    select?: job_openingsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the job_openings
+     */
+    omit?: job_openingsOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: job_openingsInclude<ExtArgs> | null
+    /**
+     * Filter, which job_openings to fetch.
+     */
+    where?: job_openingsWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of job_openings to fetch.
+     */
+    orderBy?: job_openingsOrderByWithRelationInput | job_openingsOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing job_openings.
+     */
+    cursor?: job_openingsWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` job_openings from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` job_openings.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of job_openings.
+     */
+    distinct?: Job_openingsScalarFieldEnum | Job_openingsScalarFieldEnum[]
+  }
+
+  /**
+   * job_openings create
+   */
+  export type job_openingsCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the job_openings
+     */
+    select?: job_openingsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the job_openings
+     */
+    omit?: job_openingsOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: job_openingsInclude<ExtArgs> | null
+    /**
+     * The data needed to create a job_openings.
+     */
+    data: XOR<job_openingsCreateInput, job_openingsUncheckedCreateInput>
+  }
+
+  /**
+   * job_openings createMany
+   */
+  export type job_openingsCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many job_openings.
+     */
+    data: job_openingsCreateManyInput | job_openingsCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * job_openings createManyAndReturn
+   */
+  export type job_openingsCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the job_openings
+     */
+    select?: job_openingsSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the job_openings
+     */
+    omit?: job_openingsOmit<ExtArgs> | null
+    /**
+     * The data used to create many job_openings.
+     */
+    data: job_openingsCreateManyInput | job_openingsCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: job_openingsIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * job_openings update
+   */
+  export type job_openingsUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the job_openings
+     */
+    select?: job_openingsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the job_openings
+     */
+    omit?: job_openingsOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: job_openingsInclude<ExtArgs> | null
+    /**
+     * The data needed to update a job_openings.
+     */
+    data: XOR<job_openingsUpdateInput, job_openingsUncheckedUpdateInput>
+    /**
+     * Choose, which job_openings to update.
+     */
+    where: job_openingsWhereUniqueInput
+  }
+
+  /**
+   * job_openings updateMany
+   */
+  export type job_openingsUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update job_openings.
+     */
+    data: XOR<job_openingsUpdateManyMutationInput, job_openingsUncheckedUpdateManyInput>
+    /**
+     * Filter which job_openings to update
+     */
+    where?: job_openingsWhereInput
+    /**
+     * Limit how many job_openings to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * job_openings updateManyAndReturn
+   */
+  export type job_openingsUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the job_openings
+     */
+    select?: job_openingsSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the job_openings
+     */
+    omit?: job_openingsOmit<ExtArgs> | null
+    /**
+     * The data used to update job_openings.
+     */
+    data: XOR<job_openingsUpdateManyMutationInput, job_openingsUncheckedUpdateManyInput>
+    /**
+     * Filter which job_openings to update
+     */
+    where?: job_openingsWhereInput
+    /**
+     * Limit how many job_openings to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: job_openingsIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * job_openings upsert
+   */
+  export type job_openingsUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the job_openings
+     */
+    select?: job_openingsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the job_openings
+     */
+    omit?: job_openingsOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: job_openingsInclude<ExtArgs> | null
+    /**
+     * The filter to search for the job_openings to update in case it exists.
+     */
+    where: job_openingsWhereUniqueInput
+    /**
+     * In case the job_openings found by the `where` argument doesn't exist, create a new job_openings with this data.
+     */
+    create: XOR<job_openingsCreateInput, job_openingsUncheckedCreateInput>
+    /**
+     * In case the job_openings was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<job_openingsUpdateInput, job_openingsUncheckedUpdateInput>
+  }
+
+  /**
+   * job_openings delete
+   */
+  export type job_openingsDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the job_openings
+     */
+    select?: job_openingsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the job_openings
+     */
+    omit?: job_openingsOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: job_openingsInclude<ExtArgs> | null
+    /**
+     * Filter which job_openings to delete.
+     */
+    where: job_openingsWhereUniqueInput
+  }
+
+  /**
+   * job_openings deleteMany
+   */
+  export type job_openingsDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which job_openings to delete
+     */
+    where?: job_openingsWhereInput
+    /**
+     * Limit how many job_openings to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * job_openings.memberships
+   */
+  export type job_openings$membershipsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the memberships
+     */
+    select?: membershipsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the memberships
+     */
+    omit?: membershipsOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: membershipsInclude<ExtArgs> | null
+    where?: membershipsWhereInput
+  }
+
+  /**
+   * job_openings.departments
+   */
+  export type job_openings$departmentsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the departments
+     */
+    select?: departmentsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the departments
+     */
+    omit?: departmentsOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: departmentsInclude<ExtArgs> | null
+    where?: departmentsWhereInput
+  }
+
+  /**
+   * job_openings.job_requirements
+   */
+  export type job_openings$job_requirementsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the job_requirements
+     */
+    select?: job_requirementsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the job_requirements
+     */
+    omit?: job_requirementsOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: job_requirementsInclude<ExtArgs> | null
+    where?: job_requirementsWhereInput
+    orderBy?: job_requirementsOrderByWithRelationInput | job_requirementsOrderByWithRelationInput[]
+    cursor?: job_requirementsWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: Job_requirementsScalarFieldEnum | Job_requirementsScalarFieldEnum[]
+  }
+
+  /**
+   * job_openings.screening_questions
+   */
+  export type job_openings$screening_questionsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the screening_questions
+     */
+    select?: screening_questionsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the screening_questions
+     */
+    omit?: screening_questionsOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: screening_questionsInclude<ExtArgs> | null
+    where?: screening_questionsWhereInput
+    orderBy?: screening_questionsOrderByWithRelationInput | screening_questionsOrderByWithRelationInput[]
+    cursor?: screening_questionsWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: Screening_questionsScalarFieldEnum | Screening_questionsScalarFieldEnum[]
+  }
+
+  /**
+   * job_openings without action
+   */
+  export type job_openingsDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the job_openings
+     */
+    select?: job_openingsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the job_openings
+     */
+    omit?: job_openingsOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: job_openingsInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model job_requirements
+   */
+
+  export type AggregateJob_requirements = {
+    _count: Job_requirementsCountAggregateOutputType | null
+    _avg: Job_requirementsAvgAggregateOutputType | null
+    _sum: Job_requirementsSumAggregateOutputType | null
+    _min: Job_requirementsMinAggregateOutputType | null
+    _max: Job_requirementsMaxAggregateOutputType | null
+  }
+
+  export type Job_requirementsAvgAggregateOutputType = {
+    sort_order: number | null
+  }
+
+  export type Job_requirementsSumAggregateOutputType = {
+    sort_order: number | null
+  }
+
+  export type Job_requirementsMinAggregateOutputType = {
+    id: string | null
+    job_opening_id: string | null
+    kind: $Enums.requirement_kind | null
+    label: string | null
+    sort_order: number | null
+    created_at: Date | null
+  }
+
+  export type Job_requirementsMaxAggregateOutputType = {
+    id: string | null
+    job_opening_id: string | null
+    kind: $Enums.requirement_kind | null
+    label: string | null
+    sort_order: number | null
+    created_at: Date | null
+  }
+
+  export type Job_requirementsCountAggregateOutputType = {
+    id: number
+    job_opening_id: number
+    kind: number
+    label: number
+    sort_order: number
+    created_at: number
+    _all: number
+  }
+
+
+  export type Job_requirementsAvgAggregateInputType = {
+    sort_order?: true
+  }
+
+  export type Job_requirementsSumAggregateInputType = {
+    sort_order?: true
+  }
+
+  export type Job_requirementsMinAggregateInputType = {
+    id?: true
+    job_opening_id?: true
+    kind?: true
+    label?: true
+    sort_order?: true
+    created_at?: true
+  }
+
+  export type Job_requirementsMaxAggregateInputType = {
+    id?: true
+    job_opening_id?: true
+    kind?: true
+    label?: true
+    sort_order?: true
+    created_at?: true
+  }
+
+  export type Job_requirementsCountAggregateInputType = {
+    id?: true
+    job_opening_id?: true
+    kind?: true
+    label?: true
+    sort_order?: true
+    created_at?: true
+    _all?: true
+  }
+
+  export type Job_requirementsAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which job_requirements to aggregate.
+     */
+    where?: job_requirementsWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of job_requirements to fetch.
+     */
+    orderBy?: job_requirementsOrderByWithRelationInput | job_requirementsOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: job_requirementsWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` job_requirements from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` job_requirements.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned job_requirements
+    **/
+    _count?: true | Job_requirementsCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: Job_requirementsAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: Job_requirementsSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: Job_requirementsMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: Job_requirementsMaxAggregateInputType
+  }
+
+  export type GetJob_requirementsAggregateType<T extends Job_requirementsAggregateArgs> = {
+        [P in keyof T & keyof AggregateJob_requirements]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateJob_requirements[P]>
+      : GetScalarType<T[P], AggregateJob_requirements[P]>
+  }
+
+
+
+
+  export type job_requirementsGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: job_requirementsWhereInput
+    orderBy?: job_requirementsOrderByWithAggregationInput | job_requirementsOrderByWithAggregationInput[]
+    by: Job_requirementsScalarFieldEnum[] | Job_requirementsScalarFieldEnum
+    having?: job_requirementsScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: Job_requirementsCountAggregateInputType | true
+    _avg?: Job_requirementsAvgAggregateInputType
+    _sum?: Job_requirementsSumAggregateInputType
+    _min?: Job_requirementsMinAggregateInputType
+    _max?: Job_requirementsMaxAggregateInputType
+  }
+
+  export type Job_requirementsGroupByOutputType = {
+    id: string
+    job_opening_id: string
+    kind: $Enums.requirement_kind
+    label: string
+    sort_order: number
+    created_at: Date
+    _count: Job_requirementsCountAggregateOutputType | null
+    _avg: Job_requirementsAvgAggregateOutputType | null
+    _sum: Job_requirementsSumAggregateOutputType | null
+    _min: Job_requirementsMinAggregateOutputType | null
+    _max: Job_requirementsMaxAggregateOutputType | null
+  }
+
+  type GetJob_requirementsGroupByPayload<T extends job_requirementsGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<Job_requirementsGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof Job_requirementsGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], Job_requirementsGroupByOutputType[P]>
+            : GetScalarType<T[P], Job_requirementsGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type job_requirementsSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    job_opening_id?: boolean
+    kind?: boolean
+    label?: boolean
+    sort_order?: boolean
+    created_at?: boolean
+    job_openings?: boolean | job_openingsDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["job_requirements"]>
+
+  export type job_requirementsSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    job_opening_id?: boolean
+    kind?: boolean
+    label?: boolean
+    sort_order?: boolean
+    created_at?: boolean
+    job_openings?: boolean | job_openingsDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["job_requirements"]>
+
+  export type job_requirementsSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    job_opening_id?: boolean
+    kind?: boolean
+    label?: boolean
+    sort_order?: boolean
+    created_at?: boolean
+    job_openings?: boolean | job_openingsDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["job_requirements"]>
+
+  export type job_requirementsSelectScalar = {
+    id?: boolean
+    job_opening_id?: boolean
+    kind?: boolean
+    label?: boolean
+    sort_order?: boolean
+    created_at?: boolean
+  }
+
+  export type job_requirementsOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "job_opening_id" | "kind" | "label" | "sort_order" | "created_at", ExtArgs["result"]["job_requirements"]>
+  export type job_requirementsInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    job_openings?: boolean | job_openingsDefaultArgs<ExtArgs>
+  }
+  export type job_requirementsIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    job_openings?: boolean | job_openingsDefaultArgs<ExtArgs>
+  }
+  export type job_requirementsIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    job_openings?: boolean | job_openingsDefaultArgs<ExtArgs>
+  }
+
+  export type $job_requirementsPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "job_requirements"
+    objects: {
+      job_openings: Prisma.$job_openingsPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      job_opening_id: string
+      kind: $Enums.requirement_kind
+      label: string
+      sort_order: number
+      created_at: Date
+    }, ExtArgs["result"]["job_requirements"]>
+    composites: {}
+  }
+
+  type job_requirementsGetPayload<S extends boolean | null | undefined | job_requirementsDefaultArgs> = $Result.GetResult<Prisma.$job_requirementsPayload, S>
+
+  type job_requirementsCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<job_requirementsFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: Job_requirementsCountAggregateInputType | true
+    }
+
+  export interface job_requirementsDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['job_requirements'], meta: { name: 'job_requirements' } }
+    /**
+     * Find zero or one Job_requirements that matches the filter.
+     * @param {job_requirementsFindUniqueArgs} args - Arguments to find a Job_requirements
+     * @example
+     * // Get one Job_requirements
+     * const job_requirements = await prisma.job_requirements.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends job_requirementsFindUniqueArgs>(args: SelectSubset<T, job_requirementsFindUniqueArgs<ExtArgs>>): Prisma__job_requirementsClient<$Result.GetResult<Prisma.$job_requirementsPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one Job_requirements that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {job_requirementsFindUniqueOrThrowArgs} args - Arguments to find a Job_requirements
+     * @example
+     * // Get one Job_requirements
+     * const job_requirements = await prisma.job_requirements.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends job_requirementsFindUniqueOrThrowArgs>(args: SelectSubset<T, job_requirementsFindUniqueOrThrowArgs<ExtArgs>>): Prisma__job_requirementsClient<$Result.GetResult<Prisma.$job_requirementsPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first Job_requirements that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {job_requirementsFindFirstArgs} args - Arguments to find a Job_requirements
+     * @example
+     * // Get one Job_requirements
+     * const job_requirements = await prisma.job_requirements.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends job_requirementsFindFirstArgs>(args?: SelectSubset<T, job_requirementsFindFirstArgs<ExtArgs>>): Prisma__job_requirementsClient<$Result.GetResult<Prisma.$job_requirementsPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first Job_requirements that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {job_requirementsFindFirstOrThrowArgs} args - Arguments to find a Job_requirements
+     * @example
+     * // Get one Job_requirements
+     * const job_requirements = await prisma.job_requirements.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends job_requirementsFindFirstOrThrowArgs>(args?: SelectSubset<T, job_requirementsFindFirstOrThrowArgs<ExtArgs>>): Prisma__job_requirementsClient<$Result.GetResult<Prisma.$job_requirementsPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more Job_requirements that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {job_requirementsFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all Job_requirements
+     * const job_requirements = await prisma.job_requirements.findMany()
+     * 
+     * // Get first 10 Job_requirements
+     * const job_requirements = await prisma.job_requirements.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const job_requirementsWithIdOnly = await prisma.job_requirements.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends job_requirementsFindManyArgs>(args?: SelectSubset<T, job_requirementsFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$job_requirementsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a Job_requirements.
+     * @param {job_requirementsCreateArgs} args - Arguments to create a Job_requirements.
+     * @example
+     * // Create one Job_requirements
+     * const Job_requirements = await prisma.job_requirements.create({
+     *   data: {
+     *     // ... data to create a Job_requirements
+     *   }
+     * })
+     * 
+     */
+    create<T extends job_requirementsCreateArgs>(args: SelectSubset<T, job_requirementsCreateArgs<ExtArgs>>): Prisma__job_requirementsClient<$Result.GetResult<Prisma.$job_requirementsPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many Job_requirements.
+     * @param {job_requirementsCreateManyArgs} args - Arguments to create many Job_requirements.
+     * @example
+     * // Create many Job_requirements
+     * const job_requirements = await prisma.job_requirements.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends job_requirementsCreateManyArgs>(args?: SelectSubset<T, job_requirementsCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many Job_requirements and returns the data saved in the database.
+     * @param {job_requirementsCreateManyAndReturnArgs} args - Arguments to create many Job_requirements.
+     * @example
+     * // Create many Job_requirements
+     * const job_requirements = await prisma.job_requirements.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many Job_requirements and only return the `id`
+     * const job_requirementsWithIdOnly = await prisma.job_requirements.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends job_requirementsCreateManyAndReturnArgs>(args?: SelectSubset<T, job_requirementsCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$job_requirementsPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a Job_requirements.
+     * @param {job_requirementsDeleteArgs} args - Arguments to delete one Job_requirements.
+     * @example
+     * // Delete one Job_requirements
+     * const Job_requirements = await prisma.job_requirements.delete({
+     *   where: {
+     *     // ... filter to delete one Job_requirements
+     *   }
+     * })
+     * 
+     */
+    delete<T extends job_requirementsDeleteArgs>(args: SelectSubset<T, job_requirementsDeleteArgs<ExtArgs>>): Prisma__job_requirementsClient<$Result.GetResult<Prisma.$job_requirementsPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one Job_requirements.
+     * @param {job_requirementsUpdateArgs} args - Arguments to update one Job_requirements.
+     * @example
+     * // Update one Job_requirements
+     * const job_requirements = await prisma.job_requirements.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends job_requirementsUpdateArgs>(args: SelectSubset<T, job_requirementsUpdateArgs<ExtArgs>>): Prisma__job_requirementsClient<$Result.GetResult<Prisma.$job_requirementsPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more Job_requirements.
+     * @param {job_requirementsDeleteManyArgs} args - Arguments to filter Job_requirements to delete.
+     * @example
+     * // Delete a few Job_requirements
+     * const { count } = await prisma.job_requirements.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends job_requirementsDeleteManyArgs>(args?: SelectSubset<T, job_requirementsDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Job_requirements.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {job_requirementsUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many Job_requirements
+     * const job_requirements = await prisma.job_requirements.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends job_requirementsUpdateManyArgs>(args: SelectSubset<T, job_requirementsUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Job_requirements and returns the data updated in the database.
+     * @param {job_requirementsUpdateManyAndReturnArgs} args - Arguments to update many Job_requirements.
+     * @example
+     * // Update many Job_requirements
+     * const job_requirements = await prisma.job_requirements.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more Job_requirements and only return the `id`
+     * const job_requirementsWithIdOnly = await prisma.job_requirements.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends job_requirementsUpdateManyAndReturnArgs>(args: SelectSubset<T, job_requirementsUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$job_requirementsPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one Job_requirements.
+     * @param {job_requirementsUpsertArgs} args - Arguments to update or create a Job_requirements.
+     * @example
+     * // Update or create a Job_requirements
+     * const job_requirements = await prisma.job_requirements.upsert({
+     *   create: {
+     *     // ... data to create a Job_requirements
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the Job_requirements we want to update
+     *   }
+     * })
+     */
+    upsert<T extends job_requirementsUpsertArgs>(args: SelectSubset<T, job_requirementsUpsertArgs<ExtArgs>>): Prisma__job_requirementsClient<$Result.GetResult<Prisma.$job_requirementsPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of Job_requirements.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {job_requirementsCountArgs} args - Arguments to filter Job_requirements to count.
+     * @example
+     * // Count the number of Job_requirements
+     * const count = await prisma.job_requirements.count({
+     *   where: {
+     *     // ... the filter for the Job_requirements we want to count
+     *   }
+     * })
+    **/
+    count<T extends job_requirementsCountArgs>(
+      args?: Subset<T, job_requirementsCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], Job_requirementsCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a Job_requirements.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {Job_requirementsAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends Job_requirementsAggregateArgs>(args: Subset<T, Job_requirementsAggregateArgs>): Prisma.PrismaPromise<GetJob_requirementsAggregateType<T>>
+
+    /**
+     * Group by Job_requirements.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {job_requirementsGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends job_requirementsGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: job_requirementsGroupByArgs['orderBy'] }
+        : { orderBy?: job_requirementsGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, job_requirementsGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetJob_requirementsGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the job_requirements model
+   */
+  readonly fields: job_requirementsFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for job_requirements.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__job_requirementsClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    job_openings<T extends job_openingsDefaultArgs<ExtArgs> = {}>(args?: Subset<T, job_openingsDefaultArgs<ExtArgs>>): Prisma__job_openingsClient<$Result.GetResult<Prisma.$job_openingsPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the job_requirements model
+   */
+  interface job_requirementsFieldRefs {
+    readonly id: FieldRef<"job_requirements", 'String'>
+    readonly job_opening_id: FieldRef<"job_requirements", 'String'>
+    readonly kind: FieldRef<"job_requirements", 'requirement_kind'>
+    readonly label: FieldRef<"job_requirements", 'String'>
+    readonly sort_order: FieldRef<"job_requirements", 'Int'>
+    readonly created_at: FieldRef<"job_requirements", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * job_requirements findUnique
+   */
+  export type job_requirementsFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the job_requirements
+     */
+    select?: job_requirementsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the job_requirements
+     */
+    omit?: job_requirementsOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: job_requirementsInclude<ExtArgs> | null
+    /**
+     * Filter, which job_requirements to fetch.
+     */
+    where: job_requirementsWhereUniqueInput
+  }
+
+  /**
+   * job_requirements findUniqueOrThrow
+   */
+  export type job_requirementsFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the job_requirements
+     */
+    select?: job_requirementsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the job_requirements
+     */
+    omit?: job_requirementsOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: job_requirementsInclude<ExtArgs> | null
+    /**
+     * Filter, which job_requirements to fetch.
+     */
+    where: job_requirementsWhereUniqueInput
+  }
+
+  /**
+   * job_requirements findFirst
+   */
+  export type job_requirementsFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the job_requirements
+     */
+    select?: job_requirementsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the job_requirements
+     */
+    omit?: job_requirementsOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: job_requirementsInclude<ExtArgs> | null
+    /**
+     * Filter, which job_requirements to fetch.
+     */
+    where?: job_requirementsWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of job_requirements to fetch.
+     */
+    orderBy?: job_requirementsOrderByWithRelationInput | job_requirementsOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for job_requirements.
+     */
+    cursor?: job_requirementsWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` job_requirements from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` job_requirements.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of job_requirements.
+     */
+    distinct?: Job_requirementsScalarFieldEnum | Job_requirementsScalarFieldEnum[]
+  }
+
+  /**
+   * job_requirements findFirstOrThrow
+   */
+  export type job_requirementsFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the job_requirements
+     */
+    select?: job_requirementsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the job_requirements
+     */
+    omit?: job_requirementsOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: job_requirementsInclude<ExtArgs> | null
+    /**
+     * Filter, which job_requirements to fetch.
+     */
+    where?: job_requirementsWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of job_requirements to fetch.
+     */
+    orderBy?: job_requirementsOrderByWithRelationInput | job_requirementsOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for job_requirements.
+     */
+    cursor?: job_requirementsWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` job_requirements from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` job_requirements.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of job_requirements.
+     */
+    distinct?: Job_requirementsScalarFieldEnum | Job_requirementsScalarFieldEnum[]
+  }
+
+  /**
+   * job_requirements findMany
+   */
+  export type job_requirementsFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the job_requirements
+     */
+    select?: job_requirementsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the job_requirements
+     */
+    omit?: job_requirementsOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: job_requirementsInclude<ExtArgs> | null
+    /**
+     * Filter, which job_requirements to fetch.
+     */
+    where?: job_requirementsWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of job_requirements to fetch.
+     */
+    orderBy?: job_requirementsOrderByWithRelationInput | job_requirementsOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing job_requirements.
+     */
+    cursor?: job_requirementsWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` job_requirements from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` job_requirements.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of job_requirements.
+     */
+    distinct?: Job_requirementsScalarFieldEnum | Job_requirementsScalarFieldEnum[]
+  }
+
+  /**
+   * job_requirements create
+   */
+  export type job_requirementsCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the job_requirements
+     */
+    select?: job_requirementsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the job_requirements
+     */
+    omit?: job_requirementsOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: job_requirementsInclude<ExtArgs> | null
+    /**
+     * The data needed to create a job_requirements.
+     */
+    data: XOR<job_requirementsCreateInput, job_requirementsUncheckedCreateInput>
+  }
+
+  /**
+   * job_requirements createMany
+   */
+  export type job_requirementsCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many job_requirements.
+     */
+    data: job_requirementsCreateManyInput | job_requirementsCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * job_requirements createManyAndReturn
+   */
+  export type job_requirementsCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the job_requirements
+     */
+    select?: job_requirementsSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the job_requirements
+     */
+    omit?: job_requirementsOmit<ExtArgs> | null
+    /**
+     * The data used to create many job_requirements.
+     */
+    data: job_requirementsCreateManyInput | job_requirementsCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: job_requirementsIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * job_requirements update
+   */
+  export type job_requirementsUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the job_requirements
+     */
+    select?: job_requirementsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the job_requirements
+     */
+    omit?: job_requirementsOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: job_requirementsInclude<ExtArgs> | null
+    /**
+     * The data needed to update a job_requirements.
+     */
+    data: XOR<job_requirementsUpdateInput, job_requirementsUncheckedUpdateInput>
+    /**
+     * Choose, which job_requirements to update.
+     */
+    where: job_requirementsWhereUniqueInput
+  }
+
+  /**
+   * job_requirements updateMany
+   */
+  export type job_requirementsUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update job_requirements.
+     */
+    data: XOR<job_requirementsUpdateManyMutationInput, job_requirementsUncheckedUpdateManyInput>
+    /**
+     * Filter which job_requirements to update
+     */
+    where?: job_requirementsWhereInput
+    /**
+     * Limit how many job_requirements to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * job_requirements updateManyAndReturn
+   */
+  export type job_requirementsUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the job_requirements
+     */
+    select?: job_requirementsSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the job_requirements
+     */
+    omit?: job_requirementsOmit<ExtArgs> | null
+    /**
+     * The data used to update job_requirements.
+     */
+    data: XOR<job_requirementsUpdateManyMutationInput, job_requirementsUncheckedUpdateManyInput>
+    /**
+     * Filter which job_requirements to update
+     */
+    where?: job_requirementsWhereInput
+    /**
+     * Limit how many job_requirements to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: job_requirementsIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * job_requirements upsert
+   */
+  export type job_requirementsUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the job_requirements
+     */
+    select?: job_requirementsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the job_requirements
+     */
+    omit?: job_requirementsOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: job_requirementsInclude<ExtArgs> | null
+    /**
+     * The filter to search for the job_requirements to update in case it exists.
+     */
+    where: job_requirementsWhereUniqueInput
+    /**
+     * In case the job_requirements found by the `where` argument doesn't exist, create a new job_requirements with this data.
+     */
+    create: XOR<job_requirementsCreateInput, job_requirementsUncheckedCreateInput>
+    /**
+     * In case the job_requirements was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<job_requirementsUpdateInput, job_requirementsUncheckedUpdateInput>
+  }
+
+  /**
+   * job_requirements delete
+   */
+  export type job_requirementsDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the job_requirements
+     */
+    select?: job_requirementsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the job_requirements
+     */
+    omit?: job_requirementsOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: job_requirementsInclude<ExtArgs> | null
+    /**
+     * Filter which job_requirements to delete.
+     */
+    where: job_requirementsWhereUniqueInput
+  }
+
+  /**
+   * job_requirements deleteMany
+   */
+  export type job_requirementsDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which job_requirements to delete
+     */
+    where?: job_requirementsWhereInput
+    /**
+     * Limit how many job_requirements to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * job_requirements without action
+   */
+  export type job_requirementsDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the job_requirements
+     */
+    select?: job_requirementsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the job_requirements
+     */
+    omit?: job_requirementsOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: job_requirementsInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model screening_questions
+   */
+
+  export type AggregateScreening_questions = {
+    _count: Screening_questionsCountAggregateOutputType | null
+    _avg: Screening_questionsAvgAggregateOutputType | null
+    _sum: Screening_questionsSumAggregateOutputType | null
+    _min: Screening_questionsMinAggregateOutputType | null
+    _max: Screening_questionsMaxAggregateOutputType | null
+  }
+
+  export type Screening_questionsAvgAggregateOutputType = {
+    sort_order: number | null
+  }
+
+  export type Screening_questionsSumAggregateOutputType = {
+    sort_order: number | null
+  }
+
+  export type Screening_questionsMinAggregateOutputType = {
+    id: string | null
+    job_opening_id: string | null
+    question: string | null
+    required: boolean | null
+    sort_order: number | null
+    created_at: Date | null
+  }
+
+  export type Screening_questionsMaxAggregateOutputType = {
+    id: string | null
+    job_opening_id: string | null
+    question: string | null
+    required: boolean | null
+    sort_order: number | null
+    created_at: Date | null
+  }
+
+  export type Screening_questionsCountAggregateOutputType = {
+    id: number
+    job_opening_id: number
+    question: number
+    required: number
+    sort_order: number
+    created_at: number
+    _all: number
+  }
+
+
+  export type Screening_questionsAvgAggregateInputType = {
+    sort_order?: true
+  }
+
+  export type Screening_questionsSumAggregateInputType = {
+    sort_order?: true
+  }
+
+  export type Screening_questionsMinAggregateInputType = {
+    id?: true
+    job_opening_id?: true
+    question?: true
+    required?: true
+    sort_order?: true
+    created_at?: true
+  }
+
+  export type Screening_questionsMaxAggregateInputType = {
+    id?: true
+    job_opening_id?: true
+    question?: true
+    required?: true
+    sort_order?: true
+    created_at?: true
+  }
+
+  export type Screening_questionsCountAggregateInputType = {
+    id?: true
+    job_opening_id?: true
+    question?: true
+    required?: true
+    sort_order?: true
+    created_at?: true
+    _all?: true
+  }
+
+  export type Screening_questionsAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which screening_questions to aggregate.
+     */
+    where?: screening_questionsWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of screening_questions to fetch.
+     */
+    orderBy?: screening_questionsOrderByWithRelationInput | screening_questionsOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: screening_questionsWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` screening_questions from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` screening_questions.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned screening_questions
+    **/
+    _count?: true | Screening_questionsCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: Screening_questionsAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: Screening_questionsSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: Screening_questionsMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: Screening_questionsMaxAggregateInputType
+  }
+
+  export type GetScreening_questionsAggregateType<T extends Screening_questionsAggregateArgs> = {
+        [P in keyof T & keyof AggregateScreening_questions]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateScreening_questions[P]>
+      : GetScalarType<T[P], AggregateScreening_questions[P]>
+  }
+
+
+
+
+  export type screening_questionsGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: screening_questionsWhereInput
+    orderBy?: screening_questionsOrderByWithAggregationInput | screening_questionsOrderByWithAggregationInput[]
+    by: Screening_questionsScalarFieldEnum[] | Screening_questionsScalarFieldEnum
+    having?: screening_questionsScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: Screening_questionsCountAggregateInputType | true
+    _avg?: Screening_questionsAvgAggregateInputType
+    _sum?: Screening_questionsSumAggregateInputType
+    _min?: Screening_questionsMinAggregateInputType
+    _max?: Screening_questionsMaxAggregateInputType
+  }
+
+  export type Screening_questionsGroupByOutputType = {
+    id: string
+    job_opening_id: string
+    question: string
+    required: boolean
+    sort_order: number
+    created_at: Date
+    _count: Screening_questionsCountAggregateOutputType | null
+    _avg: Screening_questionsAvgAggregateOutputType | null
+    _sum: Screening_questionsSumAggregateOutputType | null
+    _min: Screening_questionsMinAggregateOutputType | null
+    _max: Screening_questionsMaxAggregateOutputType | null
+  }
+
+  type GetScreening_questionsGroupByPayload<T extends screening_questionsGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<Screening_questionsGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof Screening_questionsGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], Screening_questionsGroupByOutputType[P]>
+            : GetScalarType<T[P], Screening_questionsGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type screening_questionsSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    job_opening_id?: boolean
+    question?: boolean
+    required?: boolean
+    sort_order?: boolean
+    created_at?: boolean
+    job_openings?: boolean | job_openingsDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["screening_questions"]>
+
+  export type screening_questionsSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    job_opening_id?: boolean
+    question?: boolean
+    required?: boolean
+    sort_order?: boolean
+    created_at?: boolean
+    job_openings?: boolean | job_openingsDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["screening_questions"]>
+
+  export type screening_questionsSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    job_opening_id?: boolean
+    question?: boolean
+    required?: boolean
+    sort_order?: boolean
+    created_at?: boolean
+    job_openings?: boolean | job_openingsDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["screening_questions"]>
+
+  export type screening_questionsSelectScalar = {
+    id?: boolean
+    job_opening_id?: boolean
+    question?: boolean
+    required?: boolean
+    sort_order?: boolean
+    created_at?: boolean
+  }
+
+  export type screening_questionsOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "job_opening_id" | "question" | "required" | "sort_order" | "created_at", ExtArgs["result"]["screening_questions"]>
+  export type screening_questionsInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    job_openings?: boolean | job_openingsDefaultArgs<ExtArgs>
+  }
+  export type screening_questionsIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    job_openings?: boolean | job_openingsDefaultArgs<ExtArgs>
+  }
+  export type screening_questionsIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    job_openings?: boolean | job_openingsDefaultArgs<ExtArgs>
+  }
+
+  export type $screening_questionsPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "screening_questions"
+    objects: {
+      job_openings: Prisma.$job_openingsPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      job_opening_id: string
+      question: string
+      required: boolean
+      sort_order: number
+      created_at: Date
+    }, ExtArgs["result"]["screening_questions"]>
+    composites: {}
+  }
+
+  type screening_questionsGetPayload<S extends boolean | null | undefined | screening_questionsDefaultArgs> = $Result.GetResult<Prisma.$screening_questionsPayload, S>
+
+  type screening_questionsCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<screening_questionsFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: Screening_questionsCountAggregateInputType | true
+    }
+
+  export interface screening_questionsDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['screening_questions'], meta: { name: 'screening_questions' } }
+    /**
+     * Find zero or one Screening_questions that matches the filter.
+     * @param {screening_questionsFindUniqueArgs} args - Arguments to find a Screening_questions
+     * @example
+     * // Get one Screening_questions
+     * const screening_questions = await prisma.screening_questions.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends screening_questionsFindUniqueArgs>(args: SelectSubset<T, screening_questionsFindUniqueArgs<ExtArgs>>): Prisma__screening_questionsClient<$Result.GetResult<Prisma.$screening_questionsPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one Screening_questions that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {screening_questionsFindUniqueOrThrowArgs} args - Arguments to find a Screening_questions
+     * @example
+     * // Get one Screening_questions
+     * const screening_questions = await prisma.screening_questions.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends screening_questionsFindUniqueOrThrowArgs>(args: SelectSubset<T, screening_questionsFindUniqueOrThrowArgs<ExtArgs>>): Prisma__screening_questionsClient<$Result.GetResult<Prisma.$screening_questionsPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first Screening_questions that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {screening_questionsFindFirstArgs} args - Arguments to find a Screening_questions
+     * @example
+     * // Get one Screening_questions
+     * const screening_questions = await prisma.screening_questions.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends screening_questionsFindFirstArgs>(args?: SelectSubset<T, screening_questionsFindFirstArgs<ExtArgs>>): Prisma__screening_questionsClient<$Result.GetResult<Prisma.$screening_questionsPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first Screening_questions that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {screening_questionsFindFirstOrThrowArgs} args - Arguments to find a Screening_questions
+     * @example
+     * // Get one Screening_questions
+     * const screening_questions = await prisma.screening_questions.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends screening_questionsFindFirstOrThrowArgs>(args?: SelectSubset<T, screening_questionsFindFirstOrThrowArgs<ExtArgs>>): Prisma__screening_questionsClient<$Result.GetResult<Prisma.$screening_questionsPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more Screening_questions that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {screening_questionsFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all Screening_questions
+     * const screening_questions = await prisma.screening_questions.findMany()
+     * 
+     * // Get first 10 Screening_questions
+     * const screening_questions = await prisma.screening_questions.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const screening_questionsWithIdOnly = await prisma.screening_questions.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends screening_questionsFindManyArgs>(args?: SelectSubset<T, screening_questionsFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$screening_questionsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a Screening_questions.
+     * @param {screening_questionsCreateArgs} args - Arguments to create a Screening_questions.
+     * @example
+     * // Create one Screening_questions
+     * const Screening_questions = await prisma.screening_questions.create({
+     *   data: {
+     *     // ... data to create a Screening_questions
+     *   }
+     * })
+     * 
+     */
+    create<T extends screening_questionsCreateArgs>(args: SelectSubset<T, screening_questionsCreateArgs<ExtArgs>>): Prisma__screening_questionsClient<$Result.GetResult<Prisma.$screening_questionsPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many Screening_questions.
+     * @param {screening_questionsCreateManyArgs} args - Arguments to create many Screening_questions.
+     * @example
+     * // Create many Screening_questions
+     * const screening_questions = await prisma.screening_questions.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends screening_questionsCreateManyArgs>(args?: SelectSubset<T, screening_questionsCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many Screening_questions and returns the data saved in the database.
+     * @param {screening_questionsCreateManyAndReturnArgs} args - Arguments to create many Screening_questions.
+     * @example
+     * // Create many Screening_questions
+     * const screening_questions = await prisma.screening_questions.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many Screening_questions and only return the `id`
+     * const screening_questionsWithIdOnly = await prisma.screening_questions.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends screening_questionsCreateManyAndReturnArgs>(args?: SelectSubset<T, screening_questionsCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$screening_questionsPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a Screening_questions.
+     * @param {screening_questionsDeleteArgs} args - Arguments to delete one Screening_questions.
+     * @example
+     * // Delete one Screening_questions
+     * const Screening_questions = await prisma.screening_questions.delete({
+     *   where: {
+     *     // ... filter to delete one Screening_questions
+     *   }
+     * })
+     * 
+     */
+    delete<T extends screening_questionsDeleteArgs>(args: SelectSubset<T, screening_questionsDeleteArgs<ExtArgs>>): Prisma__screening_questionsClient<$Result.GetResult<Prisma.$screening_questionsPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one Screening_questions.
+     * @param {screening_questionsUpdateArgs} args - Arguments to update one Screening_questions.
+     * @example
+     * // Update one Screening_questions
+     * const screening_questions = await prisma.screening_questions.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends screening_questionsUpdateArgs>(args: SelectSubset<T, screening_questionsUpdateArgs<ExtArgs>>): Prisma__screening_questionsClient<$Result.GetResult<Prisma.$screening_questionsPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more Screening_questions.
+     * @param {screening_questionsDeleteManyArgs} args - Arguments to filter Screening_questions to delete.
+     * @example
+     * // Delete a few Screening_questions
+     * const { count } = await prisma.screening_questions.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends screening_questionsDeleteManyArgs>(args?: SelectSubset<T, screening_questionsDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Screening_questions.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {screening_questionsUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many Screening_questions
+     * const screening_questions = await prisma.screening_questions.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends screening_questionsUpdateManyArgs>(args: SelectSubset<T, screening_questionsUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Screening_questions and returns the data updated in the database.
+     * @param {screening_questionsUpdateManyAndReturnArgs} args - Arguments to update many Screening_questions.
+     * @example
+     * // Update many Screening_questions
+     * const screening_questions = await prisma.screening_questions.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more Screening_questions and only return the `id`
+     * const screening_questionsWithIdOnly = await prisma.screening_questions.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends screening_questionsUpdateManyAndReturnArgs>(args: SelectSubset<T, screening_questionsUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$screening_questionsPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one Screening_questions.
+     * @param {screening_questionsUpsertArgs} args - Arguments to update or create a Screening_questions.
+     * @example
+     * // Update or create a Screening_questions
+     * const screening_questions = await prisma.screening_questions.upsert({
+     *   create: {
+     *     // ... data to create a Screening_questions
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the Screening_questions we want to update
+     *   }
+     * })
+     */
+    upsert<T extends screening_questionsUpsertArgs>(args: SelectSubset<T, screening_questionsUpsertArgs<ExtArgs>>): Prisma__screening_questionsClient<$Result.GetResult<Prisma.$screening_questionsPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of Screening_questions.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {screening_questionsCountArgs} args - Arguments to filter Screening_questions to count.
+     * @example
+     * // Count the number of Screening_questions
+     * const count = await prisma.screening_questions.count({
+     *   where: {
+     *     // ... the filter for the Screening_questions we want to count
+     *   }
+     * })
+    **/
+    count<T extends screening_questionsCountArgs>(
+      args?: Subset<T, screening_questionsCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], Screening_questionsCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a Screening_questions.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {Screening_questionsAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends Screening_questionsAggregateArgs>(args: Subset<T, Screening_questionsAggregateArgs>): Prisma.PrismaPromise<GetScreening_questionsAggregateType<T>>
+
+    /**
+     * Group by Screening_questions.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {screening_questionsGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends screening_questionsGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: screening_questionsGroupByArgs['orderBy'] }
+        : { orderBy?: screening_questionsGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, screening_questionsGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetScreening_questionsGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the screening_questions model
+   */
+  readonly fields: screening_questionsFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for screening_questions.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__screening_questionsClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    job_openings<T extends job_openingsDefaultArgs<ExtArgs> = {}>(args?: Subset<T, job_openingsDefaultArgs<ExtArgs>>): Prisma__job_openingsClient<$Result.GetResult<Prisma.$job_openingsPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the screening_questions model
+   */
+  interface screening_questionsFieldRefs {
+    readonly id: FieldRef<"screening_questions", 'String'>
+    readonly job_opening_id: FieldRef<"screening_questions", 'String'>
+    readonly question: FieldRef<"screening_questions", 'String'>
+    readonly required: FieldRef<"screening_questions", 'Boolean'>
+    readonly sort_order: FieldRef<"screening_questions", 'Int'>
+    readonly created_at: FieldRef<"screening_questions", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * screening_questions findUnique
+   */
+  export type screening_questionsFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the screening_questions
+     */
+    select?: screening_questionsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the screening_questions
+     */
+    omit?: screening_questionsOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: screening_questionsInclude<ExtArgs> | null
+    /**
+     * Filter, which screening_questions to fetch.
+     */
+    where: screening_questionsWhereUniqueInput
+  }
+
+  /**
+   * screening_questions findUniqueOrThrow
+   */
+  export type screening_questionsFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the screening_questions
+     */
+    select?: screening_questionsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the screening_questions
+     */
+    omit?: screening_questionsOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: screening_questionsInclude<ExtArgs> | null
+    /**
+     * Filter, which screening_questions to fetch.
+     */
+    where: screening_questionsWhereUniqueInput
+  }
+
+  /**
+   * screening_questions findFirst
+   */
+  export type screening_questionsFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the screening_questions
+     */
+    select?: screening_questionsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the screening_questions
+     */
+    omit?: screening_questionsOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: screening_questionsInclude<ExtArgs> | null
+    /**
+     * Filter, which screening_questions to fetch.
+     */
+    where?: screening_questionsWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of screening_questions to fetch.
+     */
+    orderBy?: screening_questionsOrderByWithRelationInput | screening_questionsOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for screening_questions.
+     */
+    cursor?: screening_questionsWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` screening_questions from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` screening_questions.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of screening_questions.
+     */
+    distinct?: Screening_questionsScalarFieldEnum | Screening_questionsScalarFieldEnum[]
+  }
+
+  /**
+   * screening_questions findFirstOrThrow
+   */
+  export type screening_questionsFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the screening_questions
+     */
+    select?: screening_questionsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the screening_questions
+     */
+    omit?: screening_questionsOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: screening_questionsInclude<ExtArgs> | null
+    /**
+     * Filter, which screening_questions to fetch.
+     */
+    where?: screening_questionsWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of screening_questions to fetch.
+     */
+    orderBy?: screening_questionsOrderByWithRelationInput | screening_questionsOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for screening_questions.
+     */
+    cursor?: screening_questionsWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` screening_questions from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` screening_questions.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of screening_questions.
+     */
+    distinct?: Screening_questionsScalarFieldEnum | Screening_questionsScalarFieldEnum[]
+  }
+
+  /**
+   * screening_questions findMany
+   */
+  export type screening_questionsFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the screening_questions
+     */
+    select?: screening_questionsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the screening_questions
+     */
+    omit?: screening_questionsOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: screening_questionsInclude<ExtArgs> | null
+    /**
+     * Filter, which screening_questions to fetch.
+     */
+    where?: screening_questionsWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of screening_questions to fetch.
+     */
+    orderBy?: screening_questionsOrderByWithRelationInput | screening_questionsOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing screening_questions.
+     */
+    cursor?: screening_questionsWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` screening_questions from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` screening_questions.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of screening_questions.
+     */
+    distinct?: Screening_questionsScalarFieldEnum | Screening_questionsScalarFieldEnum[]
+  }
+
+  /**
+   * screening_questions create
+   */
+  export type screening_questionsCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the screening_questions
+     */
+    select?: screening_questionsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the screening_questions
+     */
+    omit?: screening_questionsOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: screening_questionsInclude<ExtArgs> | null
+    /**
+     * The data needed to create a screening_questions.
+     */
+    data: XOR<screening_questionsCreateInput, screening_questionsUncheckedCreateInput>
+  }
+
+  /**
+   * screening_questions createMany
+   */
+  export type screening_questionsCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many screening_questions.
+     */
+    data: screening_questionsCreateManyInput | screening_questionsCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * screening_questions createManyAndReturn
+   */
+  export type screening_questionsCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the screening_questions
+     */
+    select?: screening_questionsSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the screening_questions
+     */
+    omit?: screening_questionsOmit<ExtArgs> | null
+    /**
+     * The data used to create many screening_questions.
+     */
+    data: screening_questionsCreateManyInput | screening_questionsCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: screening_questionsIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * screening_questions update
+   */
+  export type screening_questionsUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the screening_questions
+     */
+    select?: screening_questionsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the screening_questions
+     */
+    omit?: screening_questionsOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: screening_questionsInclude<ExtArgs> | null
+    /**
+     * The data needed to update a screening_questions.
+     */
+    data: XOR<screening_questionsUpdateInput, screening_questionsUncheckedUpdateInput>
+    /**
+     * Choose, which screening_questions to update.
+     */
+    where: screening_questionsWhereUniqueInput
+  }
+
+  /**
+   * screening_questions updateMany
+   */
+  export type screening_questionsUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update screening_questions.
+     */
+    data: XOR<screening_questionsUpdateManyMutationInput, screening_questionsUncheckedUpdateManyInput>
+    /**
+     * Filter which screening_questions to update
+     */
+    where?: screening_questionsWhereInput
+    /**
+     * Limit how many screening_questions to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * screening_questions updateManyAndReturn
+   */
+  export type screening_questionsUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the screening_questions
+     */
+    select?: screening_questionsSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the screening_questions
+     */
+    omit?: screening_questionsOmit<ExtArgs> | null
+    /**
+     * The data used to update screening_questions.
+     */
+    data: XOR<screening_questionsUpdateManyMutationInput, screening_questionsUncheckedUpdateManyInput>
+    /**
+     * Filter which screening_questions to update
+     */
+    where?: screening_questionsWhereInput
+    /**
+     * Limit how many screening_questions to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: screening_questionsIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * screening_questions upsert
+   */
+  export type screening_questionsUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the screening_questions
+     */
+    select?: screening_questionsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the screening_questions
+     */
+    omit?: screening_questionsOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: screening_questionsInclude<ExtArgs> | null
+    /**
+     * The filter to search for the screening_questions to update in case it exists.
+     */
+    where: screening_questionsWhereUniqueInput
+    /**
+     * In case the screening_questions found by the `where` argument doesn't exist, create a new screening_questions with this data.
+     */
+    create: XOR<screening_questionsCreateInput, screening_questionsUncheckedCreateInput>
+    /**
+     * In case the screening_questions was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<screening_questionsUpdateInput, screening_questionsUncheckedUpdateInput>
+  }
+
+  /**
+   * screening_questions delete
+   */
+  export type screening_questionsDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the screening_questions
+     */
+    select?: screening_questionsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the screening_questions
+     */
+    omit?: screening_questionsOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: screening_questionsInclude<ExtArgs> | null
+    /**
+     * Filter which screening_questions to delete.
+     */
+    where: screening_questionsWhereUniqueInput
+  }
+
+  /**
+   * screening_questions deleteMany
+   */
+  export type screening_questionsDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which screening_questions to delete
+     */
+    where?: screening_questionsWhereInput
+    /**
+     * Limit how many screening_questions to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * screening_questions without action
+   */
+  export type screening_questionsDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the screening_questions
+     */
+    select?: screening_questionsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the screening_questions
+     */
+    omit?: screening_questionsOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: screening_questionsInclude<ExtArgs> | null
+  }
+
+
+  /**
    * Enums
    */
 
@@ -48753,6 +52903,58 @@ export namespace Prisma {
   export type User_permission_overridesScalarFieldEnum = (typeof User_permission_overridesScalarFieldEnum)[keyof typeof User_permission_overridesScalarFieldEnum]
 
 
+  export const Job_openingsScalarFieldEnum: {
+    id: 'id',
+    organization_id: 'organization_id',
+    department_id: 'department_id',
+    created_by: 'created_by',
+    title: 'title',
+    employment_type: 'employment_type',
+    work_mode: 'work_mode',
+    location: 'location',
+    experience_min: 'experience_min',
+    experience_max: 'experience_max',
+    salary_min: 'salary_min',
+    salary_max: 'salary_max',
+    salary_currency: 'salary_currency',
+    salary_visible: 'salary_visible',
+    description: 'description',
+    positions: 'positions',
+    status: 'status',
+    application_deadline: 'application_deadline',
+    opened_at: 'opened_at',
+    closed_at: 'closed_at',
+    created_at: 'created_at',
+    updated_at: 'updated_at'
+  };
+
+  export type Job_openingsScalarFieldEnum = (typeof Job_openingsScalarFieldEnum)[keyof typeof Job_openingsScalarFieldEnum]
+
+
+  export const Job_requirementsScalarFieldEnum: {
+    id: 'id',
+    job_opening_id: 'job_opening_id',
+    kind: 'kind',
+    label: 'label',
+    sort_order: 'sort_order',
+    created_at: 'created_at'
+  };
+
+  export type Job_requirementsScalarFieldEnum = (typeof Job_requirementsScalarFieldEnum)[keyof typeof Job_requirementsScalarFieldEnum]
+
+
+  export const Screening_questionsScalarFieldEnum: {
+    id: 'id',
+    job_opening_id: 'job_opening_id',
+    question: 'question',
+    required: 'required',
+    sort_order: 'sort_order',
+    created_at: 'created_at'
+  };
+
+  export type Screening_questionsScalarFieldEnum = (typeof Screening_questionsScalarFieldEnum)[keyof typeof Screening_questionsScalarFieldEnum]
+
+
   export const SortOrder: {
     asc: 'asc',
     desc: 'desc'
@@ -49076,6 +53278,76 @@ export namespace Prisma {
    * Reference to a field of type 'permission_risk[]'
    */
   export type ListEnumpermission_riskFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'permission_risk[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'employment_type'
+   */
+  export type Enumemployment_typeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'employment_type'>
+    
+
+
+  /**
+   * Reference to a field of type 'employment_type[]'
+   */
+  export type ListEnumemployment_typeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'employment_type[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'work_mode'
+   */
+  export type Enumwork_modeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'work_mode'>
+    
+
+
+  /**
+   * Reference to a field of type 'work_mode[]'
+   */
+  export type ListEnumwork_modeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'work_mode[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'Decimal'
+   */
+  export type DecimalFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Decimal'>
+    
+
+
+  /**
+   * Reference to a field of type 'Decimal[]'
+   */
+  export type ListDecimalFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Decimal[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'opening_status'
+   */
+  export type Enumopening_statusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'opening_status'>
+    
+
+
+  /**
+   * Reference to a field of type 'opening_status[]'
+   */
+  export type ListEnumopening_statusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'opening_status[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'requirement_kind'
+   */
+  export type Enumrequirement_kindFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'requirement_kind'>
+    
+
+
+  /**
+   * Reference to a field of type 'requirement_kind[]'
+   */
+  export type ListEnumrequirement_kindFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'requirement_kind[]'>
     
 
 
@@ -51237,6 +55509,7 @@ export namespace Prisma {
     memberships_departments_head_membership_idTomemberships?: XOR<MembershipsNullableScalarRelationFilter, membershipsWhereInput> | null
     organizations?: XOR<OrganizationsScalarRelationFilter, organizationsWhereInput>
     invitations?: InvitationsListRelationFilter
+    job_openings?: Job_openingsListRelationFilter
     memberships_memberships_department_idTodepartments?: MembershipsListRelationFilter
   }
 
@@ -51251,6 +55524,7 @@ export namespace Prisma {
     memberships_departments_head_membership_idTomemberships?: membershipsOrderByWithRelationInput
     organizations?: organizationsOrderByWithRelationInput
     invitations?: invitationsOrderByRelationAggregateInput
+    job_openings?: job_openingsOrderByRelationAggregateInput
     memberships_memberships_department_idTodepartments?: membershipsOrderByRelationAggregateInput
   }
 
@@ -51269,6 +55543,7 @@ export namespace Prisma {
     memberships_departments_head_membership_idTomemberships?: XOR<MembershipsNullableScalarRelationFilter, membershipsWhereInput> | null
     organizations?: XOR<OrganizationsScalarRelationFilter, organizationsWhereInput>
     invitations?: InvitationsListRelationFilter
+    job_openings?: Job_openingsListRelationFilter
     memberships_memberships_department_idTodepartments?: MembershipsListRelationFilter
   }, "id" | "organization_id_name">
 
@@ -51424,6 +55699,7 @@ export namespace Prisma {
     audit_log?: Audit_logListRelationFilter
     departments_departments_head_membership_idTomemberships?: DepartmentsListRelationFilter
     invitations?: InvitationsListRelationFilter
+    job_openings?: Job_openingsListRelationFilter
     departments_memberships_department_idTodepartments?: XOR<DepartmentsNullableScalarRelationFilter, departmentsWhereInput> | null
     organizations?: XOR<OrganizationsScalarRelationFilter, organizationsWhereInput>
     roles?: XOR<RolesNullableScalarRelationFilter, rolesWhereInput> | null
@@ -51447,6 +55723,7 @@ export namespace Prisma {
     audit_log?: audit_logOrderByRelationAggregateInput
     departments_departments_head_membership_idTomemberships?: departmentsOrderByRelationAggregateInput
     invitations?: invitationsOrderByRelationAggregateInput
+    job_openings?: job_openingsOrderByRelationAggregateInput
     departments_memberships_department_idTodepartments?: departmentsOrderByWithRelationInput
     organizations?: organizationsOrderByWithRelationInput
     roles?: rolesOrderByWithRelationInput
@@ -51475,6 +55752,7 @@ export namespace Prisma {
     audit_log?: Audit_logListRelationFilter
     departments_departments_head_membership_idTomemberships?: DepartmentsListRelationFilter
     invitations?: InvitationsListRelationFilter
+    job_openings?: Job_openingsListRelationFilter
     departments_memberships_department_idTodepartments?: XOR<DepartmentsNullableScalarRelationFilter, departmentsWhereInput> | null
     organizations?: XOR<OrganizationsScalarRelationFilter, organizationsWhereInput>
     roles?: XOR<RolesNullableScalarRelationFilter, rolesWhereInput> | null
@@ -51537,6 +55815,7 @@ export namespace Prisma {
     audit_log?: Audit_logListRelationFilter
     departments?: DepartmentsListRelationFilter
     invitations?: InvitationsListRelationFilter
+    job_openings?: Job_openingsListRelationFilter
     memberships?: MembershipsListRelationFilter
     roles?: XOR<RolesNullableScalarRelationFilter, rolesWhereInput> | null
     user_permission_overrides?: User_permission_overridesListRelationFilter
@@ -51559,6 +55838,7 @@ export namespace Prisma {
     audit_log?: audit_logOrderByRelationAggregateInput
     departments?: departmentsOrderByRelationAggregateInput
     invitations?: invitationsOrderByRelationAggregateInput
+    job_openings?: job_openingsOrderByRelationAggregateInput
     memberships?: membershipsOrderByRelationAggregateInput
     roles?: rolesOrderByWithRelationInput
     user_permission_overrides?: user_permission_overridesOrderByRelationAggregateInput
@@ -51584,6 +55864,7 @@ export namespace Prisma {
     audit_log?: Audit_logListRelationFilter
     departments?: DepartmentsListRelationFilter
     invitations?: InvitationsListRelationFilter
+    job_openings?: Job_openingsListRelationFilter
     memberships?: MembershipsListRelationFilter
     roles?: XOR<RolesNullableScalarRelationFilter, rolesWhereInput> | null
     user_permission_overrides?: User_permission_overridesListRelationFilter
@@ -52193,6 +56474,284 @@ export namespace Prisma {
     expires_at?: DateTimeNullableWithAggregatesFilter<"user_permission_overrides"> | Date | string | null
     granted_by?: UuidNullableWithAggregatesFilter<"user_permission_overrides"> | string | null
     created_at?: DateTimeWithAggregatesFilter<"user_permission_overrides"> | Date | string
+  }
+
+  export type job_openingsWhereInput = {
+    AND?: job_openingsWhereInput | job_openingsWhereInput[]
+    OR?: job_openingsWhereInput[]
+    NOT?: job_openingsWhereInput | job_openingsWhereInput[]
+    id?: UuidFilter<"job_openings"> | string
+    organization_id?: UuidFilter<"job_openings"> | string
+    department_id?: UuidNullableFilter<"job_openings"> | string | null
+    created_by?: UuidNullableFilter<"job_openings"> | string | null
+    title?: StringFilter<"job_openings"> | string
+    employment_type?: Enumemployment_typeFilter<"job_openings"> | $Enums.employment_type
+    work_mode?: Enumwork_modeFilter<"job_openings"> | $Enums.work_mode
+    location?: StringNullableFilter<"job_openings"> | string | null
+    experience_min?: IntNullableFilter<"job_openings"> | number | null
+    experience_max?: IntNullableFilter<"job_openings"> | number | null
+    salary_min?: DecimalNullableFilter<"job_openings"> | Decimal | DecimalJsLike | number | string | null
+    salary_max?: DecimalNullableFilter<"job_openings"> | Decimal | DecimalJsLike | number | string | null
+    salary_currency?: StringNullableFilter<"job_openings"> | string | null
+    salary_visible?: BoolFilter<"job_openings"> | boolean
+    description?: StringFilter<"job_openings"> | string
+    positions?: IntFilter<"job_openings"> | number
+    status?: Enumopening_statusFilter<"job_openings"> | $Enums.opening_status
+    application_deadline?: DateTimeNullableFilter<"job_openings"> | Date | string | null
+    opened_at?: DateTimeNullableFilter<"job_openings"> | Date | string | null
+    closed_at?: DateTimeNullableFilter<"job_openings"> | Date | string | null
+    created_at?: DateTimeFilter<"job_openings"> | Date | string
+    updated_at?: DateTimeFilter<"job_openings"> | Date | string
+    memberships?: XOR<MembershipsNullableScalarRelationFilter, membershipsWhereInput> | null
+    departments?: XOR<DepartmentsNullableScalarRelationFilter, departmentsWhereInput> | null
+    organizations?: XOR<OrganizationsScalarRelationFilter, organizationsWhereInput>
+    job_requirements?: Job_requirementsListRelationFilter
+    screening_questions?: Screening_questionsListRelationFilter
+  }
+
+  export type job_openingsOrderByWithRelationInput = {
+    id?: SortOrder
+    organization_id?: SortOrder
+    department_id?: SortOrderInput | SortOrder
+    created_by?: SortOrderInput | SortOrder
+    title?: SortOrder
+    employment_type?: SortOrder
+    work_mode?: SortOrder
+    location?: SortOrderInput | SortOrder
+    experience_min?: SortOrderInput | SortOrder
+    experience_max?: SortOrderInput | SortOrder
+    salary_min?: SortOrderInput | SortOrder
+    salary_max?: SortOrderInput | SortOrder
+    salary_currency?: SortOrderInput | SortOrder
+    salary_visible?: SortOrder
+    description?: SortOrder
+    positions?: SortOrder
+    status?: SortOrder
+    application_deadline?: SortOrderInput | SortOrder
+    opened_at?: SortOrderInput | SortOrder
+    closed_at?: SortOrderInput | SortOrder
+    created_at?: SortOrder
+    updated_at?: SortOrder
+    memberships?: membershipsOrderByWithRelationInput
+    departments?: departmentsOrderByWithRelationInput
+    organizations?: organizationsOrderByWithRelationInput
+    job_requirements?: job_requirementsOrderByRelationAggregateInput
+    screening_questions?: screening_questionsOrderByRelationAggregateInput
+  }
+
+  export type job_openingsWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: job_openingsWhereInput | job_openingsWhereInput[]
+    OR?: job_openingsWhereInput[]
+    NOT?: job_openingsWhereInput | job_openingsWhereInput[]
+    organization_id?: UuidFilter<"job_openings"> | string
+    department_id?: UuidNullableFilter<"job_openings"> | string | null
+    created_by?: UuidNullableFilter<"job_openings"> | string | null
+    title?: StringFilter<"job_openings"> | string
+    employment_type?: Enumemployment_typeFilter<"job_openings"> | $Enums.employment_type
+    work_mode?: Enumwork_modeFilter<"job_openings"> | $Enums.work_mode
+    location?: StringNullableFilter<"job_openings"> | string | null
+    experience_min?: IntNullableFilter<"job_openings"> | number | null
+    experience_max?: IntNullableFilter<"job_openings"> | number | null
+    salary_min?: DecimalNullableFilter<"job_openings"> | Decimal | DecimalJsLike | number | string | null
+    salary_max?: DecimalNullableFilter<"job_openings"> | Decimal | DecimalJsLike | number | string | null
+    salary_currency?: StringNullableFilter<"job_openings"> | string | null
+    salary_visible?: BoolFilter<"job_openings"> | boolean
+    description?: StringFilter<"job_openings"> | string
+    positions?: IntFilter<"job_openings"> | number
+    status?: Enumopening_statusFilter<"job_openings"> | $Enums.opening_status
+    application_deadline?: DateTimeNullableFilter<"job_openings"> | Date | string | null
+    opened_at?: DateTimeNullableFilter<"job_openings"> | Date | string | null
+    closed_at?: DateTimeNullableFilter<"job_openings"> | Date | string | null
+    created_at?: DateTimeFilter<"job_openings"> | Date | string
+    updated_at?: DateTimeFilter<"job_openings"> | Date | string
+    memberships?: XOR<MembershipsNullableScalarRelationFilter, membershipsWhereInput> | null
+    departments?: XOR<DepartmentsNullableScalarRelationFilter, departmentsWhereInput> | null
+    organizations?: XOR<OrganizationsScalarRelationFilter, organizationsWhereInput>
+    job_requirements?: Job_requirementsListRelationFilter
+    screening_questions?: Screening_questionsListRelationFilter
+  }, "id">
+
+  export type job_openingsOrderByWithAggregationInput = {
+    id?: SortOrder
+    organization_id?: SortOrder
+    department_id?: SortOrderInput | SortOrder
+    created_by?: SortOrderInput | SortOrder
+    title?: SortOrder
+    employment_type?: SortOrder
+    work_mode?: SortOrder
+    location?: SortOrderInput | SortOrder
+    experience_min?: SortOrderInput | SortOrder
+    experience_max?: SortOrderInput | SortOrder
+    salary_min?: SortOrderInput | SortOrder
+    salary_max?: SortOrderInput | SortOrder
+    salary_currency?: SortOrderInput | SortOrder
+    salary_visible?: SortOrder
+    description?: SortOrder
+    positions?: SortOrder
+    status?: SortOrder
+    application_deadline?: SortOrderInput | SortOrder
+    opened_at?: SortOrderInput | SortOrder
+    closed_at?: SortOrderInput | SortOrder
+    created_at?: SortOrder
+    updated_at?: SortOrder
+    _count?: job_openingsCountOrderByAggregateInput
+    _avg?: job_openingsAvgOrderByAggregateInput
+    _max?: job_openingsMaxOrderByAggregateInput
+    _min?: job_openingsMinOrderByAggregateInput
+    _sum?: job_openingsSumOrderByAggregateInput
+  }
+
+  export type job_openingsScalarWhereWithAggregatesInput = {
+    AND?: job_openingsScalarWhereWithAggregatesInput | job_openingsScalarWhereWithAggregatesInput[]
+    OR?: job_openingsScalarWhereWithAggregatesInput[]
+    NOT?: job_openingsScalarWhereWithAggregatesInput | job_openingsScalarWhereWithAggregatesInput[]
+    id?: UuidWithAggregatesFilter<"job_openings"> | string
+    organization_id?: UuidWithAggregatesFilter<"job_openings"> | string
+    department_id?: UuidNullableWithAggregatesFilter<"job_openings"> | string | null
+    created_by?: UuidNullableWithAggregatesFilter<"job_openings"> | string | null
+    title?: StringWithAggregatesFilter<"job_openings"> | string
+    employment_type?: Enumemployment_typeWithAggregatesFilter<"job_openings"> | $Enums.employment_type
+    work_mode?: Enumwork_modeWithAggregatesFilter<"job_openings"> | $Enums.work_mode
+    location?: StringNullableWithAggregatesFilter<"job_openings"> | string | null
+    experience_min?: IntNullableWithAggregatesFilter<"job_openings"> | number | null
+    experience_max?: IntNullableWithAggregatesFilter<"job_openings"> | number | null
+    salary_min?: DecimalNullableWithAggregatesFilter<"job_openings"> | Decimal | DecimalJsLike | number | string | null
+    salary_max?: DecimalNullableWithAggregatesFilter<"job_openings"> | Decimal | DecimalJsLike | number | string | null
+    salary_currency?: StringNullableWithAggregatesFilter<"job_openings"> | string | null
+    salary_visible?: BoolWithAggregatesFilter<"job_openings"> | boolean
+    description?: StringWithAggregatesFilter<"job_openings"> | string
+    positions?: IntWithAggregatesFilter<"job_openings"> | number
+    status?: Enumopening_statusWithAggregatesFilter<"job_openings"> | $Enums.opening_status
+    application_deadline?: DateTimeNullableWithAggregatesFilter<"job_openings"> | Date | string | null
+    opened_at?: DateTimeNullableWithAggregatesFilter<"job_openings"> | Date | string | null
+    closed_at?: DateTimeNullableWithAggregatesFilter<"job_openings"> | Date | string | null
+    created_at?: DateTimeWithAggregatesFilter<"job_openings"> | Date | string
+    updated_at?: DateTimeWithAggregatesFilter<"job_openings"> | Date | string
+  }
+
+  export type job_requirementsWhereInput = {
+    AND?: job_requirementsWhereInput | job_requirementsWhereInput[]
+    OR?: job_requirementsWhereInput[]
+    NOT?: job_requirementsWhereInput | job_requirementsWhereInput[]
+    id?: UuidFilter<"job_requirements"> | string
+    job_opening_id?: UuidFilter<"job_requirements"> | string
+    kind?: Enumrequirement_kindFilter<"job_requirements"> | $Enums.requirement_kind
+    label?: StringFilter<"job_requirements"> | string
+    sort_order?: IntFilter<"job_requirements"> | number
+    created_at?: DateTimeFilter<"job_requirements"> | Date | string
+    job_openings?: XOR<Job_openingsScalarRelationFilter, job_openingsWhereInput>
+  }
+
+  export type job_requirementsOrderByWithRelationInput = {
+    id?: SortOrder
+    job_opening_id?: SortOrder
+    kind?: SortOrder
+    label?: SortOrder
+    sort_order?: SortOrder
+    created_at?: SortOrder
+    job_openings?: job_openingsOrderByWithRelationInput
+  }
+
+  export type job_requirementsWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: job_requirementsWhereInput | job_requirementsWhereInput[]
+    OR?: job_requirementsWhereInput[]
+    NOT?: job_requirementsWhereInput | job_requirementsWhereInput[]
+    job_opening_id?: UuidFilter<"job_requirements"> | string
+    kind?: Enumrequirement_kindFilter<"job_requirements"> | $Enums.requirement_kind
+    label?: StringFilter<"job_requirements"> | string
+    sort_order?: IntFilter<"job_requirements"> | number
+    created_at?: DateTimeFilter<"job_requirements"> | Date | string
+    job_openings?: XOR<Job_openingsScalarRelationFilter, job_openingsWhereInput>
+  }, "id">
+
+  export type job_requirementsOrderByWithAggregationInput = {
+    id?: SortOrder
+    job_opening_id?: SortOrder
+    kind?: SortOrder
+    label?: SortOrder
+    sort_order?: SortOrder
+    created_at?: SortOrder
+    _count?: job_requirementsCountOrderByAggregateInput
+    _avg?: job_requirementsAvgOrderByAggregateInput
+    _max?: job_requirementsMaxOrderByAggregateInput
+    _min?: job_requirementsMinOrderByAggregateInput
+    _sum?: job_requirementsSumOrderByAggregateInput
+  }
+
+  export type job_requirementsScalarWhereWithAggregatesInput = {
+    AND?: job_requirementsScalarWhereWithAggregatesInput | job_requirementsScalarWhereWithAggregatesInput[]
+    OR?: job_requirementsScalarWhereWithAggregatesInput[]
+    NOT?: job_requirementsScalarWhereWithAggregatesInput | job_requirementsScalarWhereWithAggregatesInput[]
+    id?: UuidWithAggregatesFilter<"job_requirements"> | string
+    job_opening_id?: UuidWithAggregatesFilter<"job_requirements"> | string
+    kind?: Enumrequirement_kindWithAggregatesFilter<"job_requirements"> | $Enums.requirement_kind
+    label?: StringWithAggregatesFilter<"job_requirements"> | string
+    sort_order?: IntWithAggregatesFilter<"job_requirements"> | number
+    created_at?: DateTimeWithAggregatesFilter<"job_requirements"> | Date | string
+  }
+
+  export type screening_questionsWhereInput = {
+    AND?: screening_questionsWhereInput | screening_questionsWhereInput[]
+    OR?: screening_questionsWhereInput[]
+    NOT?: screening_questionsWhereInput | screening_questionsWhereInput[]
+    id?: UuidFilter<"screening_questions"> | string
+    job_opening_id?: UuidFilter<"screening_questions"> | string
+    question?: StringFilter<"screening_questions"> | string
+    required?: BoolFilter<"screening_questions"> | boolean
+    sort_order?: IntFilter<"screening_questions"> | number
+    created_at?: DateTimeFilter<"screening_questions"> | Date | string
+    job_openings?: XOR<Job_openingsScalarRelationFilter, job_openingsWhereInput>
+  }
+
+  export type screening_questionsOrderByWithRelationInput = {
+    id?: SortOrder
+    job_opening_id?: SortOrder
+    question?: SortOrder
+    required?: SortOrder
+    sort_order?: SortOrder
+    created_at?: SortOrder
+    job_openings?: job_openingsOrderByWithRelationInput
+  }
+
+  export type screening_questionsWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: screening_questionsWhereInput | screening_questionsWhereInput[]
+    OR?: screening_questionsWhereInput[]
+    NOT?: screening_questionsWhereInput | screening_questionsWhereInput[]
+    job_opening_id?: UuidFilter<"screening_questions"> | string
+    question?: StringFilter<"screening_questions"> | string
+    required?: BoolFilter<"screening_questions"> | boolean
+    sort_order?: IntFilter<"screening_questions"> | number
+    created_at?: DateTimeFilter<"screening_questions"> | Date | string
+    job_openings?: XOR<Job_openingsScalarRelationFilter, job_openingsWhereInput>
+  }, "id">
+
+  export type screening_questionsOrderByWithAggregationInput = {
+    id?: SortOrder
+    job_opening_id?: SortOrder
+    question?: SortOrder
+    required?: SortOrder
+    sort_order?: SortOrder
+    created_at?: SortOrder
+    _count?: screening_questionsCountOrderByAggregateInput
+    _avg?: screening_questionsAvgOrderByAggregateInput
+    _max?: screening_questionsMaxOrderByAggregateInput
+    _min?: screening_questionsMinOrderByAggregateInput
+    _sum?: screening_questionsSumOrderByAggregateInput
+  }
+
+  export type screening_questionsScalarWhereWithAggregatesInput = {
+    AND?: screening_questionsScalarWhereWithAggregatesInput | screening_questionsScalarWhereWithAggregatesInput[]
+    OR?: screening_questionsScalarWhereWithAggregatesInput[]
+    NOT?: screening_questionsScalarWhereWithAggregatesInput | screening_questionsScalarWhereWithAggregatesInput[]
+    id?: UuidWithAggregatesFilter<"screening_questions"> | string
+    job_opening_id?: UuidWithAggregatesFilter<"screening_questions"> | string
+    question?: StringWithAggregatesFilter<"screening_questions"> | string
+    required?: BoolWithAggregatesFilter<"screening_questions"> | boolean
+    sort_order?: IntWithAggregatesFilter<"screening_questions"> | number
+    created_at?: DateTimeWithAggregatesFilter<"screening_questions"> | Date | string
   }
 
   export type audit_log_entriesCreateInput = {
@@ -54617,6 +59176,7 @@ export namespace Prisma {
     memberships_departments_head_membership_idTomemberships?: membershipsCreateNestedOneWithoutDepartments_departments_head_membership_idTomembershipsInput
     organizations: organizationsCreateNestedOneWithoutDepartmentsInput
     invitations?: invitationsCreateNestedManyWithoutDepartmentsInput
+    job_openings?: job_openingsCreateNestedManyWithoutDepartmentsInput
     memberships_memberships_department_idTodepartments?: membershipsCreateNestedManyWithoutDepartments_memberships_department_idTodepartmentsInput
   }
 
@@ -54629,6 +59189,7 @@ export namespace Prisma {
     updated_at?: Date | string
     head_membership_id?: string | null
     invitations?: invitationsUncheckedCreateNestedManyWithoutDepartmentsInput
+    job_openings?: job_openingsUncheckedCreateNestedManyWithoutDepartmentsInput
     memberships_memberships_department_idTodepartments?: membershipsUncheckedCreateNestedManyWithoutDepartments_memberships_department_idTodepartmentsInput
   }
 
@@ -54641,6 +59202,7 @@ export namespace Prisma {
     memberships_departments_head_membership_idTomemberships?: membershipsUpdateOneWithoutDepartments_departments_head_membership_idTomembershipsNestedInput
     organizations?: organizationsUpdateOneRequiredWithoutDepartmentsNestedInput
     invitations?: invitationsUpdateManyWithoutDepartmentsNestedInput
+    job_openings?: job_openingsUpdateManyWithoutDepartmentsNestedInput
     memberships_memberships_department_idTodepartments?: membershipsUpdateManyWithoutDepartments_memberships_department_idTodepartmentsNestedInput
   }
 
@@ -54653,6 +59215,7 @@ export namespace Prisma {
     updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
     head_membership_id?: NullableStringFieldUpdateOperationsInput | string | null
     invitations?: invitationsUncheckedUpdateManyWithoutDepartmentsNestedInput
+    job_openings?: job_openingsUncheckedUpdateManyWithoutDepartmentsNestedInput
     memberships_memberships_department_idTodepartments?: membershipsUncheckedUpdateManyWithoutDepartments_memberships_department_idTodepartmentsNestedInput
   }
 
@@ -54802,6 +59365,7 @@ export namespace Prisma {
     audit_log?: audit_logCreateNestedManyWithoutMembershipsInput
     departments_departments_head_membership_idTomemberships?: departmentsCreateNestedManyWithoutMemberships_departments_head_membership_idTomembershipsInput
     invitations?: invitationsCreateNestedManyWithoutMembershipsInput
+    job_openings?: job_openingsCreateNestedManyWithoutMembershipsInput
     departments_memberships_department_idTodepartments?: departmentsCreateNestedOneWithoutMemberships_memberships_department_idTodepartmentsInput
     organizations: organizationsCreateNestedOneWithoutMembershipsInput
     roles?: rolesCreateNestedOneWithoutMembershipsInput
@@ -54825,6 +59389,7 @@ export namespace Prisma {
     audit_log?: audit_logUncheckedCreateNestedManyWithoutMembershipsInput
     departments_departments_head_membership_idTomemberships?: departmentsUncheckedCreateNestedManyWithoutMemberships_departments_head_membership_idTomembershipsInput
     invitations?: invitationsUncheckedCreateNestedManyWithoutMembershipsInput
+    job_openings?: job_openingsUncheckedCreateNestedManyWithoutMembershipsInput
     user_permission_overrides_user_permission_overrides_granted_byTomemberships?: user_permission_overridesUncheckedCreateNestedManyWithoutMemberships_user_permission_overrides_granted_byTomembershipsInput
     user_permission_overrides_user_permission_overrides_membership_idTomemberships?: user_permission_overridesUncheckedCreateNestedManyWithoutMemberships_user_permission_overrides_membership_idTomembershipsInput
   }
@@ -54840,6 +59405,7 @@ export namespace Prisma {
     audit_log?: audit_logUpdateManyWithoutMembershipsNestedInput
     departments_departments_head_membership_idTomemberships?: departmentsUpdateManyWithoutMemberships_departments_head_membership_idTomembershipsNestedInput
     invitations?: invitationsUpdateManyWithoutMembershipsNestedInput
+    job_openings?: job_openingsUpdateManyWithoutMembershipsNestedInput
     departments_memberships_department_idTodepartments?: departmentsUpdateOneWithoutMemberships_memberships_department_idTodepartmentsNestedInput
     organizations?: organizationsUpdateOneRequiredWithoutMembershipsNestedInput
     roles?: rolesUpdateOneWithoutMembershipsNestedInput
@@ -54863,6 +59429,7 @@ export namespace Prisma {
     audit_log?: audit_logUncheckedUpdateManyWithoutMembershipsNestedInput
     departments_departments_head_membership_idTomemberships?: departmentsUncheckedUpdateManyWithoutMemberships_departments_head_membership_idTomembershipsNestedInput
     invitations?: invitationsUncheckedUpdateManyWithoutMembershipsNestedInput
+    job_openings?: job_openingsUncheckedUpdateManyWithoutMembershipsNestedInput
     user_permission_overrides_user_permission_overrides_granted_byTomemberships?: user_permission_overridesUncheckedUpdateManyWithoutMemberships_user_permission_overrides_granted_byTomembershipsNestedInput
     user_permission_overrides_user_permission_overrides_membership_idTomemberships?: user_permission_overridesUncheckedUpdateManyWithoutMemberships_user_permission_overrides_membership_idTomembershipsNestedInput
   }
@@ -54922,6 +59489,7 @@ export namespace Prisma {
     audit_log?: audit_logCreateNestedManyWithoutOrganizationsInput
     departments?: departmentsCreateNestedManyWithoutOrganizationsInput
     invitations?: invitationsCreateNestedManyWithoutOrganizationsInput
+    job_openings?: job_openingsCreateNestedManyWithoutOrganizationsInput
     memberships?: membershipsCreateNestedManyWithoutOrganizationsInput
     roles?: rolesCreateNestedOneWithoutOrganizationsInput
     user_permission_overrides?: user_permission_overridesCreateNestedManyWithoutOrganizationsInput
@@ -54944,6 +59512,7 @@ export namespace Prisma {
     audit_log?: audit_logUncheckedCreateNestedManyWithoutOrganizationsInput
     departments?: departmentsUncheckedCreateNestedManyWithoutOrganizationsInput
     invitations?: invitationsUncheckedCreateNestedManyWithoutOrganizationsInput
+    job_openings?: job_openingsUncheckedCreateNestedManyWithoutOrganizationsInput
     memberships?: membershipsUncheckedCreateNestedManyWithoutOrganizationsInput
     roles?: rolesUncheckedCreateNestedOneWithoutOrganizationsInput
     user_permission_overrides?: user_permission_overridesUncheckedCreateNestedManyWithoutOrganizationsInput
@@ -54966,6 +59535,7 @@ export namespace Prisma {
     audit_log?: audit_logUpdateManyWithoutOrganizationsNestedInput
     departments?: departmentsUpdateManyWithoutOrganizationsNestedInput
     invitations?: invitationsUpdateManyWithoutOrganizationsNestedInput
+    job_openings?: job_openingsUpdateManyWithoutOrganizationsNestedInput
     memberships?: membershipsUpdateManyWithoutOrganizationsNestedInput
     roles?: rolesUpdateOneWithoutOrganizationsNestedInput
     user_permission_overrides?: user_permission_overridesUpdateManyWithoutOrganizationsNestedInput
@@ -54988,6 +59558,7 @@ export namespace Prisma {
     audit_log?: audit_logUncheckedUpdateManyWithoutOrganizationsNestedInput
     departments?: departmentsUncheckedUpdateManyWithoutOrganizationsNestedInput
     invitations?: invitationsUncheckedUpdateManyWithoutOrganizationsNestedInput
+    job_openings?: job_openingsUncheckedUpdateManyWithoutOrganizationsNestedInput
     memberships?: membershipsUncheckedUpdateManyWithoutOrganizationsNestedInput
     roles?: rolesUncheckedUpdateOneWithoutOrganizationsNestedInput
     user_permission_overrides?: user_permission_overridesUncheckedUpdateManyWithoutOrganizationsNestedInput
@@ -55618,6 +60189,310 @@ export namespace Prisma {
     reason?: NullableStringFieldUpdateOperationsInput | string | null
     expires_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     granted_by?: NullableStringFieldUpdateOperationsInput | string | null
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type job_openingsCreateInput = {
+    id?: string
+    title: string
+    employment_type?: $Enums.employment_type
+    work_mode?: $Enums.work_mode
+    location?: string | null
+    experience_min?: number | null
+    experience_max?: number | null
+    salary_min?: Decimal | DecimalJsLike | number | string | null
+    salary_max?: Decimal | DecimalJsLike | number | string | null
+    salary_currency?: string | null
+    salary_visible?: boolean
+    description?: string
+    positions?: number
+    status?: $Enums.opening_status
+    application_deadline?: Date | string | null
+    opened_at?: Date | string | null
+    closed_at?: Date | string | null
+    created_at?: Date | string
+    updated_at?: Date | string
+    memberships?: membershipsCreateNestedOneWithoutJob_openingsInput
+    departments?: departmentsCreateNestedOneWithoutJob_openingsInput
+    organizations: organizationsCreateNestedOneWithoutJob_openingsInput
+    job_requirements?: job_requirementsCreateNestedManyWithoutJob_openingsInput
+    screening_questions?: screening_questionsCreateNestedManyWithoutJob_openingsInput
+  }
+
+  export type job_openingsUncheckedCreateInput = {
+    id?: string
+    organization_id: string
+    department_id?: string | null
+    created_by?: string | null
+    title: string
+    employment_type?: $Enums.employment_type
+    work_mode?: $Enums.work_mode
+    location?: string | null
+    experience_min?: number | null
+    experience_max?: number | null
+    salary_min?: Decimal | DecimalJsLike | number | string | null
+    salary_max?: Decimal | DecimalJsLike | number | string | null
+    salary_currency?: string | null
+    salary_visible?: boolean
+    description?: string
+    positions?: number
+    status?: $Enums.opening_status
+    application_deadline?: Date | string | null
+    opened_at?: Date | string | null
+    closed_at?: Date | string | null
+    created_at?: Date | string
+    updated_at?: Date | string
+    job_requirements?: job_requirementsUncheckedCreateNestedManyWithoutJob_openingsInput
+    screening_questions?: screening_questionsUncheckedCreateNestedManyWithoutJob_openingsInput
+  }
+
+  export type job_openingsUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    employment_type?: Enumemployment_typeFieldUpdateOperationsInput | $Enums.employment_type
+    work_mode?: Enumwork_modeFieldUpdateOperationsInput | $Enums.work_mode
+    location?: NullableStringFieldUpdateOperationsInput | string | null
+    experience_min?: NullableIntFieldUpdateOperationsInput | number | null
+    experience_max?: NullableIntFieldUpdateOperationsInput | number | null
+    salary_min?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    salary_max?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    salary_currency?: NullableStringFieldUpdateOperationsInput | string | null
+    salary_visible?: BoolFieldUpdateOperationsInput | boolean
+    description?: StringFieldUpdateOperationsInput | string
+    positions?: IntFieldUpdateOperationsInput | number
+    status?: Enumopening_statusFieldUpdateOperationsInput | $Enums.opening_status
+    application_deadline?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    opened_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    closed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    memberships?: membershipsUpdateOneWithoutJob_openingsNestedInput
+    departments?: departmentsUpdateOneWithoutJob_openingsNestedInput
+    organizations?: organizationsUpdateOneRequiredWithoutJob_openingsNestedInput
+    job_requirements?: job_requirementsUpdateManyWithoutJob_openingsNestedInput
+    screening_questions?: screening_questionsUpdateManyWithoutJob_openingsNestedInput
+  }
+
+  export type job_openingsUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    organization_id?: StringFieldUpdateOperationsInput | string
+    department_id?: NullableStringFieldUpdateOperationsInput | string | null
+    created_by?: NullableStringFieldUpdateOperationsInput | string | null
+    title?: StringFieldUpdateOperationsInput | string
+    employment_type?: Enumemployment_typeFieldUpdateOperationsInput | $Enums.employment_type
+    work_mode?: Enumwork_modeFieldUpdateOperationsInput | $Enums.work_mode
+    location?: NullableStringFieldUpdateOperationsInput | string | null
+    experience_min?: NullableIntFieldUpdateOperationsInput | number | null
+    experience_max?: NullableIntFieldUpdateOperationsInput | number | null
+    salary_min?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    salary_max?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    salary_currency?: NullableStringFieldUpdateOperationsInput | string | null
+    salary_visible?: BoolFieldUpdateOperationsInput | boolean
+    description?: StringFieldUpdateOperationsInput | string
+    positions?: IntFieldUpdateOperationsInput | number
+    status?: Enumopening_statusFieldUpdateOperationsInput | $Enums.opening_status
+    application_deadline?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    opened_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    closed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    job_requirements?: job_requirementsUncheckedUpdateManyWithoutJob_openingsNestedInput
+    screening_questions?: screening_questionsUncheckedUpdateManyWithoutJob_openingsNestedInput
+  }
+
+  export type job_openingsCreateManyInput = {
+    id?: string
+    organization_id: string
+    department_id?: string | null
+    created_by?: string | null
+    title: string
+    employment_type?: $Enums.employment_type
+    work_mode?: $Enums.work_mode
+    location?: string | null
+    experience_min?: number | null
+    experience_max?: number | null
+    salary_min?: Decimal | DecimalJsLike | number | string | null
+    salary_max?: Decimal | DecimalJsLike | number | string | null
+    salary_currency?: string | null
+    salary_visible?: boolean
+    description?: string
+    positions?: number
+    status?: $Enums.opening_status
+    application_deadline?: Date | string | null
+    opened_at?: Date | string | null
+    closed_at?: Date | string | null
+    created_at?: Date | string
+    updated_at?: Date | string
+  }
+
+  export type job_openingsUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    employment_type?: Enumemployment_typeFieldUpdateOperationsInput | $Enums.employment_type
+    work_mode?: Enumwork_modeFieldUpdateOperationsInput | $Enums.work_mode
+    location?: NullableStringFieldUpdateOperationsInput | string | null
+    experience_min?: NullableIntFieldUpdateOperationsInput | number | null
+    experience_max?: NullableIntFieldUpdateOperationsInput | number | null
+    salary_min?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    salary_max?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    salary_currency?: NullableStringFieldUpdateOperationsInput | string | null
+    salary_visible?: BoolFieldUpdateOperationsInput | boolean
+    description?: StringFieldUpdateOperationsInput | string
+    positions?: IntFieldUpdateOperationsInput | number
+    status?: Enumopening_statusFieldUpdateOperationsInput | $Enums.opening_status
+    application_deadline?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    opened_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    closed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type job_openingsUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    organization_id?: StringFieldUpdateOperationsInput | string
+    department_id?: NullableStringFieldUpdateOperationsInput | string | null
+    created_by?: NullableStringFieldUpdateOperationsInput | string | null
+    title?: StringFieldUpdateOperationsInput | string
+    employment_type?: Enumemployment_typeFieldUpdateOperationsInput | $Enums.employment_type
+    work_mode?: Enumwork_modeFieldUpdateOperationsInput | $Enums.work_mode
+    location?: NullableStringFieldUpdateOperationsInput | string | null
+    experience_min?: NullableIntFieldUpdateOperationsInput | number | null
+    experience_max?: NullableIntFieldUpdateOperationsInput | number | null
+    salary_min?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    salary_max?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    salary_currency?: NullableStringFieldUpdateOperationsInput | string | null
+    salary_visible?: BoolFieldUpdateOperationsInput | boolean
+    description?: StringFieldUpdateOperationsInput | string
+    positions?: IntFieldUpdateOperationsInput | number
+    status?: Enumopening_statusFieldUpdateOperationsInput | $Enums.opening_status
+    application_deadline?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    opened_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    closed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type job_requirementsCreateInput = {
+    id?: string
+    kind: $Enums.requirement_kind
+    label: string
+    sort_order?: number
+    created_at?: Date | string
+    job_openings: job_openingsCreateNestedOneWithoutJob_requirementsInput
+  }
+
+  export type job_requirementsUncheckedCreateInput = {
+    id?: string
+    job_opening_id: string
+    kind: $Enums.requirement_kind
+    label: string
+    sort_order?: number
+    created_at?: Date | string
+  }
+
+  export type job_requirementsUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    kind?: Enumrequirement_kindFieldUpdateOperationsInput | $Enums.requirement_kind
+    label?: StringFieldUpdateOperationsInput | string
+    sort_order?: IntFieldUpdateOperationsInput | number
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    job_openings?: job_openingsUpdateOneRequiredWithoutJob_requirementsNestedInput
+  }
+
+  export type job_requirementsUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    job_opening_id?: StringFieldUpdateOperationsInput | string
+    kind?: Enumrequirement_kindFieldUpdateOperationsInput | $Enums.requirement_kind
+    label?: StringFieldUpdateOperationsInput | string
+    sort_order?: IntFieldUpdateOperationsInput | number
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type job_requirementsCreateManyInput = {
+    id?: string
+    job_opening_id: string
+    kind: $Enums.requirement_kind
+    label: string
+    sort_order?: number
+    created_at?: Date | string
+  }
+
+  export type job_requirementsUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    kind?: Enumrequirement_kindFieldUpdateOperationsInput | $Enums.requirement_kind
+    label?: StringFieldUpdateOperationsInput | string
+    sort_order?: IntFieldUpdateOperationsInput | number
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type job_requirementsUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    job_opening_id?: StringFieldUpdateOperationsInput | string
+    kind?: Enumrequirement_kindFieldUpdateOperationsInput | $Enums.requirement_kind
+    label?: StringFieldUpdateOperationsInput | string
+    sort_order?: IntFieldUpdateOperationsInput | number
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type screening_questionsCreateInput = {
+    id?: string
+    question: string
+    required?: boolean
+    sort_order?: number
+    created_at?: Date | string
+    job_openings: job_openingsCreateNestedOneWithoutScreening_questionsInput
+  }
+
+  export type screening_questionsUncheckedCreateInput = {
+    id?: string
+    job_opening_id: string
+    question: string
+    required?: boolean
+    sort_order?: number
+    created_at?: Date | string
+  }
+
+  export type screening_questionsUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    question?: StringFieldUpdateOperationsInput | string
+    required?: BoolFieldUpdateOperationsInput | boolean
+    sort_order?: IntFieldUpdateOperationsInput | number
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    job_openings?: job_openingsUpdateOneRequiredWithoutScreening_questionsNestedInput
+  }
+
+  export type screening_questionsUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    job_opening_id?: StringFieldUpdateOperationsInput | string
+    question?: StringFieldUpdateOperationsInput | string
+    required?: BoolFieldUpdateOperationsInput | boolean
+    sort_order?: IntFieldUpdateOperationsInput | number
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type screening_questionsCreateManyInput = {
+    id?: string
+    job_opening_id: string
+    question: string
+    required?: boolean
+    sort_order?: number
+    created_at?: Date | string
+  }
+
+  export type screening_questionsUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    question?: StringFieldUpdateOperationsInput | string
+    required?: BoolFieldUpdateOperationsInput | boolean
+    sort_order?: IntFieldUpdateOperationsInput | number
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type screening_questionsUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    job_opening_id?: StringFieldUpdateOperationsInput | string
+    question?: StringFieldUpdateOperationsInput | string
+    required?: BoolFieldUpdateOperationsInput | boolean
+    sort_order?: IntFieldUpdateOperationsInput | number
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -57473,6 +62348,12 @@ export namespace Prisma {
     none?: invitationsWhereInput
   }
 
+  export type Job_openingsListRelationFilter = {
+    every?: job_openingsWhereInput
+    some?: job_openingsWhereInput
+    none?: job_openingsWhereInput
+  }
+
   export type MembershipsListRelationFilter = {
     every?: membershipsWhereInput
     some?: membershipsWhereInput
@@ -57480,6 +62361,10 @@ export namespace Prisma {
   }
 
   export type invitationsOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type job_openingsOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -58155,6 +63040,287 @@ export namespace Prisma {
     _count?: NestedIntNullableFilter<$PrismaModel>
     _min?: NestedEnumpermission_scopeNullableFilter<$PrismaModel>
     _max?: NestedEnumpermission_scopeNullableFilter<$PrismaModel>
+  }
+
+  export type Enumemployment_typeFilter<$PrismaModel = never> = {
+    equals?: $Enums.employment_type | Enumemployment_typeFieldRefInput<$PrismaModel>
+    in?: $Enums.employment_type[] | ListEnumemployment_typeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.employment_type[] | ListEnumemployment_typeFieldRefInput<$PrismaModel>
+    not?: NestedEnumemployment_typeFilter<$PrismaModel> | $Enums.employment_type
+  }
+
+  export type Enumwork_modeFilter<$PrismaModel = never> = {
+    equals?: $Enums.work_mode | Enumwork_modeFieldRefInput<$PrismaModel>
+    in?: $Enums.work_mode[] | ListEnumwork_modeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.work_mode[] | ListEnumwork_modeFieldRefInput<$PrismaModel>
+    not?: NestedEnumwork_modeFilter<$PrismaModel> | $Enums.work_mode
+  }
+
+  export type DecimalNullableFilter<$PrismaModel = never> = {
+    equals?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel> | null
+    in?: Decimal[] | DecimalJsLike[] | number[] | string[] | ListDecimalFieldRefInput<$PrismaModel> | null
+    notIn?: Decimal[] | DecimalJsLike[] | number[] | string[] | ListDecimalFieldRefInput<$PrismaModel> | null
+    lt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    lte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    gt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    gte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    not?: NestedDecimalNullableFilter<$PrismaModel> | Decimal | DecimalJsLike | number | string | null
+  }
+
+  export type Enumopening_statusFilter<$PrismaModel = never> = {
+    equals?: $Enums.opening_status | Enumopening_statusFieldRefInput<$PrismaModel>
+    in?: $Enums.opening_status[] | ListEnumopening_statusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.opening_status[] | ListEnumopening_statusFieldRefInput<$PrismaModel>
+    not?: NestedEnumopening_statusFilter<$PrismaModel> | $Enums.opening_status
+  }
+
+  export type Job_requirementsListRelationFilter = {
+    every?: job_requirementsWhereInput
+    some?: job_requirementsWhereInput
+    none?: job_requirementsWhereInput
+  }
+
+  export type Screening_questionsListRelationFilter = {
+    every?: screening_questionsWhereInput
+    some?: screening_questionsWhereInput
+    none?: screening_questionsWhereInput
+  }
+
+  export type job_requirementsOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type screening_questionsOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type job_openingsCountOrderByAggregateInput = {
+    id?: SortOrder
+    organization_id?: SortOrder
+    department_id?: SortOrder
+    created_by?: SortOrder
+    title?: SortOrder
+    employment_type?: SortOrder
+    work_mode?: SortOrder
+    location?: SortOrder
+    experience_min?: SortOrder
+    experience_max?: SortOrder
+    salary_min?: SortOrder
+    salary_max?: SortOrder
+    salary_currency?: SortOrder
+    salary_visible?: SortOrder
+    description?: SortOrder
+    positions?: SortOrder
+    status?: SortOrder
+    application_deadline?: SortOrder
+    opened_at?: SortOrder
+    closed_at?: SortOrder
+    created_at?: SortOrder
+    updated_at?: SortOrder
+  }
+
+  export type job_openingsAvgOrderByAggregateInput = {
+    experience_min?: SortOrder
+    experience_max?: SortOrder
+    salary_min?: SortOrder
+    salary_max?: SortOrder
+    positions?: SortOrder
+  }
+
+  export type job_openingsMaxOrderByAggregateInput = {
+    id?: SortOrder
+    organization_id?: SortOrder
+    department_id?: SortOrder
+    created_by?: SortOrder
+    title?: SortOrder
+    employment_type?: SortOrder
+    work_mode?: SortOrder
+    location?: SortOrder
+    experience_min?: SortOrder
+    experience_max?: SortOrder
+    salary_min?: SortOrder
+    salary_max?: SortOrder
+    salary_currency?: SortOrder
+    salary_visible?: SortOrder
+    description?: SortOrder
+    positions?: SortOrder
+    status?: SortOrder
+    application_deadline?: SortOrder
+    opened_at?: SortOrder
+    closed_at?: SortOrder
+    created_at?: SortOrder
+    updated_at?: SortOrder
+  }
+
+  export type job_openingsMinOrderByAggregateInput = {
+    id?: SortOrder
+    organization_id?: SortOrder
+    department_id?: SortOrder
+    created_by?: SortOrder
+    title?: SortOrder
+    employment_type?: SortOrder
+    work_mode?: SortOrder
+    location?: SortOrder
+    experience_min?: SortOrder
+    experience_max?: SortOrder
+    salary_min?: SortOrder
+    salary_max?: SortOrder
+    salary_currency?: SortOrder
+    salary_visible?: SortOrder
+    description?: SortOrder
+    positions?: SortOrder
+    status?: SortOrder
+    application_deadline?: SortOrder
+    opened_at?: SortOrder
+    closed_at?: SortOrder
+    created_at?: SortOrder
+    updated_at?: SortOrder
+  }
+
+  export type job_openingsSumOrderByAggregateInput = {
+    experience_min?: SortOrder
+    experience_max?: SortOrder
+    salary_min?: SortOrder
+    salary_max?: SortOrder
+    positions?: SortOrder
+  }
+
+  export type Enumemployment_typeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.employment_type | Enumemployment_typeFieldRefInput<$PrismaModel>
+    in?: $Enums.employment_type[] | ListEnumemployment_typeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.employment_type[] | ListEnumemployment_typeFieldRefInput<$PrismaModel>
+    not?: NestedEnumemployment_typeWithAggregatesFilter<$PrismaModel> | $Enums.employment_type
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumemployment_typeFilter<$PrismaModel>
+    _max?: NestedEnumemployment_typeFilter<$PrismaModel>
+  }
+
+  export type Enumwork_modeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.work_mode | Enumwork_modeFieldRefInput<$PrismaModel>
+    in?: $Enums.work_mode[] | ListEnumwork_modeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.work_mode[] | ListEnumwork_modeFieldRefInput<$PrismaModel>
+    not?: NestedEnumwork_modeWithAggregatesFilter<$PrismaModel> | $Enums.work_mode
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumwork_modeFilter<$PrismaModel>
+    _max?: NestedEnumwork_modeFilter<$PrismaModel>
+  }
+
+  export type DecimalNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel> | null
+    in?: Decimal[] | DecimalJsLike[] | number[] | string[] | ListDecimalFieldRefInput<$PrismaModel> | null
+    notIn?: Decimal[] | DecimalJsLike[] | number[] | string[] | ListDecimalFieldRefInput<$PrismaModel> | null
+    lt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    lte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    gt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    gte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    not?: NestedDecimalNullableWithAggregatesFilter<$PrismaModel> | Decimal | DecimalJsLike | number | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _avg?: NestedDecimalNullableFilter<$PrismaModel>
+    _sum?: NestedDecimalNullableFilter<$PrismaModel>
+    _min?: NestedDecimalNullableFilter<$PrismaModel>
+    _max?: NestedDecimalNullableFilter<$PrismaModel>
+  }
+
+  export type Enumopening_statusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.opening_status | Enumopening_statusFieldRefInput<$PrismaModel>
+    in?: $Enums.opening_status[] | ListEnumopening_statusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.opening_status[] | ListEnumopening_statusFieldRefInput<$PrismaModel>
+    not?: NestedEnumopening_statusWithAggregatesFilter<$PrismaModel> | $Enums.opening_status
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumopening_statusFilter<$PrismaModel>
+    _max?: NestedEnumopening_statusFilter<$PrismaModel>
+  }
+
+  export type Enumrequirement_kindFilter<$PrismaModel = never> = {
+    equals?: $Enums.requirement_kind | Enumrequirement_kindFieldRefInput<$PrismaModel>
+    in?: $Enums.requirement_kind[] | ListEnumrequirement_kindFieldRefInput<$PrismaModel>
+    notIn?: $Enums.requirement_kind[] | ListEnumrequirement_kindFieldRefInput<$PrismaModel>
+    not?: NestedEnumrequirement_kindFilter<$PrismaModel> | $Enums.requirement_kind
+  }
+
+  export type Job_openingsScalarRelationFilter = {
+    is?: job_openingsWhereInput
+    isNot?: job_openingsWhereInput
+  }
+
+  export type job_requirementsCountOrderByAggregateInput = {
+    id?: SortOrder
+    job_opening_id?: SortOrder
+    kind?: SortOrder
+    label?: SortOrder
+    sort_order?: SortOrder
+    created_at?: SortOrder
+  }
+
+  export type job_requirementsAvgOrderByAggregateInput = {
+    sort_order?: SortOrder
+  }
+
+  export type job_requirementsMaxOrderByAggregateInput = {
+    id?: SortOrder
+    job_opening_id?: SortOrder
+    kind?: SortOrder
+    label?: SortOrder
+    sort_order?: SortOrder
+    created_at?: SortOrder
+  }
+
+  export type job_requirementsMinOrderByAggregateInput = {
+    id?: SortOrder
+    job_opening_id?: SortOrder
+    kind?: SortOrder
+    label?: SortOrder
+    sort_order?: SortOrder
+    created_at?: SortOrder
+  }
+
+  export type job_requirementsSumOrderByAggregateInput = {
+    sort_order?: SortOrder
+  }
+
+  export type Enumrequirement_kindWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.requirement_kind | Enumrequirement_kindFieldRefInput<$PrismaModel>
+    in?: $Enums.requirement_kind[] | ListEnumrequirement_kindFieldRefInput<$PrismaModel>
+    notIn?: $Enums.requirement_kind[] | ListEnumrequirement_kindFieldRefInput<$PrismaModel>
+    not?: NestedEnumrequirement_kindWithAggregatesFilter<$PrismaModel> | $Enums.requirement_kind
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumrequirement_kindFilter<$PrismaModel>
+    _max?: NestedEnumrequirement_kindFilter<$PrismaModel>
+  }
+
+  export type screening_questionsCountOrderByAggregateInput = {
+    id?: SortOrder
+    job_opening_id?: SortOrder
+    question?: SortOrder
+    required?: SortOrder
+    sort_order?: SortOrder
+    created_at?: SortOrder
+  }
+
+  export type screening_questionsAvgOrderByAggregateInput = {
+    sort_order?: SortOrder
+  }
+
+  export type screening_questionsMaxOrderByAggregateInput = {
+    id?: SortOrder
+    job_opening_id?: SortOrder
+    question?: SortOrder
+    required?: SortOrder
+    sort_order?: SortOrder
+    created_at?: SortOrder
+  }
+
+  export type screening_questionsMinOrderByAggregateInput = {
+    id?: SortOrder
+    job_opening_id?: SortOrder
+    question?: SortOrder
+    required?: SortOrder
+    sort_order?: SortOrder
+    created_at?: SortOrder
+  }
+
+  export type screening_questionsSumOrderByAggregateInput = {
+    sort_order?: SortOrder
   }
 
   export type NullableStringFieldUpdateOperationsInput = {
@@ -59416,6 +64582,13 @@ export namespace Prisma {
     connect?: invitationsWhereUniqueInput | invitationsWhereUniqueInput[]
   }
 
+  export type job_openingsCreateNestedManyWithoutDepartmentsInput = {
+    create?: XOR<job_openingsCreateWithoutDepartmentsInput, job_openingsUncheckedCreateWithoutDepartmentsInput> | job_openingsCreateWithoutDepartmentsInput[] | job_openingsUncheckedCreateWithoutDepartmentsInput[]
+    connectOrCreate?: job_openingsCreateOrConnectWithoutDepartmentsInput | job_openingsCreateOrConnectWithoutDepartmentsInput[]
+    createMany?: job_openingsCreateManyDepartmentsInputEnvelope
+    connect?: job_openingsWhereUniqueInput | job_openingsWhereUniqueInput[]
+  }
+
   export type membershipsCreateNestedManyWithoutDepartments_memberships_department_idTodepartmentsInput = {
     create?: XOR<membershipsCreateWithoutDepartments_memberships_department_idTodepartmentsInput, membershipsUncheckedCreateWithoutDepartments_memberships_department_idTodepartmentsInput> | membershipsCreateWithoutDepartments_memberships_department_idTodepartmentsInput[] | membershipsUncheckedCreateWithoutDepartments_memberships_department_idTodepartmentsInput[]
     connectOrCreate?: membershipsCreateOrConnectWithoutDepartments_memberships_department_idTodepartmentsInput | membershipsCreateOrConnectWithoutDepartments_memberships_department_idTodepartmentsInput[]
@@ -59428,6 +64601,13 @@ export namespace Prisma {
     connectOrCreate?: invitationsCreateOrConnectWithoutDepartmentsInput | invitationsCreateOrConnectWithoutDepartmentsInput[]
     createMany?: invitationsCreateManyDepartmentsInputEnvelope
     connect?: invitationsWhereUniqueInput | invitationsWhereUniqueInput[]
+  }
+
+  export type job_openingsUncheckedCreateNestedManyWithoutDepartmentsInput = {
+    create?: XOR<job_openingsCreateWithoutDepartmentsInput, job_openingsUncheckedCreateWithoutDepartmentsInput> | job_openingsCreateWithoutDepartmentsInput[] | job_openingsUncheckedCreateWithoutDepartmentsInput[]
+    connectOrCreate?: job_openingsCreateOrConnectWithoutDepartmentsInput | job_openingsCreateOrConnectWithoutDepartmentsInput[]
+    createMany?: job_openingsCreateManyDepartmentsInputEnvelope
+    connect?: job_openingsWhereUniqueInput | job_openingsWhereUniqueInput[]
   }
 
   export type membershipsUncheckedCreateNestedManyWithoutDepartments_memberships_department_idTodepartmentsInput = {
@@ -59469,6 +64649,20 @@ export namespace Prisma {
     deleteMany?: invitationsScalarWhereInput | invitationsScalarWhereInput[]
   }
 
+  export type job_openingsUpdateManyWithoutDepartmentsNestedInput = {
+    create?: XOR<job_openingsCreateWithoutDepartmentsInput, job_openingsUncheckedCreateWithoutDepartmentsInput> | job_openingsCreateWithoutDepartmentsInput[] | job_openingsUncheckedCreateWithoutDepartmentsInput[]
+    connectOrCreate?: job_openingsCreateOrConnectWithoutDepartmentsInput | job_openingsCreateOrConnectWithoutDepartmentsInput[]
+    upsert?: job_openingsUpsertWithWhereUniqueWithoutDepartmentsInput | job_openingsUpsertWithWhereUniqueWithoutDepartmentsInput[]
+    createMany?: job_openingsCreateManyDepartmentsInputEnvelope
+    set?: job_openingsWhereUniqueInput | job_openingsWhereUniqueInput[]
+    disconnect?: job_openingsWhereUniqueInput | job_openingsWhereUniqueInput[]
+    delete?: job_openingsWhereUniqueInput | job_openingsWhereUniqueInput[]
+    connect?: job_openingsWhereUniqueInput | job_openingsWhereUniqueInput[]
+    update?: job_openingsUpdateWithWhereUniqueWithoutDepartmentsInput | job_openingsUpdateWithWhereUniqueWithoutDepartmentsInput[]
+    updateMany?: job_openingsUpdateManyWithWhereWithoutDepartmentsInput | job_openingsUpdateManyWithWhereWithoutDepartmentsInput[]
+    deleteMany?: job_openingsScalarWhereInput | job_openingsScalarWhereInput[]
+  }
+
   export type membershipsUpdateManyWithoutDepartments_memberships_department_idTodepartmentsNestedInput = {
     create?: XOR<membershipsCreateWithoutDepartments_memberships_department_idTodepartmentsInput, membershipsUncheckedCreateWithoutDepartments_memberships_department_idTodepartmentsInput> | membershipsCreateWithoutDepartments_memberships_department_idTodepartmentsInput[] | membershipsUncheckedCreateWithoutDepartments_memberships_department_idTodepartmentsInput[]
     connectOrCreate?: membershipsCreateOrConnectWithoutDepartments_memberships_department_idTodepartmentsInput | membershipsCreateOrConnectWithoutDepartments_memberships_department_idTodepartmentsInput[]
@@ -59495,6 +64689,20 @@ export namespace Prisma {
     update?: invitationsUpdateWithWhereUniqueWithoutDepartmentsInput | invitationsUpdateWithWhereUniqueWithoutDepartmentsInput[]
     updateMany?: invitationsUpdateManyWithWhereWithoutDepartmentsInput | invitationsUpdateManyWithWhereWithoutDepartmentsInput[]
     deleteMany?: invitationsScalarWhereInput | invitationsScalarWhereInput[]
+  }
+
+  export type job_openingsUncheckedUpdateManyWithoutDepartmentsNestedInput = {
+    create?: XOR<job_openingsCreateWithoutDepartmentsInput, job_openingsUncheckedCreateWithoutDepartmentsInput> | job_openingsCreateWithoutDepartmentsInput[] | job_openingsUncheckedCreateWithoutDepartmentsInput[]
+    connectOrCreate?: job_openingsCreateOrConnectWithoutDepartmentsInput | job_openingsCreateOrConnectWithoutDepartmentsInput[]
+    upsert?: job_openingsUpsertWithWhereUniqueWithoutDepartmentsInput | job_openingsUpsertWithWhereUniqueWithoutDepartmentsInput[]
+    createMany?: job_openingsCreateManyDepartmentsInputEnvelope
+    set?: job_openingsWhereUniqueInput | job_openingsWhereUniqueInput[]
+    disconnect?: job_openingsWhereUniqueInput | job_openingsWhereUniqueInput[]
+    delete?: job_openingsWhereUniqueInput | job_openingsWhereUniqueInput[]
+    connect?: job_openingsWhereUniqueInput | job_openingsWhereUniqueInput[]
+    update?: job_openingsUpdateWithWhereUniqueWithoutDepartmentsInput | job_openingsUpdateWithWhereUniqueWithoutDepartmentsInput[]
+    updateMany?: job_openingsUpdateManyWithWhereWithoutDepartmentsInput | job_openingsUpdateManyWithWhereWithoutDepartmentsInput[]
+    deleteMany?: job_openingsScalarWhereInput | job_openingsScalarWhereInput[]
   }
 
   export type membershipsUncheckedUpdateManyWithoutDepartments_memberships_department_idTodepartmentsNestedInput = {
@@ -59614,6 +64822,13 @@ export namespace Prisma {
     connect?: invitationsWhereUniqueInput | invitationsWhereUniqueInput[]
   }
 
+  export type job_openingsCreateNestedManyWithoutMembershipsInput = {
+    create?: XOR<job_openingsCreateWithoutMembershipsInput, job_openingsUncheckedCreateWithoutMembershipsInput> | job_openingsCreateWithoutMembershipsInput[] | job_openingsUncheckedCreateWithoutMembershipsInput[]
+    connectOrCreate?: job_openingsCreateOrConnectWithoutMembershipsInput | job_openingsCreateOrConnectWithoutMembershipsInput[]
+    createMany?: job_openingsCreateManyMembershipsInputEnvelope
+    connect?: job_openingsWhereUniqueInput | job_openingsWhereUniqueInput[]
+  }
+
   export type departmentsCreateNestedOneWithoutMemberships_memberships_department_idTodepartmentsInput = {
     create?: XOR<departmentsCreateWithoutMemberships_memberships_department_idTodepartmentsInput, departmentsUncheckedCreateWithoutMemberships_memberships_department_idTodepartmentsInput>
     connectOrCreate?: departmentsCreateOrConnectWithoutMemberships_memberships_department_idTodepartmentsInput
@@ -59671,6 +64886,13 @@ export namespace Prisma {
     connectOrCreate?: invitationsCreateOrConnectWithoutMembershipsInput | invitationsCreateOrConnectWithoutMembershipsInput[]
     createMany?: invitationsCreateManyMembershipsInputEnvelope
     connect?: invitationsWhereUniqueInput | invitationsWhereUniqueInput[]
+  }
+
+  export type job_openingsUncheckedCreateNestedManyWithoutMembershipsInput = {
+    create?: XOR<job_openingsCreateWithoutMembershipsInput, job_openingsUncheckedCreateWithoutMembershipsInput> | job_openingsCreateWithoutMembershipsInput[] | job_openingsUncheckedCreateWithoutMembershipsInput[]
+    connectOrCreate?: job_openingsCreateOrConnectWithoutMembershipsInput | job_openingsCreateOrConnectWithoutMembershipsInput[]
+    createMany?: job_openingsCreateManyMembershipsInputEnvelope
+    connect?: job_openingsWhereUniqueInput | job_openingsWhereUniqueInput[]
   }
 
   export type user_permission_overridesUncheckedCreateNestedManyWithoutMemberships_user_permission_overrides_granted_byTomembershipsInput = {
@@ -59731,6 +64953,20 @@ export namespace Prisma {
     update?: invitationsUpdateWithWhereUniqueWithoutMembershipsInput | invitationsUpdateWithWhereUniqueWithoutMembershipsInput[]
     updateMany?: invitationsUpdateManyWithWhereWithoutMembershipsInput | invitationsUpdateManyWithWhereWithoutMembershipsInput[]
     deleteMany?: invitationsScalarWhereInput | invitationsScalarWhereInput[]
+  }
+
+  export type job_openingsUpdateManyWithoutMembershipsNestedInput = {
+    create?: XOR<job_openingsCreateWithoutMembershipsInput, job_openingsUncheckedCreateWithoutMembershipsInput> | job_openingsCreateWithoutMembershipsInput[] | job_openingsUncheckedCreateWithoutMembershipsInput[]
+    connectOrCreate?: job_openingsCreateOrConnectWithoutMembershipsInput | job_openingsCreateOrConnectWithoutMembershipsInput[]
+    upsert?: job_openingsUpsertWithWhereUniqueWithoutMembershipsInput | job_openingsUpsertWithWhereUniqueWithoutMembershipsInput[]
+    createMany?: job_openingsCreateManyMembershipsInputEnvelope
+    set?: job_openingsWhereUniqueInput | job_openingsWhereUniqueInput[]
+    disconnect?: job_openingsWhereUniqueInput | job_openingsWhereUniqueInput[]
+    delete?: job_openingsWhereUniqueInput | job_openingsWhereUniqueInput[]
+    connect?: job_openingsWhereUniqueInput | job_openingsWhereUniqueInput[]
+    update?: job_openingsUpdateWithWhereUniqueWithoutMembershipsInput | job_openingsUpdateWithWhereUniqueWithoutMembershipsInput[]
+    updateMany?: job_openingsUpdateManyWithWhereWithoutMembershipsInput | job_openingsUpdateManyWithWhereWithoutMembershipsInput[]
+    deleteMany?: job_openingsScalarWhereInput | job_openingsScalarWhereInput[]
   }
 
   export type departmentsUpdateOneWithoutMemberships_memberships_department_idTodepartmentsNestedInput = {
@@ -59839,6 +65075,20 @@ export namespace Prisma {
     deleteMany?: invitationsScalarWhereInput | invitationsScalarWhereInput[]
   }
 
+  export type job_openingsUncheckedUpdateManyWithoutMembershipsNestedInput = {
+    create?: XOR<job_openingsCreateWithoutMembershipsInput, job_openingsUncheckedCreateWithoutMembershipsInput> | job_openingsCreateWithoutMembershipsInput[] | job_openingsUncheckedCreateWithoutMembershipsInput[]
+    connectOrCreate?: job_openingsCreateOrConnectWithoutMembershipsInput | job_openingsCreateOrConnectWithoutMembershipsInput[]
+    upsert?: job_openingsUpsertWithWhereUniqueWithoutMembershipsInput | job_openingsUpsertWithWhereUniqueWithoutMembershipsInput[]
+    createMany?: job_openingsCreateManyMembershipsInputEnvelope
+    set?: job_openingsWhereUniqueInput | job_openingsWhereUniqueInput[]
+    disconnect?: job_openingsWhereUniqueInput | job_openingsWhereUniqueInput[]
+    delete?: job_openingsWhereUniqueInput | job_openingsWhereUniqueInput[]
+    connect?: job_openingsWhereUniqueInput | job_openingsWhereUniqueInput[]
+    update?: job_openingsUpdateWithWhereUniqueWithoutMembershipsInput | job_openingsUpdateWithWhereUniqueWithoutMembershipsInput[]
+    updateMany?: job_openingsUpdateManyWithWhereWithoutMembershipsInput | job_openingsUpdateManyWithWhereWithoutMembershipsInput[]
+    deleteMany?: job_openingsScalarWhereInput | job_openingsScalarWhereInput[]
+  }
+
   export type user_permission_overridesUncheckedUpdateManyWithoutMemberships_user_permission_overrides_granted_byTomembershipsNestedInput = {
     create?: XOR<user_permission_overridesCreateWithoutMemberships_user_permission_overrides_granted_byTomembershipsInput, user_permission_overridesUncheckedCreateWithoutMemberships_user_permission_overrides_granted_byTomembershipsInput> | user_permission_overridesCreateWithoutMemberships_user_permission_overrides_granted_byTomembershipsInput[] | user_permission_overridesUncheckedCreateWithoutMemberships_user_permission_overrides_granted_byTomembershipsInput[]
     connectOrCreate?: user_permission_overridesCreateOrConnectWithoutMemberships_user_permission_overrides_granted_byTomembershipsInput | user_permission_overridesCreateOrConnectWithoutMemberships_user_permission_overrides_granted_byTomembershipsInput[]
@@ -59895,6 +65145,13 @@ export namespace Prisma {
     connect?: invitationsWhereUniqueInput | invitationsWhereUniqueInput[]
   }
 
+  export type job_openingsCreateNestedManyWithoutOrganizationsInput = {
+    create?: XOR<job_openingsCreateWithoutOrganizationsInput, job_openingsUncheckedCreateWithoutOrganizationsInput> | job_openingsCreateWithoutOrganizationsInput[] | job_openingsUncheckedCreateWithoutOrganizationsInput[]
+    connectOrCreate?: job_openingsCreateOrConnectWithoutOrganizationsInput | job_openingsCreateOrConnectWithoutOrganizationsInput[]
+    createMany?: job_openingsCreateManyOrganizationsInputEnvelope
+    connect?: job_openingsWhereUniqueInput | job_openingsWhereUniqueInput[]
+  }
+
   export type membershipsCreateNestedManyWithoutOrganizationsInput = {
     create?: XOR<membershipsCreateWithoutOrganizationsInput, membershipsUncheckedCreateWithoutOrganizationsInput> | membershipsCreateWithoutOrganizationsInput[] | membershipsUncheckedCreateWithoutOrganizationsInput[]
     connectOrCreate?: membershipsCreateOrConnectWithoutOrganizationsInput | membershipsCreateOrConnectWithoutOrganizationsInput[]
@@ -59941,6 +65198,13 @@ export namespace Prisma {
     connectOrCreate?: invitationsCreateOrConnectWithoutOrganizationsInput | invitationsCreateOrConnectWithoutOrganizationsInput[]
     createMany?: invitationsCreateManyOrganizationsInputEnvelope
     connect?: invitationsWhereUniqueInput | invitationsWhereUniqueInput[]
+  }
+
+  export type job_openingsUncheckedCreateNestedManyWithoutOrganizationsInput = {
+    create?: XOR<job_openingsCreateWithoutOrganizationsInput, job_openingsUncheckedCreateWithoutOrganizationsInput> | job_openingsCreateWithoutOrganizationsInput[] | job_openingsUncheckedCreateWithoutOrganizationsInput[]
+    connectOrCreate?: job_openingsCreateOrConnectWithoutOrganizationsInput | job_openingsCreateOrConnectWithoutOrganizationsInput[]
+    createMany?: job_openingsCreateManyOrganizationsInputEnvelope
+    connect?: job_openingsWhereUniqueInput | job_openingsWhereUniqueInput[]
   }
 
   export type membershipsUncheckedCreateNestedManyWithoutOrganizationsInput = {
@@ -60017,6 +65281,20 @@ export namespace Prisma {
     update?: invitationsUpdateWithWhereUniqueWithoutOrganizationsInput | invitationsUpdateWithWhereUniqueWithoutOrganizationsInput[]
     updateMany?: invitationsUpdateManyWithWhereWithoutOrganizationsInput | invitationsUpdateManyWithWhereWithoutOrganizationsInput[]
     deleteMany?: invitationsScalarWhereInput | invitationsScalarWhereInput[]
+  }
+
+  export type job_openingsUpdateManyWithoutOrganizationsNestedInput = {
+    create?: XOR<job_openingsCreateWithoutOrganizationsInput, job_openingsUncheckedCreateWithoutOrganizationsInput> | job_openingsCreateWithoutOrganizationsInput[] | job_openingsUncheckedCreateWithoutOrganizationsInput[]
+    connectOrCreate?: job_openingsCreateOrConnectWithoutOrganizationsInput | job_openingsCreateOrConnectWithoutOrganizationsInput[]
+    upsert?: job_openingsUpsertWithWhereUniqueWithoutOrganizationsInput | job_openingsUpsertWithWhereUniqueWithoutOrganizationsInput[]
+    createMany?: job_openingsCreateManyOrganizationsInputEnvelope
+    set?: job_openingsWhereUniqueInput | job_openingsWhereUniqueInput[]
+    disconnect?: job_openingsWhereUniqueInput | job_openingsWhereUniqueInput[]
+    delete?: job_openingsWhereUniqueInput | job_openingsWhereUniqueInput[]
+    connect?: job_openingsWhereUniqueInput | job_openingsWhereUniqueInput[]
+    update?: job_openingsUpdateWithWhereUniqueWithoutOrganizationsInput | job_openingsUpdateWithWhereUniqueWithoutOrganizationsInput[]
+    updateMany?: job_openingsUpdateManyWithWhereWithoutOrganizationsInput | job_openingsUpdateManyWithWhereWithoutOrganizationsInput[]
+    deleteMany?: job_openingsScalarWhereInput | job_openingsScalarWhereInput[]
   }
 
   export type membershipsUpdateManyWithoutOrganizationsNestedInput = {
@@ -60111,6 +65389,20 @@ export namespace Prisma {
     update?: invitationsUpdateWithWhereUniqueWithoutOrganizationsInput | invitationsUpdateWithWhereUniqueWithoutOrganizationsInput[]
     updateMany?: invitationsUpdateManyWithWhereWithoutOrganizationsInput | invitationsUpdateManyWithWhereWithoutOrganizationsInput[]
     deleteMany?: invitationsScalarWhereInput | invitationsScalarWhereInput[]
+  }
+
+  export type job_openingsUncheckedUpdateManyWithoutOrganizationsNestedInput = {
+    create?: XOR<job_openingsCreateWithoutOrganizationsInput, job_openingsUncheckedCreateWithoutOrganizationsInput> | job_openingsCreateWithoutOrganizationsInput[] | job_openingsUncheckedCreateWithoutOrganizationsInput[]
+    connectOrCreate?: job_openingsCreateOrConnectWithoutOrganizationsInput | job_openingsCreateOrConnectWithoutOrganizationsInput[]
+    upsert?: job_openingsUpsertWithWhereUniqueWithoutOrganizationsInput | job_openingsUpsertWithWhereUniqueWithoutOrganizationsInput[]
+    createMany?: job_openingsCreateManyOrganizationsInputEnvelope
+    set?: job_openingsWhereUniqueInput | job_openingsWhereUniqueInput[]
+    disconnect?: job_openingsWhereUniqueInput | job_openingsWhereUniqueInput[]
+    delete?: job_openingsWhereUniqueInput | job_openingsWhereUniqueInput[]
+    connect?: job_openingsWhereUniqueInput | job_openingsWhereUniqueInput[]
+    update?: job_openingsUpdateWithWhereUniqueWithoutOrganizationsInput | job_openingsUpdateWithWhereUniqueWithoutOrganizationsInput[]
+    updateMany?: job_openingsUpdateManyWithWhereWithoutOrganizationsInput | job_openingsUpdateManyWithWhereWithoutOrganizationsInput[]
+    deleteMany?: job_openingsScalarWhereInput | job_openingsScalarWhereInput[]
   }
 
   export type membershipsUncheckedUpdateManyWithoutOrganizationsNestedInput = {
@@ -60781,6 +66073,188 @@ export namespace Prisma {
     update?: XOR<XOR<permissionsUpdateToOneWithWhereWithoutUser_permission_overridesInput, permissionsUpdateWithoutUser_permission_overridesInput>, permissionsUncheckedUpdateWithoutUser_permission_overridesInput>
   }
 
+  export type membershipsCreateNestedOneWithoutJob_openingsInput = {
+    create?: XOR<membershipsCreateWithoutJob_openingsInput, membershipsUncheckedCreateWithoutJob_openingsInput>
+    connectOrCreate?: membershipsCreateOrConnectWithoutJob_openingsInput
+    connect?: membershipsWhereUniqueInput
+  }
+
+  export type departmentsCreateNestedOneWithoutJob_openingsInput = {
+    create?: XOR<departmentsCreateWithoutJob_openingsInput, departmentsUncheckedCreateWithoutJob_openingsInput>
+    connectOrCreate?: departmentsCreateOrConnectWithoutJob_openingsInput
+    connect?: departmentsWhereUniqueInput
+  }
+
+  export type organizationsCreateNestedOneWithoutJob_openingsInput = {
+    create?: XOR<organizationsCreateWithoutJob_openingsInput, organizationsUncheckedCreateWithoutJob_openingsInput>
+    connectOrCreate?: organizationsCreateOrConnectWithoutJob_openingsInput
+    connect?: organizationsWhereUniqueInput
+  }
+
+  export type job_requirementsCreateNestedManyWithoutJob_openingsInput = {
+    create?: XOR<job_requirementsCreateWithoutJob_openingsInput, job_requirementsUncheckedCreateWithoutJob_openingsInput> | job_requirementsCreateWithoutJob_openingsInput[] | job_requirementsUncheckedCreateWithoutJob_openingsInput[]
+    connectOrCreate?: job_requirementsCreateOrConnectWithoutJob_openingsInput | job_requirementsCreateOrConnectWithoutJob_openingsInput[]
+    createMany?: job_requirementsCreateManyJob_openingsInputEnvelope
+    connect?: job_requirementsWhereUniqueInput | job_requirementsWhereUniqueInput[]
+  }
+
+  export type screening_questionsCreateNestedManyWithoutJob_openingsInput = {
+    create?: XOR<screening_questionsCreateWithoutJob_openingsInput, screening_questionsUncheckedCreateWithoutJob_openingsInput> | screening_questionsCreateWithoutJob_openingsInput[] | screening_questionsUncheckedCreateWithoutJob_openingsInput[]
+    connectOrCreate?: screening_questionsCreateOrConnectWithoutJob_openingsInput | screening_questionsCreateOrConnectWithoutJob_openingsInput[]
+    createMany?: screening_questionsCreateManyJob_openingsInputEnvelope
+    connect?: screening_questionsWhereUniqueInput | screening_questionsWhereUniqueInput[]
+  }
+
+  export type job_requirementsUncheckedCreateNestedManyWithoutJob_openingsInput = {
+    create?: XOR<job_requirementsCreateWithoutJob_openingsInput, job_requirementsUncheckedCreateWithoutJob_openingsInput> | job_requirementsCreateWithoutJob_openingsInput[] | job_requirementsUncheckedCreateWithoutJob_openingsInput[]
+    connectOrCreate?: job_requirementsCreateOrConnectWithoutJob_openingsInput | job_requirementsCreateOrConnectWithoutJob_openingsInput[]
+    createMany?: job_requirementsCreateManyJob_openingsInputEnvelope
+    connect?: job_requirementsWhereUniqueInput | job_requirementsWhereUniqueInput[]
+  }
+
+  export type screening_questionsUncheckedCreateNestedManyWithoutJob_openingsInput = {
+    create?: XOR<screening_questionsCreateWithoutJob_openingsInput, screening_questionsUncheckedCreateWithoutJob_openingsInput> | screening_questionsCreateWithoutJob_openingsInput[] | screening_questionsUncheckedCreateWithoutJob_openingsInput[]
+    connectOrCreate?: screening_questionsCreateOrConnectWithoutJob_openingsInput | screening_questionsCreateOrConnectWithoutJob_openingsInput[]
+    createMany?: screening_questionsCreateManyJob_openingsInputEnvelope
+    connect?: screening_questionsWhereUniqueInput | screening_questionsWhereUniqueInput[]
+  }
+
+  export type Enumemployment_typeFieldUpdateOperationsInput = {
+    set?: $Enums.employment_type
+  }
+
+  export type Enumwork_modeFieldUpdateOperationsInput = {
+    set?: $Enums.work_mode
+  }
+
+  export type NullableDecimalFieldUpdateOperationsInput = {
+    set?: Decimal | DecimalJsLike | number | string | null
+    increment?: Decimal | DecimalJsLike | number | string
+    decrement?: Decimal | DecimalJsLike | number | string
+    multiply?: Decimal | DecimalJsLike | number | string
+    divide?: Decimal | DecimalJsLike | number | string
+  }
+
+  export type Enumopening_statusFieldUpdateOperationsInput = {
+    set?: $Enums.opening_status
+  }
+
+  export type membershipsUpdateOneWithoutJob_openingsNestedInput = {
+    create?: XOR<membershipsCreateWithoutJob_openingsInput, membershipsUncheckedCreateWithoutJob_openingsInput>
+    connectOrCreate?: membershipsCreateOrConnectWithoutJob_openingsInput
+    upsert?: membershipsUpsertWithoutJob_openingsInput
+    disconnect?: membershipsWhereInput | boolean
+    delete?: membershipsWhereInput | boolean
+    connect?: membershipsWhereUniqueInput
+    update?: XOR<XOR<membershipsUpdateToOneWithWhereWithoutJob_openingsInput, membershipsUpdateWithoutJob_openingsInput>, membershipsUncheckedUpdateWithoutJob_openingsInput>
+  }
+
+  export type departmentsUpdateOneWithoutJob_openingsNestedInput = {
+    create?: XOR<departmentsCreateWithoutJob_openingsInput, departmentsUncheckedCreateWithoutJob_openingsInput>
+    connectOrCreate?: departmentsCreateOrConnectWithoutJob_openingsInput
+    upsert?: departmentsUpsertWithoutJob_openingsInput
+    disconnect?: departmentsWhereInput | boolean
+    delete?: departmentsWhereInput | boolean
+    connect?: departmentsWhereUniqueInput
+    update?: XOR<XOR<departmentsUpdateToOneWithWhereWithoutJob_openingsInput, departmentsUpdateWithoutJob_openingsInput>, departmentsUncheckedUpdateWithoutJob_openingsInput>
+  }
+
+  export type organizationsUpdateOneRequiredWithoutJob_openingsNestedInput = {
+    create?: XOR<organizationsCreateWithoutJob_openingsInput, organizationsUncheckedCreateWithoutJob_openingsInput>
+    connectOrCreate?: organizationsCreateOrConnectWithoutJob_openingsInput
+    upsert?: organizationsUpsertWithoutJob_openingsInput
+    connect?: organizationsWhereUniqueInput
+    update?: XOR<XOR<organizationsUpdateToOneWithWhereWithoutJob_openingsInput, organizationsUpdateWithoutJob_openingsInput>, organizationsUncheckedUpdateWithoutJob_openingsInput>
+  }
+
+  export type job_requirementsUpdateManyWithoutJob_openingsNestedInput = {
+    create?: XOR<job_requirementsCreateWithoutJob_openingsInput, job_requirementsUncheckedCreateWithoutJob_openingsInput> | job_requirementsCreateWithoutJob_openingsInput[] | job_requirementsUncheckedCreateWithoutJob_openingsInput[]
+    connectOrCreate?: job_requirementsCreateOrConnectWithoutJob_openingsInput | job_requirementsCreateOrConnectWithoutJob_openingsInput[]
+    upsert?: job_requirementsUpsertWithWhereUniqueWithoutJob_openingsInput | job_requirementsUpsertWithWhereUniqueWithoutJob_openingsInput[]
+    createMany?: job_requirementsCreateManyJob_openingsInputEnvelope
+    set?: job_requirementsWhereUniqueInput | job_requirementsWhereUniqueInput[]
+    disconnect?: job_requirementsWhereUniqueInput | job_requirementsWhereUniqueInput[]
+    delete?: job_requirementsWhereUniqueInput | job_requirementsWhereUniqueInput[]
+    connect?: job_requirementsWhereUniqueInput | job_requirementsWhereUniqueInput[]
+    update?: job_requirementsUpdateWithWhereUniqueWithoutJob_openingsInput | job_requirementsUpdateWithWhereUniqueWithoutJob_openingsInput[]
+    updateMany?: job_requirementsUpdateManyWithWhereWithoutJob_openingsInput | job_requirementsUpdateManyWithWhereWithoutJob_openingsInput[]
+    deleteMany?: job_requirementsScalarWhereInput | job_requirementsScalarWhereInput[]
+  }
+
+  export type screening_questionsUpdateManyWithoutJob_openingsNestedInput = {
+    create?: XOR<screening_questionsCreateWithoutJob_openingsInput, screening_questionsUncheckedCreateWithoutJob_openingsInput> | screening_questionsCreateWithoutJob_openingsInput[] | screening_questionsUncheckedCreateWithoutJob_openingsInput[]
+    connectOrCreate?: screening_questionsCreateOrConnectWithoutJob_openingsInput | screening_questionsCreateOrConnectWithoutJob_openingsInput[]
+    upsert?: screening_questionsUpsertWithWhereUniqueWithoutJob_openingsInput | screening_questionsUpsertWithWhereUniqueWithoutJob_openingsInput[]
+    createMany?: screening_questionsCreateManyJob_openingsInputEnvelope
+    set?: screening_questionsWhereUniqueInput | screening_questionsWhereUniqueInput[]
+    disconnect?: screening_questionsWhereUniqueInput | screening_questionsWhereUniqueInput[]
+    delete?: screening_questionsWhereUniqueInput | screening_questionsWhereUniqueInput[]
+    connect?: screening_questionsWhereUniqueInput | screening_questionsWhereUniqueInput[]
+    update?: screening_questionsUpdateWithWhereUniqueWithoutJob_openingsInput | screening_questionsUpdateWithWhereUniqueWithoutJob_openingsInput[]
+    updateMany?: screening_questionsUpdateManyWithWhereWithoutJob_openingsInput | screening_questionsUpdateManyWithWhereWithoutJob_openingsInput[]
+    deleteMany?: screening_questionsScalarWhereInput | screening_questionsScalarWhereInput[]
+  }
+
+  export type job_requirementsUncheckedUpdateManyWithoutJob_openingsNestedInput = {
+    create?: XOR<job_requirementsCreateWithoutJob_openingsInput, job_requirementsUncheckedCreateWithoutJob_openingsInput> | job_requirementsCreateWithoutJob_openingsInput[] | job_requirementsUncheckedCreateWithoutJob_openingsInput[]
+    connectOrCreate?: job_requirementsCreateOrConnectWithoutJob_openingsInput | job_requirementsCreateOrConnectWithoutJob_openingsInput[]
+    upsert?: job_requirementsUpsertWithWhereUniqueWithoutJob_openingsInput | job_requirementsUpsertWithWhereUniqueWithoutJob_openingsInput[]
+    createMany?: job_requirementsCreateManyJob_openingsInputEnvelope
+    set?: job_requirementsWhereUniqueInput | job_requirementsWhereUniqueInput[]
+    disconnect?: job_requirementsWhereUniqueInput | job_requirementsWhereUniqueInput[]
+    delete?: job_requirementsWhereUniqueInput | job_requirementsWhereUniqueInput[]
+    connect?: job_requirementsWhereUniqueInput | job_requirementsWhereUniqueInput[]
+    update?: job_requirementsUpdateWithWhereUniqueWithoutJob_openingsInput | job_requirementsUpdateWithWhereUniqueWithoutJob_openingsInput[]
+    updateMany?: job_requirementsUpdateManyWithWhereWithoutJob_openingsInput | job_requirementsUpdateManyWithWhereWithoutJob_openingsInput[]
+    deleteMany?: job_requirementsScalarWhereInput | job_requirementsScalarWhereInput[]
+  }
+
+  export type screening_questionsUncheckedUpdateManyWithoutJob_openingsNestedInput = {
+    create?: XOR<screening_questionsCreateWithoutJob_openingsInput, screening_questionsUncheckedCreateWithoutJob_openingsInput> | screening_questionsCreateWithoutJob_openingsInput[] | screening_questionsUncheckedCreateWithoutJob_openingsInput[]
+    connectOrCreate?: screening_questionsCreateOrConnectWithoutJob_openingsInput | screening_questionsCreateOrConnectWithoutJob_openingsInput[]
+    upsert?: screening_questionsUpsertWithWhereUniqueWithoutJob_openingsInput | screening_questionsUpsertWithWhereUniqueWithoutJob_openingsInput[]
+    createMany?: screening_questionsCreateManyJob_openingsInputEnvelope
+    set?: screening_questionsWhereUniqueInput | screening_questionsWhereUniqueInput[]
+    disconnect?: screening_questionsWhereUniqueInput | screening_questionsWhereUniqueInput[]
+    delete?: screening_questionsWhereUniqueInput | screening_questionsWhereUniqueInput[]
+    connect?: screening_questionsWhereUniqueInput | screening_questionsWhereUniqueInput[]
+    update?: screening_questionsUpdateWithWhereUniqueWithoutJob_openingsInput | screening_questionsUpdateWithWhereUniqueWithoutJob_openingsInput[]
+    updateMany?: screening_questionsUpdateManyWithWhereWithoutJob_openingsInput | screening_questionsUpdateManyWithWhereWithoutJob_openingsInput[]
+    deleteMany?: screening_questionsScalarWhereInput | screening_questionsScalarWhereInput[]
+  }
+
+  export type job_openingsCreateNestedOneWithoutJob_requirementsInput = {
+    create?: XOR<job_openingsCreateWithoutJob_requirementsInput, job_openingsUncheckedCreateWithoutJob_requirementsInput>
+    connectOrCreate?: job_openingsCreateOrConnectWithoutJob_requirementsInput
+    connect?: job_openingsWhereUniqueInput
+  }
+
+  export type Enumrequirement_kindFieldUpdateOperationsInput = {
+    set?: $Enums.requirement_kind
+  }
+
+  export type job_openingsUpdateOneRequiredWithoutJob_requirementsNestedInput = {
+    create?: XOR<job_openingsCreateWithoutJob_requirementsInput, job_openingsUncheckedCreateWithoutJob_requirementsInput>
+    connectOrCreate?: job_openingsCreateOrConnectWithoutJob_requirementsInput
+    upsert?: job_openingsUpsertWithoutJob_requirementsInput
+    connect?: job_openingsWhereUniqueInput
+    update?: XOR<XOR<job_openingsUpdateToOneWithWhereWithoutJob_requirementsInput, job_openingsUpdateWithoutJob_requirementsInput>, job_openingsUncheckedUpdateWithoutJob_requirementsInput>
+  }
+
+  export type job_openingsCreateNestedOneWithoutScreening_questionsInput = {
+    create?: XOR<job_openingsCreateWithoutScreening_questionsInput, job_openingsUncheckedCreateWithoutScreening_questionsInput>
+    connectOrCreate?: job_openingsCreateOrConnectWithoutScreening_questionsInput
+    connect?: job_openingsWhereUniqueInput
+  }
+
+  export type job_openingsUpdateOneRequiredWithoutScreening_questionsNestedInput = {
+    create?: XOR<job_openingsCreateWithoutScreening_questionsInput, job_openingsUncheckedCreateWithoutScreening_questionsInput>
+    connectOrCreate?: job_openingsCreateOrConnectWithoutScreening_questionsInput
+    upsert?: job_openingsUpsertWithoutScreening_questionsInput
+    connect?: job_openingsWhereUniqueInput
+    update?: XOR<XOR<job_openingsUpdateToOneWithWhereWithoutScreening_questionsInput, job_openingsUpdateWithoutScreening_questionsInput>, job_openingsUncheckedUpdateWithoutScreening_questionsInput>
+  }
+
   export type NestedUuidNullableFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel> | null
     in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
@@ -61398,6 +66872,101 @@ export namespace Prisma {
     _count?: NestedIntNullableFilter<$PrismaModel>
     _min?: NestedEnumpermission_scopeNullableFilter<$PrismaModel>
     _max?: NestedEnumpermission_scopeNullableFilter<$PrismaModel>
+  }
+
+  export type NestedEnumemployment_typeFilter<$PrismaModel = never> = {
+    equals?: $Enums.employment_type | Enumemployment_typeFieldRefInput<$PrismaModel>
+    in?: $Enums.employment_type[] | ListEnumemployment_typeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.employment_type[] | ListEnumemployment_typeFieldRefInput<$PrismaModel>
+    not?: NestedEnumemployment_typeFilter<$PrismaModel> | $Enums.employment_type
+  }
+
+  export type NestedEnumwork_modeFilter<$PrismaModel = never> = {
+    equals?: $Enums.work_mode | Enumwork_modeFieldRefInput<$PrismaModel>
+    in?: $Enums.work_mode[] | ListEnumwork_modeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.work_mode[] | ListEnumwork_modeFieldRefInput<$PrismaModel>
+    not?: NestedEnumwork_modeFilter<$PrismaModel> | $Enums.work_mode
+  }
+
+  export type NestedDecimalNullableFilter<$PrismaModel = never> = {
+    equals?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel> | null
+    in?: Decimal[] | DecimalJsLike[] | number[] | string[] | ListDecimalFieldRefInput<$PrismaModel> | null
+    notIn?: Decimal[] | DecimalJsLike[] | number[] | string[] | ListDecimalFieldRefInput<$PrismaModel> | null
+    lt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    lte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    gt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    gte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    not?: NestedDecimalNullableFilter<$PrismaModel> | Decimal | DecimalJsLike | number | string | null
+  }
+
+  export type NestedEnumopening_statusFilter<$PrismaModel = never> = {
+    equals?: $Enums.opening_status | Enumopening_statusFieldRefInput<$PrismaModel>
+    in?: $Enums.opening_status[] | ListEnumopening_statusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.opening_status[] | ListEnumopening_statusFieldRefInput<$PrismaModel>
+    not?: NestedEnumopening_statusFilter<$PrismaModel> | $Enums.opening_status
+  }
+
+  export type NestedEnumemployment_typeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.employment_type | Enumemployment_typeFieldRefInput<$PrismaModel>
+    in?: $Enums.employment_type[] | ListEnumemployment_typeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.employment_type[] | ListEnumemployment_typeFieldRefInput<$PrismaModel>
+    not?: NestedEnumemployment_typeWithAggregatesFilter<$PrismaModel> | $Enums.employment_type
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumemployment_typeFilter<$PrismaModel>
+    _max?: NestedEnumemployment_typeFilter<$PrismaModel>
+  }
+
+  export type NestedEnumwork_modeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.work_mode | Enumwork_modeFieldRefInput<$PrismaModel>
+    in?: $Enums.work_mode[] | ListEnumwork_modeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.work_mode[] | ListEnumwork_modeFieldRefInput<$PrismaModel>
+    not?: NestedEnumwork_modeWithAggregatesFilter<$PrismaModel> | $Enums.work_mode
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumwork_modeFilter<$PrismaModel>
+    _max?: NestedEnumwork_modeFilter<$PrismaModel>
+  }
+
+  export type NestedDecimalNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel> | null
+    in?: Decimal[] | DecimalJsLike[] | number[] | string[] | ListDecimalFieldRefInput<$PrismaModel> | null
+    notIn?: Decimal[] | DecimalJsLike[] | number[] | string[] | ListDecimalFieldRefInput<$PrismaModel> | null
+    lt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    lte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    gt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    gte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    not?: NestedDecimalNullableWithAggregatesFilter<$PrismaModel> | Decimal | DecimalJsLike | number | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _avg?: NestedDecimalNullableFilter<$PrismaModel>
+    _sum?: NestedDecimalNullableFilter<$PrismaModel>
+    _min?: NestedDecimalNullableFilter<$PrismaModel>
+    _max?: NestedDecimalNullableFilter<$PrismaModel>
+  }
+
+  export type NestedEnumopening_statusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.opening_status | Enumopening_statusFieldRefInput<$PrismaModel>
+    in?: $Enums.opening_status[] | ListEnumopening_statusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.opening_status[] | ListEnumopening_statusFieldRefInput<$PrismaModel>
+    not?: NestedEnumopening_statusWithAggregatesFilter<$PrismaModel> | $Enums.opening_status
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumopening_statusFilter<$PrismaModel>
+    _max?: NestedEnumopening_statusFilter<$PrismaModel>
+  }
+
+  export type NestedEnumrequirement_kindFilter<$PrismaModel = never> = {
+    equals?: $Enums.requirement_kind | Enumrequirement_kindFieldRefInput<$PrismaModel>
+    in?: $Enums.requirement_kind[] | ListEnumrequirement_kindFieldRefInput<$PrismaModel>
+    notIn?: $Enums.requirement_kind[] | ListEnumrequirement_kindFieldRefInput<$PrismaModel>
+    not?: NestedEnumrequirement_kindFilter<$PrismaModel> | $Enums.requirement_kind
+  }
+
+  export type NestedEnumrequirement_kindWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.requirement_kind | Enumrequirement_kindFieldRefInput<$PrismaModel>
+    in?: $Enums.requirement_kind[] | ListEnumrequirement_kindFieldRefInput<$PrismaModel>
+    notIn?: $Enums.requirement_kind[] | ListEnumrequirement_kindFieldRefInput<$PrismaModel>
+    not?: NestedEnumrequirement_kindWithAggregatesFilter<$PrismaModel> | $Enums.requirement_kind
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumrequirement_kindFilter<$PrismaModel>
+    _max?: NestedEnumrequirement_kindFilter<$PrismaModel>
   }
 
   export type saml_relay_statesCreateWithoutFlow_stateInput = {
@@ -65017,6 +70586,7 @@ export namespace Prisma {
     audit_log?: audit_logCreateNestedManyWithoutOrganizationsInput
     departments?: departmentsCreateNestedManyWithoutOrganizationsInput
     invitations?: invitationsCreateNestedManyWithoutOrganizationsInput
+    job_openings?: job_openingsCreateNestedManyWithoutOrganizationsInput
     memberships?: membershipsCreateNestedManyWithoutOrganizationsInput
     roles?: rolesCreateNestedOneWithoutOrganizationsInput
     user_permission_overrides?: user_permission_overridesCreateNestedManyWithoutOrganizationsInput
@@ -65038,6 +70608,7 @@ export namespace Prisma {
     audit_log?: audit_logUncheckedCreateNestedManyWithoutOrganizationsInput
     departments?: departmentsUncheckedCreateNestedManyWithoutOrganizationsInput
     invitations?: invitationsUncheckedCreateNestedManyWithoutOrganizationsInput
+    job_openings?: job_openingsUncheckedCreateNestedManyWithoutOrganizationsInput
     memberships?: membershipsUncheckedCreateNestedManyWithoutOrganizationsInput
     roles?: rolesUncheckedCreateNestedOneWithoutOrganizationsInput
     user_permission_overrides?: user_permission_overridesUncheckedCreateNestedManyWithoutOrganizationsInput
@@ -65114,6 +70685,7 @@ export namespace Prisma {
     audit_log?: audit_logUpdateManyWithoutOrganizationsNestedInput
     departments?: departmentsUpdateManyWithoutOrganizationsNestedInput
     invitations?: invitationsUpdateManyWithoutOrganizationsNestedInput
+    job_openings?: job_openingsUpdateManyWithoutOrganizationsNestedInput
     memberships?: membershipsUpdateManyWithoutOrganizationsNestedInput
     roles?: rolesUpdateOneWithoutOrganizationsNestedInput
     user_permission_overrides?: user_permission_overridesUpdateManyWithoutOrganizationsNestedInput
@@ -65135,6 +70707,7 @@ export namespace Prisma {
     audit_log?: audit_logUncheckedUpdateManyWithoutOrganizationsNestedInput
     departments?: departmentsUncheckedUpdateManyWithoutOrganizationsNestedInput
     invitations?: invitationsUncheckedUpdateManyWithoutOrganizationsNestedInput
+    job_openings?: job_openingsUncheckedUpdateManyWithoutOrganizationsNestedInput
     memberships?: membershipsUncheckedUpdateManyWithoutOrganizationsNestedInput
     roles?: rolesUncheckedUpdateOneWithoutOrganizationsNestedInput
     user_permission_overrides?: user_permission_overridesUncheckedUpdateManyWithoutOrganizationsNestedInput
@@ -65150,6 +70723,7 @@ export namespace Prisma {
     updated_at?: Date | string
     departments_departments_head_membership_idTomemberships?: departmentsCreateNestedManyWithoutMemberships_departments_head_membership_idTomembershipsInput
     invitations?: invitationsCreateNestedManyWithoutMembershipsInput
+    job_openings?: job_openingsCreateNestedManyWithoutMembershipsInput
     departments_memberships_department_idTodepartments?: departmentsCreateNestedOneWithoutMemberships_memberships_department_idTodepartmentsInput
     organizations: organizationsCreateNestedOneWithoutMembershipsInput
     roles?: rolesCreateNestedOneWithoutMembershipsInput
@@ -65172,6 +70746,7 @@ export namespace Prisma {
     updated_at?: Date | string
     departments_departments_head_membership_idTomemberships?: departmentsUncheckedCreateNestedManyWithoutMemberships_departments_head_membership_idTomembershipsInput
     invitations?: invitationsUncheckedCreateNestedManyWithoutMembershipsInput
+    job_openings?: job_openingsUncheckedCreateNestedManyWithoutMembershipsInput
     user_permission_overrides_user_permission_overrides_granted_byTomemberships?: user_permission_overridesUncheckedCreateNestedManyWithoutMemberships_user_permission_overrides_granted_byTomembershipsInput
     user_permission_overrides_user_permission_overrides_membership_idTomemberships?: user_permission_overridesUncheckedCreateNestedManyWithoutMemberships_user_permission_overrides_membership_idTomembershipsInput
   }
@@ -65197,6 +70772,7 @@ export namespace Prisma {
     approval_rules?: approval_rulesCreateNestedManyWithoutOrganizationsInput
     departments?: departmentsCreateNestedManyWithoutOrganizationsInput
     invitations?: invitationsCreateNestedManyWithoutOrganizationsInput
+    job_openings?: job_openingsCreateNestedManyWithoutOrganizationsInput
     memberships?: membershipsCreateNestedManyWithoutOrganizationsInput
     roles?: rolesCreateNestedOneWithoutOrganizationsInput
     user_permission_overrides?: user_permission_overridesCreateNestedManyWithoutOrganizationsInput
@@ -65218,6 +70794,7 @@ export namespace Prisma {
     approval_rules?: approval_rulesUncheckedCreateNestedManyWithoutOrganizationsInput
     departments?: departmentsUncheckedCreateNestedManyWithoutOrganizationsInput
     invitations?: invitationsUncheckedCreateNestedManyWithoutOrganizationsInput
+    job_openings?: job_openingsUncheckedCreateNestedManyWithoutOrganizationsInput
     memberships?: membershipsUncheckedCreateNestedManyWithoutOrganizationsInput
     roles?: rolesUncheckedCreateNestedOneWithoutOrganizationsInput
     user_permission_overrides?: user_permission_overridesUncheckedCreateNestedManyWithoutOrganizationsInput
@@ -65249,6 +70826,7 @@ export namespace Prisma {
     updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
     departments_departments_head_membership_idTomemberships?: departmentsUpdateManyWithoutMemberships_departments_head_membership_idTomembershipsNestedInput
     invitations?: invitationsUpdateManyWithoutMembershipsNestedInput
+    job_openings?: job_openingsUpdateManyWithoutMembershipsNestedInput
     departments_memberships_department_idTodepartments?: departmentsUpdateOneWithoutMemberships_memberships_department_idTodepartmentsNestedInput
     organizations?: organizationsUpdateOneRequiredWithoutMembershipsNestedInput
     roles?: rolesUpdateOneWithoutMembershipsNestedInput
@@ -65271,6 +70849,7 @@ export namespace Prisma {
     updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
     departments_departments_head_membership_idTomemberships?: departmentsUncheckedUpdateManyWithoutMemberships_departments_head_membership_idTomembershipsNestedInput
     invitations?: invitationsUncheckedUpdateManyWithoutMembershipsNestedInput
+    job_openings?: job_openingsUncheckedUpdateManyWithoutMembershipsNestedInput
     user_permission_overrides_user_permission_overrides_granted_byTomemberships?: user_permission_overridesUncheckedUpdateManyWithoutMemberships_user_permission_overrides_granted_byTomembershipsNestedInput
     user_permission_overrides_user_permission_overrides_membership_idTomemberships?: user_permission_overridesUncheckedUpdateManyWithoutMemberships_user_permission_overrides_membership_idTomembershipsNestedInput
   }
@@ -65302,6 +70881,7 @@ export namespace Prisma {
     approval_rules?: approval_rulesUpdateManyWithoutOrganizationsNestedInput
     departments?: departmentsUpdateManyWithoutOrganizationsNestedInput
     invitations?: invitationsUpdateManyWithoutOrganizationsNestedInput
+    job_openings?: job_openingsUpdateManyWithoutOrganizationsNestedInput
     memberships?: membershipsUpdateManyWithoutOrganizationsNestedInput
     roles?: rolesUpdateOneWithoutOrganizationsNestedInput
     user_permission_overrides?: user_permission_overridesUpdateManyWithoutOrganizationsNestedInput
@@ -65323,6 +70903,7 @@ export namespace Prisma {
     approval_rules?: approval_rulesUncheckedUpdateManyWithoutOrganizationsNestedInput
     departments?: departmentsUncheckedUpdateManyWithoutOrganizationsNestedInput
     invitations?: invitationsUncheckedUpdateManyWithoutOrganizationsNestedInput
+    job_openings?: job_openingsUncheckedUpdateManyWithoutOrganizationsNestedInput
     memberships?: membershipsUncheckedUpdateManyWithoutOrganizationsNestedInput
     roles?: rolesUncheckedUpdateOneWithoutOrganizationsNestedInput
     user_permission_overrides?: user_permission_overridesUncheckedUpdateManyWithoutOrganizationsNestedInput
@@ -65338,6 +70919,7 @@ export namespace Prisma {
     updated_at?: Date | string
     audit_log?: audit_logCreateNestedManyWithoutMembershipsInput
     invitations?: invitationsCreateNestedManyWithoutMembershipsInput
+    job_openings?: job_openingsCreateNestedManyWithoutMembershipsInput
     departments_memberships_department_idTodepartments?: departmentsCreateNestedOneWithoutMemberships_memberships_department_idTodepartmentsInput
     organizations: organizationsCreateNestedOneWithoutMembershipsInput
     roles?: rolesCreateNestedOneWithoutMembershipsInput
@@ -65360,6 +70942,7 @@ export namespace Prisma {
     updated_at?: Date | string
     audit_log?: audit_logUncheckedCreateNestedManyWithoutMembershipsInput
     invitations?: invitationsUncheckedCreateNestedManyWithoutMembershipsInput
+    job_openings?: job_openingsUncheckedCreateNestedManyWithoutMembershipsInput
     user_permission_overrides_user_permission_overrides_granted_byTomemberships?: user_permission_overridesUncheckedCreateNestedManyWithoutMemberships_user_permission_overrides_granted_byTomembershipsInput
     user_permission_overrides_user_permission_overrides_membership_idTomemberships?: user_permission_overridesUncheckedCreateNestedManyWithoutMemberships_user_permission_overrides_membership_idTomembershipsInput
   }
@@ -65385,6 +70968,7 @@ export namespace Prisma {
     approval_rules?: approval_rulesCreateNestedManyWithoutOrganizationsInput
     audit_log?: audit_logCreateNestedManyWithoutOrganizationsInput
     invitations?: invitationsCreateNestedManyWithoutOrganizationsInput
+    job_openings?: job_openingsCreateNestedManyWithoutOrganizationsInput
     memberships?: membershipsCreateNestedManyWithoutOrganizationsInput
     roles?: rolesCreateNestedOneWithoutOrganizationsInput
     user_permission_overrides?: user_permission_overridesCreateNestedManyWithoutOrganizationsInput
@@ -65406,6 +70990,7 @@ export namespace Prisma {
     approval_rules?: approval_rulesUncheckedCreateNestedManyWithoutOrganizationsInput
     audit_log?: audit_logUncheckedCreateNestedManyWithoutOrganizationsInput
     invitations?: invitationsUncheckedCreateNestedManyWithoutOrganizationsInput
+    job_openings?: job_openingsUncheckedCreateNestedManyWithoutOrganizationsInput
     memberships?: membershipsUncheckedCreateNestedManyWithoutOrganizationsInput
     roles?: rolesUncheckedCreateNestedOneWithoutOrganizationsInput
     user_permission_overrides?: user_permission_overridesUncheckedCreateNestedManyWithoutOrganizationsInput
@@ -65456,6 +71041,68 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type job_openingsCreateWithoutDepartmentsInput = {
+    id?: string
+    title: string
+    employment_type?: $Enums.employment_type
+    work_mode?: $Enums.work_mode
+    location?: string | null
+    experience_min?: number | null
+    experience_max?: number | null
+    salary_min?: Decimal | DecimalJsLike | number | string | null
+    salary_max?: Decimal | DecimalJsLike | number | string | null
+    salary_currency?: string | null
+    salary_visible?: boolean
+    description?: string
+    positions?: number
+    status?: $Enums.opening_status
+    application_deadline?: Date | string | null
+    opened_at?: Date | string | null
+    closed_at?: Date | string | null
+    created_at?: Date | string
+    updated_at?: Date | string
+    memberships?: membershipsCreateNestedOneWithoutJob_openingsInput
+    organizations: organizationsCreateNestedOneWithoutJob_openingsInput
+    job_requirements?: job_requirementsCreateNestedManyWithoutJob_openingsInput
+    screening_questions?: screening_questionsCreateNestedManyWithoutJob_openingsInput
+  }
+
+  export type job_openingsUncheckedCreateWithoutDepartmentsInput = {
+    id?: string
+    organization_id: string
+    created_by?: string | null
+    title: string
+    employment_type?: $Enums.employment_type
+    work_mode?: $Enums.work_mode
+    location?: string | null
+    experience_min?: number | null
+    experience_max?: number | null
+    salary_min?: Decimal | DecimalJsLike | number | string | null
+    salary_max?: Decimal | DecimalJsLike | number | string | null
+    salary_currency?: string | null
+    salary_visible?: boolean
+    description?: string
+    positions?: number
+    status?: $Enums.opening_status
+    application_deadline?: Date | string | null
+    opened_at?: Date | string | null
+    closed_at?: Date | string | null
+    created_at?: Date | string
+    updated_at?: Date | string
+    job_requirements?: job_requirementsUncheckedCreateNestedManyWithoutJob_openingsInput
+    screening_questions?: screening_questionsUncheckedCreateNestedManyWithoutJob_openingsInput
+  }
+
+  export type job_openingsCreateOrConnectWithoutDepartmentsInput = {
+    where: job_openingsWhereUniqueInput
+    create: XOR<job_openingsCreateWithoutDepartmentsInput, job_openingsUncheckedCreateWithoutDepartmentsInput>
+  }
+
+  export type job_openingsCreateManyDepartmentsInputEnvelope = {
+    data: job_openingsCreateManyDepartmentsInput | job_openingsCreateManyDepartmentsInput[]
+    skipDuplicates?: boolean
+  }
+
   export type membershipsCreateWithoutDepartments_memberships_department_idTodepartmentsInput = {
     id?: string
     job_title?: string | null
@@ -65467,6 +71114,7 @@ export namespace Prisma {
     audit_log?: audit_logCreateNestedManyWithoutMembershipsInput
     departments_departments_head_membership_idTomemberships?: departmentsCreateNestedManyWithoutMemberships_departments_head_membership_idTomembershipsInput
     invitations?: invitationsCreateNestedManyWithoutMembershipsInput
+    job_openings?: job_openingsCreateNestedManyWithoutMembershipsInput
     organizations: organizationsCreateNestedOneWithoutMembershipsInput
     roles?: rolesCreateNestedOneWithoutMembershipsInput
     profiles: profilesCreateNestedOneWithoutMembershipsInput
@@ -65488,6 +71136,7 @@ export namespace Prisma {
     audit_log?: audit_logUncheckedCreateNestedManyWithoutMembershipsInput
     departments_departments_head_membership_idTomemberships?: departmentsUncheckedCreateNestedManyWithoutMemberships_departments_head_membership_idTomembershipsInput
     invitations?: invitationsUncheckedCreateNestedManyWithoutMembershipsInput
+    job_openings?: job_openingsUncheckedCreateNestedManyWithoutMembershipsInput
     user_permission_overrides_user_permission_overrides_granted_byTomemberships?: user_permission_overridesUncheckedCreateNestedManyWithoutMemberships_user_permission_overrides_granted_byTomembershipsInput
     user_permission_overrides_user_permission_overrides_membership_idTomemberships?: user_permission_overridesUncheckedCreateNestedManyWithoutMemberships_user_permission_overrides_membership_idTomembershipsInput
   }
@@ -65523,6 +71172,7 @@ export namespace Prisma {
     updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
     audit_log?: audit_logUpdateManyWithoutMembershipsNestedInput
     invitations?: invitationsUpdateManyWithoutMembershipsNestedInput
+    job_openings?: job_openingsUpdateManyWithoutMembershipsNestedInput
     departments_memberships_department_idTodepartments?: departmentsUpdateOneWithoutMemberships_memberships_department_idTodepartmentsNestedInput
     organizations?: organizationsUpdateOneRequiredWithoutMembershipsNestedInput
     roles?: rolesUpdateOneWithoutMembershipsNestedInput
@@ -65545,6 +71195,7 @@ export namespace Prisma {
     updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
     audit_log?: audit_logUncheckedUpdateManyWithoutMembershipsNestedInput
     invitations?: invitationsUncheckedUpdateManyWithoutMembershipsNestedInput
+    job_openings?: job_openingsUncheckedUpdateManyWithoutMembershipsNestedInput
     user_permission_overrides_user_permission_overrides_granted_byTomemberships?: user_permission_overridesUncheckedUpdateManyWithoutMemberships_user_permission_overrides_granted_byTomembershipsNestedInput
     user_permission_overrides_user_permission_overrides_membership_idTomemberships?: user_permission_overridesUncheckedUpdateManyWithoutMemberships_user_permission_overrides_membership_idTomembershipsNestedInput
   }
@@ -65576,6 +71227,7 @@ export namespace Prisma {
     approval_rules?: approval_rulesUpdateManyWithoutOrganizationsNestedInput
     audit_log?: audit_logUpdateManyWithoutOrganizationsNestedInput
     invitations?: invitationsUpdateManyWithoutOrganizationsNestedInput
+    job_openings?: job_openingsUpdateManyWithoutOrganizationsNestedInput
     memberships?: membershipsUpdateManyWithoutOrganizationsNestedInput
     roles?: rolesUpdateOneWithoutOrganizationsNestedInput
     user_permission_overrides?: user_permission_overridesUpdateManyWithoutOrganizationsNestedInput
@@ -65597,6 +71249,7 @@ export namespace Prisma {
     approval_rules?: approval_rulesUncheckedUpdateManyWithoutOrganizationsNestedInput
     audit_log?: audit_logUncheckedUpdateManyWithoutOrganizationsNestedInput
     invitations?: invitationsUncheckedUpdateManyWithoutOrganizationsNestedInput
+    job_openings?: job_openingsUncheckedUpdateManyWithoutOrganizationsNestedInput
     memberships?: membershipsUncheckedUpdateManyWithoutOrganizationsNestedInput
     roles?: rolesUncheckedUpdateOneWithoutOrganizationsNestedInput
     user_permission_overrides?: user_permission_overridesUncheckedUpdateManyWithoutOrganizationsNestedInput
@@ -65635,6 +71288,50 @@ export namespace Prisma {
     accepted_by?: UuidNullableFilter<"invitations"> | string | null
     created_at?: DateTimeFilter<"invitations"> | Date | string
     updated_at?: DateTimeFilter<"invitations"> | Date | string
+  }
+
+  export type job_openingsUpsertWithWhereUniqueWithoutDepartmentsInput = {
+    where: job_openingsWhereUniqueInput
+    update: XOR<job_openingsUpdateWithoutDepartmentsInput, job_openingsUncheckedUpdateWithoutDepartmentsInput>
+    create: XOR<job_openingsCreateWithoutDepartmentsInput, job_openingsUncheckedCreateWithoutDepartmentsInput>
+  }
+
+  export type job_openingsUpdateWithWhereUniqueWithoutDepartmentsInput = {
+    where: job_openingsWhereUniqueInput
+    data: XOR<job_openingsUpdateWithoutDepartmentsInput, job_openingsUncheckedUpdateWithoutDepartmentsInput>
+  }
+
+  export type job_openingsUpdateManyWithWhereWithoutDepartmentsInput = {
+    where: job_openingsScalarWhereInput
+    data: XOR<job_openingsUpdateManyMutationInput, job_openingsUncheckedUpdateManyWithoutDepartmentsInput>
+  }
+
+  export type job_openingsScalarWhereInput = {
+    AND?: job_openingsScalarWhereInput | job_openingsScalarWhereInput[]
+    OR?: job_openingsScalarWhereInput[]
+    NOT?: job_openingsScalarWhereInput | job_openingsScalarWhereInput[]
+    id?: UuidFilter<"job_openings"> | string
+    organization_id?: UuidFilter<"job_openings"> | string
+    department_id?: UuidNullableFilter<"job_openings"> | string | null
+    created_by?: UuidNullableFilter<"job_openings"> | string | null
+    title?: StringFilter<"job_openings"> | string
+    employment_type?: Enumemployment_typeFilter<"job_openings"> | $Enums.employment_type
+    work_mode?: Enumwork_modeFilter<"job_openings"> | $Enums.work_mode
+    location?: StringNullableFilter<"job_openings"> | string | null
+    experience_min?: IntNullableFilter<"job_openings"> | number | null
+    experience_max?: IntNullableFilter<"job_openings"> | number | null
+    salary_min?: DecimalNullableFilter<"job_openings"> | Decimal | DecimalJsLike | number | string | null
+    salary_max?: DecimalNullableFilter<"job_openings"> | Decimal | DecimalJsLike | number | string | null
+    salary_currency?: StringNullableFilter<"job_openings"> | string | null
+    salary_visible?: BoolFilter<"job_openings"> | boolean
+    description?: StringFilter<"job_openings"> | string
+    positions?: IntFilter<"job_openings"> | number
+    status?: Enumopening_statusFilter<"job_openings"> | $Enums.opening_status
+    application_deadline?: DateTimeNullableFilter<"job_openings"> | Date | string | null
+    opened_at?: DateTimeNullableFilter<"job_openings"> | Date | string | null
+    closed_at?: DateTimeNullableFilter<"job_openings"> | Date | string | null
+    created_at?: DateTimeFilter<"job_openings"> | Date | string
+    updated_at?: DateTimeFilter<"job_openings"> | Date | string
   }
 
   export type membershipsUpsertWithWhereUniqueWithoutDepartments_memberships_department_idTodepartmentsInput = {
@@ -65705,6 +71402,7 @@ export namespace Prisma {
     updated_at?: Date | string
     memberships_departments_head_membership_idTomemberships?: membershipsCreateNestedOneWithoutDepartments_departments_head_membership_idTomembershipsInput
     organizations: organizationsCreateNestedOneWithoutDepartmentsInput
+    job_openings?: job_openingsCreateNestedManyWithoutDepartmentsInput
     memberships_memberships_department_idTodepartments?: membershipsCreateNestedManyWithoutDepartments_memberships_department_idTodepartmentsInput
   }
 
@@ -65716,6 +71414,7 @@ export namespace Prisma {
     created_at?: Date | string
     updated_at?: Date | string
     head_membership_id?: string | null
+    job_openings?: job_openingsUncheckedCreateNestedManyWithoutDepartmentsInput
     memberships_memberships_department_idTodepartments?: membershipsUncheckedCreateNestedManyWithoutDepartments_memberships_department_idTodepartmentsInput
   }
 
@@ -65734,6 +71433,7 @@ export namespace Prisma {
     updated_at?: Date | string
     audit_log?: audit_logCreateNestedManyWithoutMembershipsInput
     departments_departments_head_membership_idTomemberships?: departmentsCreateNestedManyWithoutMemberships_departments_head_membership_idTomembershipsInput
+    job_openings?: job_openingsCreateNestedManyWithoutMembershipsInput
     departments_memberships_department_idTodepartments?: departmentsCreateNestedOneWithoutMemberships_memberships_department_idTodepartmentsInput
     organizations: organizationsCreateNestedOneWithoutMembershipsInput
     roles?: rolesCreateNestedOneWithoutMembershipsInput
@@ -65756,6 +71456,7 @@ export namespace Prisma {
     updated_at?: Date | string
     audit_log?: audit_logUncheckedCreateNestedManyWithoutMembershipsInput
     departments_departments_head_membership_idTomemberships?: departmentsUncheckedCreateNestedManyWithoutMemberships_departments_head_membership_idTomembershipsInput
+    job_openings?: job_openingsUncheckedCreateNestedManyWithoutMembershipsInput
     user_permission_overrides_user_permission_overrides_granted_byTomemberships?: user_permission_overridesUncheckedCreateNestedManyWithoutMemberships_user_permission_overrides_granted_byTomembershipsInput
     user_permission_overrides_user_permission_overrides_membership_idTomemberships?: user_permission_overridesUncheckedCreateNestedManyWithoutMemberships_user_permission_overrides_membership_idTomembershipsInput
   }
@@ -65781,6 +71482,7 @@ export namespace Prisma {
     approval_rules?: approval_rulesCreateNestedManyWithoutOrganizationsInput
     audit_log?: audit_logCreateNestedManyWithoutOrganizationsInput
     departments?: departmentsCreateNestedManyWithoutOrganizationsInput
+    job_openings?: job_openingsCreateNestedManyWithoutOrganizationsInput
     memberships?: membershipsCreateNestedManyWithoutOrganizationsInput
     roles?: rolesCreateNestedOneWithoutOrganizationsInput
     user_permission_overrides?: user_permission_overridesCreateNestedManyWithoutOrganizationsInput
@@ -65802,6 +71504,7 @@ export namespace Prisma {
     approval_rules?: approval_rulesUncheckedCreateNestedManyWithoutOrganizationsInput
     audit_log?: audit_logUncheckedCreateNestedManyWithoutOrganizationsInput
     departments?: departmentsUncheckedCreateNestedManyWithoutOrganizationsInput
+    job_openings?: job_openingsUncheckedCreateNestedManyWithoutOrganizationsInput
     memberships?: membershipsUncheckedCreateNestedManyWithoutOrganizationsInput
     roles?: rolesUncheckedCreateNestedOneWithoutOrganizationsInput
     user_permission_overrides?: user_permission_overridesUncheckedCreateNestedManyWithoutOrganizationsInput
@@ -65899,6 +71602,7 @@ export namespace Prisma {
     updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
     memberships_departments_head_membership_idTomemberships?: membershipsUpdateOneWithoutDepartments_departments_head_membership_idTomembershipsNestedInput
     organizations?: organizationsUpdateOneRequiredWithoutDepartmentsNestedInput
+    job_openings?: job_openingsUpdateManyWithoutDepartmentsNestedInput
     memberships_memberships_department_idTodepartments?: membershipsUpdateManyWithoutDepartments_memberships_department_idTodepartmentsNestedInput
   }
 
@@ -65910,6 +71614,7 @@ export namespace Prisma {
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
     updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
     head_membership_id?: NullableStringFieldUpdateOperationsInput | string | null
+    job_openings?: job_openingsUncheckedUpdateManyWithoutDepartmentsNestedInput
     memberships_memberships_department_idTodepartments?: membershipsUncheckedUpdateManyWithoutDepartments_memberships_department_idTodepartmentsNestedInput
   }
 
@@ -65934,6 +71639,7 @@ export namespace Prisma {
     updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
     audit_log?: audit_logUpdateManyWithoutMembershipsNestedInput
     departments_departments_head_membership_idTomemberships?: departmentsUpdateManyWithoutMemberships_departments_head_membership_idTomembershipsNestedInput
+    job_openings?: job_openingsUpdateManyWithoutMembershipsNestedInput
     departments_memberships_department_idTodepartments?: departmentsUpdateOneWithoutMemberships_memberships_department_idTodepartmentsNestedInput
     organizations?: organizationsUpdateOneRequiredWithoutMembershipsNestedInput
     roles?: rolesUpdateOneWithoutMembershipsNestedInput
@@ -65956,6 +71662,7 @@ export namespace Prisma {
     updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
     audit_log?: audit_logUncheckedUpdateManyWithoutMembershipsNestedInput
     departments_departments_head_membership_idTomemberships?: departmentsUncheckedUpdateManyWithoutMemberships_departments_head_membership_idTomembershipsNestedInput
+    job_openings?: job_openingsUncheckedUpdateManyWithoutMembershipsNestedInput
     user_permission_overrides_user_permission_overrides_granted_byTomemberships?: user_permission_overridesUncheckedUpdateManyWithoutMemberships_user_permission_overrides_granted_byTomembershipsNestedInput
     user_permission_overrides_user_permission_overrides_membership_idTomemberships?: user_permission_overridesUncheckedUpdateManyWithoutMemberships_user_permission_overrides_membership_idTomembershipsNestedInput
   }
@@ -65987,6 +71694,7 @@ export namespace Prisma {
     approval_rules?: approval_rulesUpdateManyWithoutOrganizationsNestedInput
     audit_log?: audit_logUpdateManyWithoutOrganizationsNestedInput
     departments?: departmentsUpdateManyWithoutOrganizationsNestedInput
+    job_openings?: job_openingsUpdateManyWithoutOrganizationsNestedInput
     memberships?: membershipsUpdateManyWithoutOrganizationsNestedInput
     roles?: rolesUpdateOneWithoutOrganizationsNestedInput
     user_permission_overrides?: user_permission_overridesUpdateManyWithoutOrganizationsNestedInput
@@ -66008,6 +71716,7 @@ export namespace Prisma {
     approval_rules?: approval_rulesUncheckedUpdateManyWithoutOrganizationsNestedInput
     audit_log?: audit_logUncheckedUpdateManyWithoutOrganizationsNestedInput
     departments?: departmentsUncheckedUpdateManyWithoutOrganizationsNestedInput
+    job_openings?: job_openingsUncheckedUpdateManyWithoutOrganizationsNestedInput
     memberships?: membershipsUncheckedUpdateManyWithoutOrganizationsNestedInput
     roles?: rolesUncheckedUpdateOneWithoutOrganizationsNestedInput
     user_permission_overrides?: user_permission_overridesUncheckedUpdateManyWithoutOrganizationsNestedInput
@@ -66104,6 +71813,7 @@ export namespace Prisma {
     updated_at?: Date | string
     organizations: organizationsCreateNestedOneWithoutDepartmentsInput
     invitations?: invitationsCreateNestedManyWithoutDepartmentsInput
+    job_openings?: job_openingsCreateNestedManyWithoutDepartmentsInput
     memberships_memberships_department_idTodepartments?: membershipsCreateNestedManyWithoutDepartments_memberships_department_idTodepartmentsInput
   }
 
@@ -66115,6 +71825,7 @@ export namespace Prisma {
     created_at?: Date | string
     updated_at?: Date | string
     invitations?: invitationsUncheckedCreateNestedManyWithoutDepartmentsInput
+    job_openings?: job_openingsUncheckedCreateNestedManyWithoutDepartmentsInput
     memberships_memberships_department_idTodepartments?: membershipsUncheckedCreateNestedManyWithoutDepartments_memberships_department_idTodepartmentsInput
   }
 
@@ -66168,6 +71879,68 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type job_openingsCreateWithoutMembershipsInput = {
+    id?: string
+    title: string
+    employment_type?: $Enums.employment_type
+    work_mode?: $Enums.work_mode
+    location?: string | null
+    experience_min?: number | null
+    experience_max?: number | null
+    salary_min?: Decimal | DecimalJsLike | number | string | null
+    salary_max?: Decimal | DecimalJsLike | number | string | null
+    salary_currency?: string | null
+    salary_visible?: boolean
+    description?: string
+    positions?: number
+    status?: $Enums.opening_status
+    application_deadline?: Date | string | null
+    opened_at?: Date | string | null
+    closed_at?: Date | string | null
+    created_at?: Date | string
+    updated_at?: Date | string
+    departments?: departmentsCreateNestedOneWithoutJob_openingsInput
+    organizations: organizationsCreateNestedOneWithoutJob_openingsInput
+    job_requirements?: job_requirementsCreateNestedManyWithoutJob_openingsInput
+    screening_questions?: screening_questionsCreateNestedManyWithoutJob_openingsInput
+  }
+
+  export type job_openingsUncheckedCreateWithoutMembershipsInput = {
+    id?: string
+    organization_id: string
+    department_id?: string | null
+    title: string
+    employment_type?: $Enums.employment_type
+    work_mode?: $Enums.work_mode
+    location?: string | null
+    experience_min?: number | null
+    experience_max?: number | null
+    salary_min?: Decimal | DecimalJsLike | number | string | null
+    salary_max?: Decimal | DecimalJsLike | number | string | null
+    salary_currency?: string | null
+    salary_visible?: boolean
+    description?: string
+    positions?: number
+    status?: $Enums.opening_status
+    application_deadline?: Date | string | null
+    opened_at?: Date | string | null
+    closed_at?: Date | string | null
+    created_at?: Date | string
+    updated_at?: Date | string
+    job_requirements?: job_requirementsUncheckedCreateNestedManyWithoutJob_openingsInput
+    screening_questions?: screening_questionsUncheckedCreateNestedManyWithoutJob_openingsInput
+  }
+
+  export type job_openingsCreateOrConnectWithoutMembershipsInput = {
+    where: job_openingsWhereUniqueInput
+    create: XOR<job_openingsCreateWithoutMembershipsInput, job_openingsUncheckedCreateWithoutMembershipsInput>
+  }
+
+  export type job_openingsCreateManyMembershipsInputEnvelope = {
+    data: job_openingsCreateManyMembershipsInput | job_openingsCreateManyMembershipsInput[]
+    skipDuplicates?: boolean
+  }
+
   export type departmentsCreateWithoutMemberships_memberships_department_idTodepartmentsInput = {
     id?: string
     name: string
@@ -66177,6 +71950,7 @@ export namespace Prisma {
     memberships_departments_head_membership_idTomemberships?: membershipsCreateNestedOneWithoutDepartments_departments_head_membership_idTomembershipsInput
     organizations: organizationsCreateNestedOneWithoutDepartmentsInput
     invitations?: invitationsCreateNestedManyWithoutDepartmentsInput
+    job_openings?: job_openingsCreateNestedManyWithoutDepartmentsInput
   }
 
   export type departmentsUncheckedCreateWithoutMemberships_memberships_department_idTodepartmentsInput = {
@@ -66188,6 +71962,7 @@ export namespace Prisma {
     updated_at?: Date | string
     head_membership_id?: string | null
     invitations?: invitationsUncheckedCreateNestedManyWithoutDepartmentsInput
+    job_openings?: job_openingsUncheckedCreateNestedManyWithoutDepartmentsInput
   }
 
   export type departmentsCreateOrConnectWithoutMemberships_memberships_department_idTodepartmentsInput = {
@@ -66212,6 +71987,7 @@ export namespace Prisma {
     audit_log?: audit_logCreateNestedManyWithoutOrganizationsInput
     departments?: departmentsCreateNestedManyWithoutOrganizationsInput
     invitations?: invitationsCreateNestedManyWithoutOrganizationsInput
+    job_openings?: job_openingsCreateNestedManyWithoutOrganizationsInput
     roles?: rolesCreateNestedOneWithoutOrganizationsInput
     user_permission_overrides?: user_permission_overridesCreateNestedManyWithoutOrganizationsInput
   }
@@ -66233,6 +72009,7 @@ export namespace Prisma {
     audit_log?: audit_logUncheckedCreateNestedManyWithoutOrganizationsInput
     departments?: departmentsUncheckedCreateNestedManyWithoutOrganizationsInput
     invitations?: invitationsUncheckedCreateNestedManyWithoutOrganizationsInput
+    job_openings?: job_openingsUncheckedCreateNestedManyWithoutOrganizationsInput
     roles?: rolesUncheckedCreateNestedOneWithoutOrganizationsInput
     user_permission_overrides?: user_permission_overridesUncheckedCreateNestedManyWithoutOrganizationsInput
   }
@@ -66453,6 +72230,22 @@ export namespace Prisma {
     data: XOR<invitationsUpdateManyMutationInput, invitationsUncheckedUpdateManyWithoutMembershipsInput>
   }
 
+  export type job_openingsUpsertWithWhereUniqueWithoutMembershipsInput = {
+    where: job_openingsWhereUniqueInput
+    update: XOR<job_openingsUpdateWithoutMembershipsInput, job_openingsUncheckedUpdateWithoutMembershipsInput>
+    create: XOR<job_openingsCreateWithoutMembershipsInput, job_openingsUncheckedCreateWithoutMembershipsInput>
+  }
+
+  export type job_openingsUpdateWithWhereUniqueWithoutMembershipsInput = {
+    where: job_openingsWhereUniqueInput
+    data: XOR<job_openingsUpdateWithoutMembershipsInput, job_openingsUncheckedUpdateWithoutMembershipsInput>
+  }
+
+  export type job_openingsUpdateManyWithWhereWithoutMembershipsInput = {
+    where: job_openingsScalarWhereInput
+    data: XOR<job_openingsUpdateManyMutationInput, job_openingsUncheckedUpdateManyWithoutMembershipsInput>
+  }
+
   export type departmentsUpsertWithoutMemberships_memberships_department_idTodepartmentsInput = {
     update: XOR<departmentsUpdateWithoutMemberships_memberships_department_idTodepartmentsInput, departmentsUncheckedUpdateWithoutMemberships_memberships_department_idTodepartmentsInput>
     create: XOR<departmentsCreateWithoutMemberships_memberships_department_idTodepartmentsInput, departmentsUncheckedCreateWithoutMemberships_memberships_department_idTodepartmentsInput>
@@ -66473,6 +72266,7 @@ export namespace Prisma {
     memberships_departments_head_membership_idTomemberships?: membershipsUpdateOneWithoutDepartments_departments_head_membership_idTomembershipsNestedInput
     organizations?: organizationsUpdateOneRequiredWithoutDepartmentsNestedInput
     invitations?: invitationsUpdateManyWithoutDepartmentsNestedInput
+    job_openings?: job_openingsUpdateManyWithoutDepartmentsNestedInput
   }
 
   export type departmentsUncheckedUpdateWithoutMemberships_memberships_department_idTodepartmentsInput = {
@@ -66484,6 +72278,7 @@ export namespace Prisma {
     updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
     head_membership_id?: NullableStringFieldUpdateOperationsInput | string | null
     invitations?: invitationsUncheckedUpdateManyWithoutDepartmentsNestedInput
+    job_openings?: job_openingsUncheckedUpdateManyWithoutDepartmentsNestedInput
   }
 
   export type organizationsUpsertWithoutMembershipsInput = {
@@ -66514,6 +72309,7 @@ export namespace Prisma {
     audit_log?: audit_logUpdateManyWithoutOrganizationsNestedInput
     departments?: departmentsUpdateManyWithoutOrganizationsNestedInput
     invitations?: invitationsUpdateManyWithoutOrganizationsNestedInput
+    job_openings?: job_openingsUpdateManyWithoutOrganizationsNestedInput
     roles?: rolesUpdateOneWithoutOrganizationsNestedInput
     user_permission_overrides?: user_permission_overridesUpdateManyWithoutOrganizationsNestedInput
   }
@@ -66535,6 +72331,7 @@ export namespace Prisma {
     audit_log?: audit_logUncheckedUpdateManyWithoutOrganizationsNestedInput
     departments?: departmentsUncheckedUpdateManyWithoutOrganizationsNestedInput
     invitations?: invitationsUncheckedUpdateManyWithoutOrganizationsNestedInput
+    job_openings?: job_openingsUncheckedUpdateManyWithoutOrganizationsNestedInput
     roles?: rolesUncheckedUpdateOneWithoutOrganizationsNestedInput
     user_permission_overrides?: user_permission_overridesUncheckedUpdateManyWithoutOrganizationsNestedInput
   }
@@ -66741,6 +72538,7 @@ export namespace Prisma {
     updated_at?: Date | string
     memberships_departments_head_membership_idTomemberships?: membershipsCreateNestedOneWithoutDepartments_departments_head_membership_idTomembershipsInput
     invitations?: invitationsCreateNestedManyWithoutDepartmentsInput
+    job_openings?: job_openingsCreateNestedManyWithoutDepartmentsInput
     memberships_memberships_department_idTodepartments?: membershipsCreateNestedManyWithoutDepartments_memberships_department_idTodepartmentsInput
   }
 
@@ -66752,6 +72550,7 @@ export namespace Prisma {
     updated_at?: Date | string
     head_membership_id?: string | null
     invitations?: invitationsUncheckedCreateNestedManyWithoutDepartmentsInput
+    job_openings?: job_openingsUncheckedCreateNestedManyWithoutDepartmentsInput
     memberships_memberships_department_idTodepartments?: membershipsUncheckedCreateNestedManyWithoutDepartments_memberships_department_idTodepartmentsInput
   }
 
@@ -66805,6 +72604,68 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type job_openingsCreateWithoutOrganizationsInput = {
+    id?: string
+    title: string
+    employment_type?: $Enums.employment_type
+    work_mode?: $Enums.work_mode
+    location?: string | null
+    experience_min?: number | null
+    experience_max?: number | null
+    salary_min?: Decimal | DecimalJsLike | number | string | null
+    salary_max?: Decimal | DecimalJsLike | number | string | null
+    salary_currency?: string | null
+    salary_visible?: boolean
+    description?: string
+    positions?: number
+    status?: $Enums.opening_status
+    application_deadline?: Date | string | null
+    opened_at?: Date | string | null
+    closed_at?: Date | string | null
+    created_at?: Date | string
+    updated_at?: Date | string
+    memberships?: membershipsCreateNestedOneWithoutJob_openingsInput
+    departments?: departmentsCreateNestedOneWithoutJob_openingsInput
+    job_requirements?: job_requirementsCreateNestedManyWithoutJob_openingsInput
+    screening_questions?: screening_questionsCreateNestedManyWithoutJob_openingsInput
+  }
+
+  export type job_openingsUncheckedCreateWithoutOrganizationsInput = {
+    id?: string
+    department_id?: string | null
+    created_by?: string | null
+    title: string
+    employment_type?: $Enums.employment_type
+    work_mode?: $Enums.work_mode
+    location?: string | null
+    experience_min?: number | null
+    experience_max?: number | null
+    salary_min?: Decimal | DecimalJsLike | number | string | null
+    salary_max?: Decimal | DecimalJsLike | number | string | null
+    salary_currency?: string | null
+    salary_visible?: boolean
+    description?: string
+    positions?: number
+    status?: $Enums.opening_status
+    application_deadline?: Date | string | null
+    opened_at?: Date | string | null
+    closed_at?: Date | string | null
+    created_at?: Date | string
+    updated_at?: Date | string
+    job_requirements?: job_requirementsUncheckedCreateNestedManyWithoutJob_openingsInput
+    screening_questions?: screening_questionsUncheckedCreateNestedManyWithoutJob_openingsInput
+  }
+
+  export type job_openingsCreateOrConnectWithoutOrganizationsInput = {
+    where: job_openingsWhereUniqueInput
+    create: XOR<job_openingsCreateWithoutOrganizationsInput, job_openingsUncheckedCreateWithoutOrganizationsInput>
+  }
+
+  export type job_openingsCreateManyOrganizationsInputEnvelope = {
+    data: job_openingsCreateManyOrganizationsInput | job_openingsCreateManyOrganizationsInput[]
+    skipDuplicates?: boolean
+  }
+
   export type membershipsCreateWithoutOrganizationsInput = {
     id?: string
     job_title?: string | null
@@ -66816,6 +72677,7 @@ export namespace Prisma {
     audit_log?: audit_logCreateNestedManyWithoutMembershipsInput
     departments_departments_head_membership_idTomemberships?: departmentsCreateNestedManyWithoutMemberships_departments_head_membership_idTomembershipsInput
     invitations?: invitationsCreateNestedManyWithoutMembershipsInput
+    job_openings?: job_openingsCreateNestedManyWithoutMembershipsInput
     departments_memberships_department_idTodepartments?: departmentsCreateNestedOneWithoutMemberships_memberships_department_idTodepartmentsInput
     roles?: rolesCreateNestedOneWithoutMembershipsInput
     profiles: profilesCreateNestedOneWithoutMembershipsInput
@@ -66837,6 +72699,7 @@ export namespace Prisma {
     audit_log?: audit_logUncheckedCreateNestedManyWithoutMembershipsInput
     departments_departments_head_membership_idTomemberships?: departmentsUncheckedCreateNestedManyWithoutMemberships_departments_head_membership_idTomembershipsInput
     invitations?: invitationsUncheckedCreateNestedManyWithoutMembershipsInput
+    job_openings?: job_openingsUncheckedCreateNestedManyWithoutMembershipsInput
     user_permission_overrides_user_permission_overrides_granted_byTomemberships?: user_permission_overridesUncheckedCreateNestedManyWithoutMemberships_user_permission_overrides_granted_byTomembershipsInput
     user_permission_overrides_user_permission_overrides_membership_idTomemberships?: user_permission_overridesUncheckedCreateNestedManyWithoutMemberships_user_permission_overrides_membership_idTomembershipsInput
   }
@@ -66996,6 +72859,22 @@ export namespace Prisma {
   export type invitationsUpdateManyWithWhereWithoutOrganizationsInput = {
     where: invitationsScalarWhereInput
     data: XOR<invitationsUpdateManyMutationInput, invitationsUncheckedUpdateManyWithoutOrganizationsInput>
+  }
+
+  export type job_openingsUpsertWithWhereUniqueWithoutOrganizationsInput = {
+    where: job_openingsWhereUniqueInput
+    update: XOR<job_openingsUpdateWithoutOrganizationsInput, job_openingsUncheckedUpdateWithoutOrganizationsInput>
+    create: XOR<job_openingsCreateWithoutOrganizationsInput, job_openingsUncheckedCreateWithoutOrganizationsInput>
+  }
+
+  export type job_openingsUpdateWithWhereUniqueWithoutOrganizationsInput = {
+    where: job_openingsWhereUniqueInput
+    data: XOR<job_openingsUpdateWithoutOrganizationsInput, job_openingsUncheckedUpdateWithoutOrganizationsInput>
+  }
+
+  export type job_openingsUpdateManyWithWhereWithoutOrganizationsInput = {
+    where: job_openingsScalarWhereInput
+    data: XOR<job_openingsUpdateManyMutationInput, job_openingsUncheckedUpdateManyWithoutOrganizationsInput>
   }
 
   export type membershipsUpsertWithWhereUniqueWithoutOrganizationsInput = {
@@ -67581,6 +73460,7 @@ export namespace Prisma {
     audit_log?: audit_logCreateNestedManyWithoutMembershipsInput
     departments_departments_head_membership_idTomemberships?: departmentsCreateNestedManyWithoutMemberships_departments_head_membership_idTomembershipsInput
     invitations?: invitationsCreateNestedManyWithoutMembershipsInput
+    job_openings?: job_openingsCreateNestedManyWithoutMembershipsInput
     departments_memberships_department_idTodepartments?: departmentsCreateNestedOneWithoutMemberships_memberships_department_idTodepartmentsInput
     organizations: organizationsCreateNestedOneWithoutMembershipsInput
     roles?: rolesCreateNestedOneWithoutMembershipsInput
@@ -67602,6 +73482,7 @@ export namespace Prisma {
     audit_log?: audit_logUncheckedCreateNestedManyWithoutMembershipsInput
     departments_departments_head_membership_idTomemberships?: departmentsUncheckedCreateNestedManyWithoutMemberships_departments_head_membership_idTomembershipsInput
     invitations?: invitationsUncheckedCreateNestedManyWithoutMembershipsInput
+    job_openings?: job_openingsUncheckedCreateNestedManyWithoutMembershipsInput
     user_permission_overrides_user_permission_overrides_granted_byTomemberships?: user_permission_overridesUncheckedCreateNestedManyWithoutMemberships_user_permission_overrides_granted_byTomembershipsInput
     user_permission_overrides_user_permission_overrides_membership_idTomemberships?: user_permission_overridesUncheckedCreateNestedManyWithoutMemberships_user_permission_overrides_membership_idTomembershipsInput
   }
@@ -68047,6 +73928,7 @@ export namespace Prisma {
     audit_log?: audit_logCreateNestedManyWithoutMembershipsInput
     departments_departments_head_membership_idTomemberships?: departmentsCreateNestedManyWithoutMemberships_departments_head_membership_idTomembershipsInput
     invitations?: invitationsCreateNestedManyWithoutMembershipsInput
+    job_openings?: job_openingsCreateNestedManyWithoutMembershipsInput
     departments_memberships_department_idTodepartments?: departmentsCreateNestedOneWithoutMemberships_memberships_department_idTodepartmentsInput
     organizations: organizationsCreateNestedOneWithoutMembershipsInput
     profiles: profilesCreateNestedOneWithoutMembershipsInput
@@ -68068,6 +73950,7 @@ export namespace Prisma {
     audit_log?: audit_logUncheckedCreateNestedManyWithoutMembershipsInput
     departments_departments_head_membership_idTomemberships?: departmentsUncheckedCreateNestedManyWithoutMemberships_departments_head_membership_idTomembershipsInput
     invitations?: invitationsUncheckedCreateNestedManyWithoutMembershipsInput
+    job_openings?: job_openingsUncheckedCreateNestedManyWithoutMembershipsInput
     user_permission_overrides_user_permission_overrides_granted_byTomemberships?: user_permission_overridesUncheckedCreateNestedManyWithoutMemberships_user_permission_overrides_granted_byTomembershipsInput
     user_permission_overrides_user_permission_overrides_membership_idTomemberships?: user_permission_overridesUncheckedCreateNestedManyWithoutMemberships_user_permission_overrides_membership_idTomembershipsInput
   }
@@ -68123,6 +74006,7 @@ export namespace Prisma {
     audit_log?: audit_logCreateNestedManyWithoutOrganizationsInput
     departments?: departmentsCreateNestedManyWithoutOrganizationsInput
     invitations?: invitationsCreateNestedManyWithoutOrganizationsInput
+    job_openings?: job_openingsCreateNestedManyWithoutOrganizationsInput
     memberships?: membershipsCreateNestedManyWithoutOrganizationsInput
     user_permission_overrides?: user_permission_overridesCreateNestedManyWithoutOrganizationsInput
   }
@@ -68144,6 +74028,7 @@ export namespace Prisma {
     audit_log?: audit_logUncheckedCreateNestedManyWithoutOrganizationsInput
     departments?: departmentsUncheckedCreateNestedManyWithoutOrganizationsInput
     invitations?: invitationsUncheckedCreateNestedManyWithoutOrganizationsInput
+    job_openings?: job_openingsUncheckedCreateNestedManyWithoutOrganizationsInput
     memberships?: membershipsUncheckedCreateNestedManyWithoutOrganizationsInput
     user_permission_overrides?: user_permission_overridesUncheckedCreateNestedManyWithoutOrganizationsInput
   }
@@ -68229,6 +74114,7 @@ export namespace Prisma {
     audit_log?: audit_logUpdateManyWithoutOrganizationsNestedInput
     departments?: departmentsUpdateManyWithoutOrganizationsNestedInput
     invitations?: invitationsUpdateManyWithoutOrganizationsNestedInput
+    job_openings?: job_openingsUpdateManyWithoutOrganizationsNestedInput
     memberships?: membershipsUpdateManyWithoutOrganizationsNestedInput
     user_permission_overrides?: user_permission_overridesUpdateManyWithoutOrganizationsNestedInput
   }
@@ -68250,6 +74136,7 @@ export namespace Prisma {
     audit_log?: audit_logUncheckedUpdateManyWithoutOrganizationsNestedInput
     departments?: departmentsUncheckedUpdateManyWithoutOrganizationsNestedInput
     invitations?: invitationsUncheckedUpdateManyWithoutOrganizationsNestedInput
+    job_openings?: job_openingsUncheckedUpdateManyWithoutOrganizationsNestedInput
     memberships?: membershipsUncheckedUpdateManyWithoutOrganizationsNestedInput
     user_permission_overrides?: user_permission_overridesUncheckedUpdateManyWithoutOrganizationsNestedInput
   }
@@ -68265,6 +74152,7 @@ export namespace Prisma {
     audit_log?: audit_logCreateNestedManyWithoutMembershipsInput
     departments_departments_head_membership_idTomemberships?: departmentsCreateNestedManyWithoutMemberships_departments_head_membership_idTomembershipsInput
     invitations?: invitationsCreateNestedManyWithoutMembershipsInput
+    job_openings?: job_openingsCreateNestedManyWithoutMembershipsInput
     departments_memberships_department_idTodepartments?: departmentsCreateNestedOneWithoutMemberships_memberships_department_idTodepartmentsInput
     organizations: organizationsCreateNestedOneWithoutMembershipsInput
     roles?: rolesCreateNestedOneWithoutMembershipsInput
@@ -68287,6 +74175,7 @@ export namespace Prisma {
     audit_log?: audit_logUncheckedCreateNestedManyWithoutMembershipsInput
     departments_departments_head_membership_idTomemberships?: departmentsUncheckedCreateNestedManyWithoutMemberships_departments_head_membership_idTomembershipsInput
     invitations?: invitationsUncheckedCreateNestedManyWithoutMembershipsInput
+    job_openings?: job_openingsUncheckedCreateNestedManyWithoutMembershipsInput
     user_permission_overrides_user_permission_overrides_membership_idTomemberships?: user_permission_overridesUncheckedCreateNestedManyWithoutMemberships_user_permission_overrides_membership_idTomembershipsInput
   }
 
@@ -68306,6 +74195,7 @@ export namespace Prisma {
     audit_log?: audit_logCreateNestedManyWithoutMembershipsInput
     departments_departments_head_membership_idTomemberships?: departmentsCreateNestedManyWithoutMemberships_departments_head_membership_idTomembershipsInput
     invitations?: invitationsCreateNestedManyWithoutMembershipsInput
+    job_openings?: job_openingsCreateNestedManyWithoutMembershipsInput
     departments_memberships_department_idTodepartments?: departmentsCreateNestedOneWithoutMemberships_memberships_department_idTodepartmentsInput
     organizations: organizationsCreateNestedOneWithoutMembershipsInput
     roles?: rolesCreateNestedOneWithoutMembershipsInput
@@ -68328,6 +74218,7 @@ export namespace Prisma {
     audit_log?: audit_logUncheckedCreateNestedManyWithoutMembershipsInput
     departments_departments_head_membership_idTomemberships?: departmentsUncheckedCreateNestedManyWithoutMemberships_departments_head_membership_idTomembershipsInput
     invitations?: invitationsUncheckedCreateNestedManyWithoutMembershipsInput
+    job_openings?: job_openingsUncheckedCreateNestedManyWithoutMembershipsInput
     user_permission_overrides_user_permission_overrides_granted_byTomemberships?: user_permission_overridesUncheckedCreateNestedManyWithoutMemberships_user_permission_overrides_granted_byTomembershipsInput
   }
 
@@ -68353,6 +74244,7 @@ export namespace Prisma {
     audit_log?: audit_logCreateNestedManyWithoutOrganizationsInput
     departments?: departmentsCreateNestedManyWithoutOrganizationsInput
     invitations?: invitationsCreateNestedManyWithoutOrganizationsInput
+    job_openings?: job_openingsCreateNestedManyWithoutOrganizationsInput
     memberships?: membershipsCreateNestedManyWithoutOrganizationsInput
     roles?: rolesCreateNestedOneWithoutOrganizationsInput
   }
@@ -68374,6 +74266,7 @@ export namespace Prisma {
     audit_log?: audit_logUncheckedCreateNestedManyWithoutOrganizationsInput
     departments?: departmentsUncheckedCreateNestedManyWithoutOrganizationsInput
     invitations?: invitationsUncheckedCreateNestedManyWithoutOrganizationsInput
+    job_openings?: job_openingsUncheckedCreateNestedManyWithoutOrganizationsInput
     memberships?: membershipsUncheckedCreateNestedManyWithoutOrganizationsInput
     roles?: rolesUncheckedCreateNestedOneWithoutOrganizationsInput
   }
@@ -68438,6 +74331,7 @@ export namespace Prisma {
     audit_log?: audit_logUpdateManyWithoutMembershipsNestedInput
     departments_departments_head_membership_idTomemberships?: departmentsUpdateManyWithoutMemberships_departments_head_membership_idTomembershipsNestedInput
     invitations?: invitationsUpdateManyWithoutMembershipsNestedInput
+    job_openings?: job_openingsUpdateManyWithoutMembershipsNestedInput
     departments_memberships_department_idTodepartments?: departmentsUpdateOneWithoutMemberships_memberships_department_idTodepartmentsNestedInput
     organizations?: organizationsUpdateOneRequiredWithoutMembershipsNestedInput
     roles?: rolesUpdateOneWithoutMembershipsNestedInput
@@ -68460,6 +74354,7 @@ export namespace Prisma {
     audit_log?: audit_logUncheckedUpdateManyWithoutMembershipsNestedInput
     departments_departments_head_membership_idTomemberships?: departmentsUncheckedUpdateManyWithoutMemberships_departments_head_membership_idTomembershipsNestedInput
     invitations?: invitationsUncheckedUpdateManyWithoutMembershipsNestedInput
+    job_openings?: job_openingsUncheckedUpdateManyWithoutMembershipsNestedInput
     user_permission_overrides_user_permission_overrides_membership_idTomemberships?: user_permission_overridesUncheckedUpdateManyWithoutMemberships_user_permission_overrides_membership_idTomembershipsNestedInput
   }
 
@@ -68485,6 +74380,7 @@ export namespace Prisma {
     audit_log?: audit_logUpdateManyWithoutMembershipsNestedInput
     departments_departments_head_membership_idTomemberships?: departmentsUpdateManyWithoutMemberships_departments_head_membership_idTomembershipsNestedInput
     invitations?: invitationsUpdateManyWithoutMembershipsNestedInput
+    job_openings?: job_openingsUpdateManyWithoutMembershipsNestedInput
     departments_memberships_department_idTodepartments?: departmentsUpdateOneWithoutMemberships_memberships_department_idTodepartmentsNestedInput
     organizations?: organizationsUpdateOneRequiredWithoutMembershipsNestedInput
     roles?: rolesUpdateOneWithoutMembershipsNestedInput
@@ -68507,6 +74403,7 @@ export namespace Prisma {
     audit_log?: audit_logUncheckedUpdateManyWithoutMembershipsNestedInput
     departments_departments_head_membership_idTomemberships?: departmentsUncheckedUpdateManyWithoutMemberships_departments_head_membership_idTomembershipsNestedInput
     invitations?: invitationsUncheckedUpdateManyWithoutMembershipsNestedInput
+    job_openings?: job_openingsUncheckedUpdateManyWithoutMembershipsNestedInput
     user_permission_overrides_user_permission_overrides_granted_byTomemberships?: user_permission_overridesUncheckedUpdateManyWithoutMemberships_user_permission_overrides_granted_byTomembershipsNestedInput
   }
 
@@ -68538,6 +74435,7 @@ export namespace Prisma {
     audit_log?: audit_logUpdateManyWithoutOrganizationsNestedInput
     departments?: departmentsUpdateManyWithoutOrganizationsNestedInput
     invitations?: invitationsUpdateManyWithoutOrganizationsNestedInput
+    job_openings?: job_openingsUpdateManyWithoutOrganizationsNestedInput
     memberships?: membershipsUpdateManyWithoutOrganizationsNestedInput
     roles?: rolesUpdateOneWithoutOrganizationsNestedInput
   }
@@ -68559,6 +74457,7 @@ export namespace Prisma {
     audit_log?: audit_logUncheckedUpdateManyWithoutOrganizationsNestedInput
     departments?: departmentsUncheckedUpdateManyWithoutOrganizationsNestedInput
     invitations?: invitationsUncheckedUpdateManyWithoutOrganizationsNestedInput
+    job_openings?: job_openingsUncheckedUpdateManyWithoutOrganizationsNestedInput
     memberships?: membershipsUncheckedUpdateManyWithoutOrganizationsNestedInput
     roles?: rolesUncheckedUpdateOneWithoutOrganizationsNestedInput
   }
@@ -68600,6 +74499,614 @@ export namespace Prisma {
     approval_rules?: approval_rulesUncheckedUpdateManyWithoutPermissionsNestedInput
     permission_preset_grants?: permission_preset_grantsUncheckedUpdateManyWithoutPermissionsNestedInput
     role_permissions?: role_permissionsUncheckedUpdateManyWithoutPermissionsNestedInput
+  }
+
+  export type membershipsCreateWithoutJob_openingsInput = {
+    id?: string
+    job_title?: string | null
+    status?: $Enums.membership_status
+    is_owner?: boolean
+    deactivated_at?: Date | string | null
+    created_at?: Date | string
+    updated_at?: Date | string
+    audit_log?: audit_logCreateNestedManyWithoutMembershipsInput
+    departments_departments_head_membership_idTomemberships?: departmentsCreateNestedManyWithoutMemberships_departments_head_membership_idTomembershipsInput
+    invitations?: invitationsCreateNestedManyWithoutMembershipsInput
+    departments_memberships_department_idTodepartments?: departmentsCreateNestedOneWithoutMemberships_memberships_department_idTodepartmentsInput
+    organizations: organizationsCreateNestedOneWithoutMembershipsInput
+    roles?: rolesCreateNestedOneWithoutMembershipsInput
+    profiles: profilesCreateNestedOneWithoutMembershipsInput
+    user_permission_overrides_user_permission_overrides_granted_byTomemberships?: user_permission_overridesCreateNestedManyWithoutMemberships_user_permission_overrides_granted_byTomembershipsInput
+    user_permission_overrides_user_permission_overrides_membership_idTomemberships?: user_permission_overridesCreateNestedManyWithoutMemberships_user_permission_overrides_membership_idTomembershipsInput
+  }
+
+  export type membershipsUncheckedCreateWithoutJob_openingsInput = {
+    id?: string
+    organization_id: string
+    user_id: string
+    role_id?: string | null
+    department_id?: string | null
+    job_title?: string | null
+    status?: $Enums.membership_status
+    is_owner?: boolean
+    deactivated_at?: Date | string | null
+    created_at?: Date | string
+    updated_at?: Date | string
+    audit_log?: audit_logUncheckedCreateNestedManyWithoutMembershipsInput
+    departments_departments_head_membership_idTomemberships?: departmentsUncheckedCreateNestedManyWithoutMemberships_departments_head_membership_idTomembershipsInput
+    invitations?: invitationsUncheckedCreateNestedManyWithoutMembershipsInput
+    user_permission_overrides_user_permission_overrides_granted_byTomemberships?: user_permission_overridesUncheckedCreateNestedManyWithoutMemberships_user_permission_overrides_granted_byTomembershipsInput
+    user_permission_overrides_user_permission_overrides_membership_idTomemberships?: user_permission_overridesUncheckedCreateNestedManyWithoutMemberships_user_permission_overrides_membership_idTomembershipsInput
+  }
+
+  export type membershipsCreateOrConnectWithoutJob_openingsInput = {
+    where: membershipsWhereUniqueInput
+    create: XOR<membershipsCreateWithoutJob_openingsInput, membershipsUncheckedCreateWithoutJob_openingsInput>
+  }
+
+  export type departmentsCreateWithoutJob_openingsInput = {
+    id?: string
+    name: string
+    description?: string | null
+    created_at?: Date | string
+    updated_at?: Date | string
+    memberships_departments_head_membership_idTomemberships?: membershipsCreateNestedOneWithoutDepartments_departments_head_membership_idTomembershipsInput
+    organizations: organizationsCreateNestedOneWithoutDepartmentsInput
+    invitations?: invitationsCreateNestedManyWithoutDepartmentsInput
+    memberships_memberships_department_idTodepartments?: membershipsCreateNestedManyWithoutDepartments_memberships_department_idTodepartmentsInput
+  }
+
+  export type departmentsUncheckedCreateWithoutJob_openingsInput = {
+    id?: string
+    organization_id: string
+    name: string
+    description?: string | null
+    created_at?: Date | string
+    updated_at?: Date | string
+    head_membership_id?: string | null
+    invitations?: invitationsUncheckedCreateNestedManyWithoutDepartmentsInput
+    memberships_memberships_department_idTodepartments?: membershipsUncheckedCreateNestedManyWithoutDepartments_memberships_department_idTodepartmentsInput
+  }
+
+  export type departmentsCreateOrConnectWithoutJob_openingsInput = {
+    where: departmentsWhereUniqueInput
+    create: XOR<departmentsCreateWithoutJob_openingsInput, departmentsUncheckedCreateWithoutJob_openingsInput>
+  }
+
+  export type organizationsCreateWithoutJob_openingsInput = {
+    id?: string
+    name: string
+    slug: string
+    logo_url?: string | null
+    industry?: string | null
+    website?: string | null
+    timezone?: string
+    currency?: string
+    locale?: string
+    onboarding_completed_at?: Date | string | null
+    created_at?: Date | string
+    updated_at?: Date | string
+    approval_rules?: approval_rulesCreateNestedManyWithoutOrganizationsInput
+    audit_log?: audit_logCreateNestedManyWithoutOrganizationsInput
+    departments?: departmentsCreateNestedManyWithoutOrganizationsInput
+    invitations?: invitationsCreateNestedManyWithoutOrganizationsInput
+    memberships?: membershipsCreateNestedManyWithoutOrganizationsInput
+    roles?: rolesCreateNestedOneWithoutOrganizationsInput
+    user_permission_overrides?: user_permission_overridesCreateNestedManyWithoutOrganizationsInput
+  }
+
+  export type organizationsUncheckedCreateWithoutJob_openingsInput = {
+    id?: string
+    name: string
+    slug: string
+    logo_url?: string | null
+    industry?: string | null
+    website?: string | null
+    timezone?: string
+    currency?: string
+    locale?: string
+    onboarding_completed_at?: Date | string | null
+    created_at?: Date | string
+    updated_at?: Date | string
+    approval_rules?: approval_rulesUncheckedCreateNestedManyWithoutOrganizationsInput
+    audit_log?: audit_logUncheckedCreateNestedManyWithoutOrganizationsInput
+    departments?: departmentsUncheckedCreateNestedManyWithoutOrganizationsInput
+    invitations?: invitationsUncheckedCreateNestedManyWithoutOrganizationsInput
+    memberships?: membershipsUncheckedCreateNestedManyWithoutOrganizationsInput
+    roles?: rolesUncheckedCreateNestedOneWithoutOrganizationsInput
+    user_permission_overrides?: user_permission_overridesUncheckedCreateNestedManyWithoutOrganizationsInput
+  }
+
+  export type organizationsCreateOrConnectWithoutJob_openingsInput = {
+    where: organizationsWhereUniqueInput
+    create: XOR<organizationsCreateWithoutJob_openingsInput, organizationsUncheckedCreateWithoutJob_openingsInput>
+  }
+
+  export type job_requirementsCreateWithoutJob_openingsInput = {
+    id?: string
+    kind: $Enums.requirement_kind
+    label: string
+    sort_order?: number
+    created_at?: Date | string
+  }
+
+  export type job_requirementsUncheckedCreateWithoutJob_openingsInput = {
+    id?: string
+    kind: $Enums.requirement_kind
+    label: string
+    sort_order?: number
+    created_at?: Date | string
+  }
+
+  export type job_requirementsCreateOrConnectWithoutJob_openingsInput = {
+    where: job_requirementsWhereUniqueInput
+    create: XOR<job_requirementsCreateWithoutJob_openingsInput, job_requirementsUncheckedCreateWithoutJob_openingsInput>
+  }
+
+  export type job_requirementsCreateManyJob_openingsInputEnvelope = {
+    data: job_requirementsCreateManyJob_openingsInput | job_requirementsCreateManyJob_openingsInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type screening_questionsCreateWithoutJob_openingsInput = {
+    id?: string
+    question: string
+    required?: boolean
+    sort_order?: number
+    created_at?: Date | string
+  }
+
+  export type screening_questionsUncheckedCreateWithoutJob_openingsInput = {
+    id?: string
+    question: string
+    required?: boolean
+    sort_order?: number
+    created_at?: Date | string
+  }
+
+  export type screening_questionsCreateOrConnectWithoutJob_openingsInput = {
+    where: screening_questionsWhereUniqueInput
+    create: XOR<screening_questionsCreateWithoutJob_openingsInput, screening_questionsUncheckedCreateWithoutJob_openingsInput>
+  }
+
+  export type screening_questionsCreateManyJob_openingsInputEnvelope = {
+    data: screening_questionsCreateManyJob_openingsInput | screening_questionsCreateManyJob_openingsInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type membershipsUpsertWithoutJob_openingsInput = {
+    update: XOR<membershipsUpdateWithoutJob_openingsInput, membershipsUncheckedUpdateWithoutJob_openingsInput>
+    create: XOR<membershipsCreateWithoutJob_openingsInput, membershipsUncheckedCreateWithoutJob_openingsInput>
+    where?: membershipsWhereInput
+  }
+
+  export type membershipsUpdateToOneWithWhereWithoutJob_openingsInput = {
+    where?: membershipsWhereInput
+    data: XOR<membershipsUpdateWithoutJob_openingsInput, membershipsUncheckedUpdateWithoutJob_openingsInput>
+  }
+
+  export type membershipsUpdateWithoutJob_openingsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    job_title?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: Enummembership_statusFieldUpdateOperationsInput | $Enums.membership_status
+    is_owner?: BoolFieldUpdateOperationsInput | boolean
+    deactivated_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    audit_log?: audit_logUpdateManyWithoutMembershipsNestedInput
+    departments_departments_head_membership_idTomemberships?: departmentsUpdateManyWithoutMemberships_departments_head_membership_idTomembershipsNestedInput
+    invitations?: invitationsUpdateManyWithoutMembershipsNestedInput
+    departments_memberships_department_idTodepartments?: departmentsUpdateOneWithoutMemberships_memberships_department_idTodepartmentsNestedInput
+    organizations?: organizationsUpdateOneRequiredWithoutMembershipsNestedInput
+    roles?: rolesUpdateOneWithoutMembershipsNestedInput
+    profiles?: profilesUpdateOneRequiredWithoutMembershipsNestedInput
+    user_permission_overrides_user_permission_overrides_granted_byTomemberships?: user_permission_overridesUpdateManyWithoutMemberships_user_permission_overrides_granted_byTomembershipsNestedInput
+    user_permission_overrides_user_permission_overrides_membership_idTomemberships?: user_permission_overridesUpdateManyWithoutMemberships_user_permission_overrides_membership_idTomembershipsNestedInput
+  }
+
+  export type membershipsUncheckedUpdateWithoutJob_openingsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    organization_id?: StringFieldUpdateOperationsInput | string
+    user_id?: StringFieldUpdateOperationsInput | string
+    role_id?: NullableStringFieldUpdateOperationsInput | string | null
+    department_id?: NullableStringFieldUpdateOperationsInput | string | null
+    job_title?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: Enummembership_statusFieldUpdateOperationsInput | $Enums.membership_status
+    is_owner?: BoolFieldUpdateOperationsInput | boolean
+    deactivated_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    audit_log?: audit_logUncheckedUpdateManyWithoutMembershipsNestedInput
+    departments_departments_head_membership_idTomemberships?: departmentsUncheckedUpdateManyWithoutMemberships_departments_head_membership_idTomembershipsNestedInput
+    invitations?: invitationsUncheckedUpdateManyWithoutMembershipsNestedInput
+    user_permission_overrides_user_permission_overrides_granted_byTomemberships?: user_permission_overridesUncheckedUpdateManyWithoutMemberships_user_permission_overrides_granted_byTomembershipsNestedInput
+    user_permission_overrides_user_permission_overrides_membership_idTomemberships?: user_permission_overridesUncheckedUpdateManyWithoutMemberships_user_permission_overrides_membership_idTomembershipsNestedInput
+  }
+
+  export type departmentsUpsertWithoutJob_openingsInput = {
+    update: XOR<departmentsUpdateWithoutJob_openingsInput, departmentsUncheckedUpdateWithoutJob_openingsInput>
+    create: XOR<departmentsCreateWithoutJob_openingsInput, departmentsUncheckedCreateWithoutJob_openingsInput>
+    where?: departmentsWhereInput
+  }
+
+  export type departmentsUpdateToOneWithWhereWithoutJob_openingsInput = {
+    where?: departmentsWhereInput
+    data: XOR<departmentsUpdateWithoutJob_openingsInput, departmentsUncheckedUpdateWithoutJob_openingsInput>
+  }
+
+  export type departmentsUpdateWithoutJob_openingsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    memberships_departments_head_membership_idTomemberships?: membershipsUpdateOneWithoutDepartments_departments_head_membership_idTomembershipsNestedInput
+    organizations?: organizationsUpdateOneRequiredWithoutDepartmentsNestedInput
+    invitations?: invitationsUpdateManyWithoutDepartmentsNestedInput
+    memberships_memberships_department_idTodepartments?: membershipsUpdateManyWithoutDepartments_memberships_department_idTodepartmentsNestedInput
+  }
+
+  export type departmentsUncheckedUpdateWithoutJob_openingsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    organization_id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    head_membership_id?: NullableStringFieldUpdateOperationsInput | string | null
+    invitations?: invitationsUncheckedUpdateManyWithoutDepartmentsNestedInput
+    memberships_memberships_department_idTodepartments?: membershipsUncheckedUpdateManyWithoutDepartments_memberships_department_idTodepartmentsNestedInput
+  }
+
+  export type organizationsUpsertWithoutJob_openingsInput = {
+    update: XOR<organizationsUpdateWithoutJob_openingsInput, organizationsUncheckedUpdateWithoutJob_openingsInput>
+    create: XOR<organizationsCreateWithoutJob_openingsInput, organizationsUncheckedCreateWithoutJob_openingsInput>
+    where?: organizationsWhereInput
+  }
+
+  export type organizationsUpdateToOneWithWhereWithoutJob_openingsInput = {
+    where?: organizationsWhereInput
+    data: XOR<organizationsUpdateWithoutJob_openingsInput, organizationsUncheckedUpdateWithoutJob_openingsInput>
+  }
+
+  export type organizationsUpdateWithoutJob_openingsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    slug?: StringFieldUpdateOperationsInput | string
+    logo_url?: NullableStringFieldUpdateOperationsInput | string | null
+    industry?: NullableStringFieldUpdateOperationsInput | string | null
+    website?: NullableStringFieldUpdateOperationsInput | string | null
+    timezone?: StringFieldUpdateOperationsInput | string
+    currency?: StringFieldUpdateOperationsInput | string
+    locale?: StringFieldUpdateOperationsInput | string
+    onboarding_completed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    approval_rules?: approval_rulesUpdateManyWithoutOrganizationsNestedInput
+    audit_log?: audit_logUpdateManyWithoutOrganizationsNestedInput
+    departments?: departmentsUpdateManyWithoutOrganizationsNestedInput
+    invitations?: invitationsUpdateManyWithoutOrganizationsNestedInput
+    memberships?: membershipsUpdateManyWithoutOrganizationsNestedInput
+    roles?: rolesUpdateOneWithoutOrganizationsNestedInput
+    user_permission_overrides?: user_permission_overridesUpdateManyWithoutOrganizationsNestedInput
+  }
+
+  export type organizationsUncheckedUpdateWithoutJob_openingsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    slug?: StringFieldUpdateOperationsInput | string
+    logo_url?: NullableStringFieldUpdateOperationsInput | string | null
+    industry?: NullableStringFieldUpdateOperationsInput | string | null
+    website?: NullableStringFieldUpdateOperationsInput | string | null
+    timezone?: StringFieldUpdateOperationsInput | string
+    currency?: StringFieldUpdateOperationsInput | string
+    locale?: StringFieldUpdateOperationsInput | string
+    onboarding_completed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    approval_rules?: approval_rulesUncheckedUpdateManyWithoutOrganizationsNestedInput
+    audit_log?: audit_logUncheckedUpdateManyWithoutOrganizationsNestedInput
+    departments?: departmentsUncheckedUpdateManyWithoutOrganizationsNestedInput
+    invitations?: invitationsUncheckedUpdateManyWithoutOrganizationsNestedInput
+    memberships?: membershipsUncheckedUpdateManyWithoutOrganizationsNestedInput
+    roles?: rolesUncheckedUpdateOneWithoutOrganizationsNestedInput
+    user_permission_overrides?: user_permission_overridesUncheckedUpdateManyWithoutOrganizationsNestedInput
+  }
+
+  export type job_requirementsUpsertWithWhereUniqueWithoutJob_openingsInput = {
+    where: job_requirementsWhereUniqueInput
+    update: XOR<job_requirementsUpdateWithoutJob_openingsInput, job_requirementsUncheckedUpdateWithoutJob_openingsInput>
+    create: XOR<job_requirementsCreateWithoutJob_openingsInput, job_requirementsUncheckedCreateWithoutJob_openingsInput>
+  }
+
+  export type job_requirementsUpdateWithWhereUniqueWithoutJob_openingsInput = {
+    where: job_requirementsWhereUniqueInput
+    data: XOR<job_requirementsUpdateWithoutJob_openingsInput, job_requirementsUncheckedUpdateWithoutJob_openingsInput>
+  }
+
+  export type job_requirementsUpdateManyWithWhereWithoutJob_openingsInput = {
+    where: job_requirementsScalarWhereInput
+    data: XOR<job_requirementsUpdateManyMutationInput, job_requirementsUncheckedUpdateManyWithoutJob_openingsInput>
+  }
+
+  export type job_requirementsScalarWhereInput = {
+    AND?: job_requirementsScalarWhereInput | job_requirementsScalarWhereInput[]
+    OR?: job_requirementsScalarWhereInput[]
+    NOT?: job_requirementsScalarWhereInput | job_requirementsScalarWhereInput[]
+    id?: UuidFilter<"job_requirements"> | string
+    job_opening_id?: UuidFilter<"job_requirements"> | string
+    kind?: Enumrequirement_kindFilter<"job_requirements"> | $Enums.requirement_kind
+    label?: StringFilter<"job_requirements"> | string
+    sort_order?: IntFilter<"job_requirements"> | number
+    created_at?: DateTimeFilter<"job_requirements"> | Date | string
+  }
+
+  export type screening_questionsUpsertWithWhereUniqueWithoutJob_openingsInput = {
+    where: screening_questionsWhereUniqueInput
+    update: XOR<screening_questionsUpdateWithoutJob_openingsInput, screening_questionsUncheckedUpdateWithoutJob_openingsInput>
+    create: XOR<screening_questionsCreateWithoutJob_openingsInput, screening_questionsUncheckedCreateWithoutJob_openingsInput>
+  }
+
+  export type screening_questionsUpdateWithWhereUniqueWithoutJob_openingsInput = {
+    where: screening_questionsWhereUniqueInput
+    data: XOR<screening_questionsUpdateWithoutJob_openingsInput, screening_questionsUncheckedUpdateWithoutJob_openingsInput>
+  }
+
+  export type screening_questionsUpdateManyWithWhereWithoutJob_openingsInput = {
+    where: screening_questionsScalarWhereInput
+    data: XOR<screening_questionsUpdateManyMutationInput, screening_questionsUncheckedUpdateManyWithoutJob_openingsInput>
+  }
+
+  export type screening_questionsScalarWhereInput = {
+    AND?: screening_questionsScalarWhereInput | screening_questionsScalarWhereInput[]
+    OR?: screening_questionsScalarWhereInput[]
+    NOT?: screening_questionsScalarWhereInput | screening_questionsScalarWhereInput[]
+    id?: UuidFilter<"screening_questions"> | string
+    job_opening_id?: UuidFilter<"screening_questions"> | string
+    question?: StringFilter<"screening_questions"> | string
+    required?: BoolFilter<"screening_questions"> | boolean
+    sort_order?: IntFilter<"screening_questions"> | number
+    created_at?: DateTimeFilter<"screening_questions"> | Date | string
+  }
+
+  export type job_openingsCreateWithoutJob_requirementsInput = {
+    id?: string
+    title: string
+    employment_type?: $Enums.employment_type
+    work_mode?: $Enums.work_mode
+    location?: string | null
+    experience_min?: number | null
+    experience_max?: number | null
+    salary_min?: Decimal | DecimalJsLike | number | string | null
+    salary_max?: Decimal | DecimalJsLike | number | string | null
+    salary_currency?: string | null
+    salary_visible?: boolean
+    description?: string
+    positions?: number
+    status?: $Enums.opening_status
+    application_deadline?: Date | string | null
+    opened_at?: Date | string | null
+    closed_at?: Date | string | null
+    created_at?: Date | string
+    updated_at?: Date | string
+    memberships?: membershipsCreateNestedOneWithoutJob_openingsInput
+    departments?: departmentsCreateNestedOneWithoutJob_openingsInput
+    organizations: organizationsCreateNestedOneWithoutJob_openingsInput
+    screening_questions?: screening_questionsCreateNestedManyWithoutJob_openingsInput
+  }
+
+  export type job_openingsUncheckedCreateWithoutJob_requirementsInput = {
+    id?: string
+    organization_id: string
+    department_id?: string | null
+    created_by?: string | null
+    title: string
+    employment_type?: $Enums.employment_type
+    work_mode?: $Enums.work_mode
+    location?: string | null
+    experience_min?: number | null
+    experience_max?: number | null
+    salary_min?: Decimal | DecimalJsLike | number | string | null
+    salary_max?: Decimal | DecimalJsLike | number | string | null
+    salary_currency?: string | null
+    salary_visible?: boolean
+    description?: string
+    positions?: number
+    status?: $Enums.opening_status
+    application_deadline?: Date | string | null
+    opened_at?: Date | string | null
+    closed_at?: Date | string | null
+    created_at?: Date | string
+    updated_at?: Date | string
+    screening_questions?: screening_questionsUncheckedCreateNestedManyWithoutJob_openingsInput
+  }
+
+  export type job_openingsCreateOrConnectWithoutJob_requirementsInput = {
+    where: job_openingsWhereUniqueInput
+    create: XOR<job_openingsCreateWithoutJob_requirementsInput, job_openingsUncheckedCreateWithoutJob_requirementsInput>
+  }
+
+  export type job_openingsUpsertWithoutJob_requirementsInput = {
+    update: XOR<job_openingsUpdateWithoutJob_requirementsInput, job_openingsUncheckedUpdateWithoutJob_requirementsInput>
+    create: XOR<job_openingsCreateWithoutJob_requirementsInput, job_openingsUncheckedCreateWithoutJob_requirementsInput>
+    where?: job_openingsWhereInput
+  }
+
+  export type job_openingsUpdateToOneWithWhereWithoutJob_requirementsInput = {
+    where?: job_openingsWhereInput
+    data: XOR<job_openingsUpdateWithoutJob_requirementsInput, job_openingsUncheckedUpdateWithoutJob_requirementsInput>
+  }
+
+  export type job_openingsUpdateWithoutJob_requirementsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    employment_type?: Enumemployment_typeFieldUpdateOperationsInput | $Enums.employment_type
+    work_mode?: Enumwork_modeFieldUpdateOperationsInput | $Enums.work_mode
+    location?: NullableStringFieldUpdateOperationsInput | string | null
+    experience_min?: NullableIntFieldUpdateOperationsInput | number | null
+    experience_max?: NullableIntFieldUpdateOperationsInput | number | null
+    salary_min?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    salary_max?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    salary_currency?: NullableStringFieldUpdateOperationsInput | string | null
+    salary_visible?: BoolFieldUpdateOperationsInput | boolean
+    description?: StringFieldUpdateOperationsInput | string
+    positions?: IntFieldUpdateOperationsInput | number
+    status?: Enumopening_statusFieldUpdateOperationsInput | $Enums.opening_status
+    application_deadline?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    opened_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    closed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    memberships?: membershipsUpdateOneWithoutJob_openingsNestedInput
+    departments?: departmentsUpdateOneWithoutJob_openingsNestedInput
+    organizations?: organizationsUpdateOneRequiredWithoutJob_openingsNestedInput
+    screening_questions?: screening_questionsUpdateManyWithoutJob_openingsNestedInput
+  }
+
+  export type job_openingsUncheckedUpdateWithoutJob_requirementsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    organization_id?: StringFieldUpdateOperationsInput | string
+    department_id?: NullableStringFieldUpdateOperationsInput | string | null
+    created_by?: NullableStringFieldUpdateOperationsInput | string | null
+    title?: StringFieldUpdateOperationsInput | string
+    employment_type?: Enumemployment_typeFieldUpdateOperationsInput | $Enums.employment_type
+    work_mode?: Enumwork_modeFieldUpdateOperationsInput | $Enums.work_mode
+    location?: NullableStringFieldUpdateOperationsInput | string | null
+    experience_min?: NullableIntFieldUpdateOperationsInput | number | null
+    experience_max?: NullableIntFieldUpdateOperationsInput | number | null
+    salary_min?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    salary_max?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    salary_currency?: NullableStringFieldUpdateOperationsInput | string | null
+    salary_visible?: BoolFieldUpdateOperationsInput | boolean
+    description?: StringFieldUpdateOperationsInput | string
+    positions?: IntFieldUpdateOperationsInput | number
+    status?: Enumopening_statusFieldUpdateOperationsInput | $Enums.opening_status
+    application_deadline?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    opened_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    closed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    screening_questions?: screening_questionsUncheckedUpdateManyWithoutJob_openingsNestedInput
+  }
+
+  export type job_openingsCreateWithoutScreening_questionsInput = {
+    id?: string
+    title: string
+    employment_type?: $Enums.employment_type
+    work_mode?: $Enums.work_mode
+    location?: string | null
+    experience_min?: number | null
+    experience_max?: number | null
+    salary_min?: Decimal | DecimalJsLike | number | string | null
+    salary_max?: Decimal | DecimalJsLike | number | string | null
+    salary_currency?: string | null
+    salary_visible?: boolean
+    description?: string
+    positions?: number
+    status?: $Enums.opening_status
+    application_deadline?: Date | string | null
+    opened_at?: Date | string | null
+    closed_at?: Date | string | null
+    created_at?: Date | string
+    updated_at?: Date | string
+    memberships?: membershipsCreateNestedOneWithoutJob_openingsInput
+    departments?: departmentsCreateNestedOneWithoutJob_openingsInput
+    organizations: organizationsCreateNestedOneWithoutJob_openingsInput
+    job_requirements?: job_requirementsCreateNestedManyWithoutJob_openingsInput
+  }
+
+  export type job_openingsUncheckedCreateWithoutScreening_questionsInput = {
+    id?: string
+    organization_id: string
+    department_id?: string | null
+    created_by?: string | null
+    title: string
+    employment_type?: $Enums.employment_type
+    work_mode?: $Enums.work_mode
+    location?: string | null
+    experience_min?: number | null
+    experience_max?: number | null
+    salary_min?: Decimal | DecimalJsLike | number | string | null
+    salary_max?: Decimal | DecimalJsLike | number | string | null
+    salary_currency?: string | null
+    salary_visible?: boolean
+    description?: string
+    positions?: number
+    status?: $Enums.opening_status
+    application_deadline?: Date | string | null
+    opened_at?: Date | string | null
+    closed_at?: Date | string | null
+    created_at?: Date | string
+    updated_at?: Date | string
+    job_requirements?: job_requirementsUncheckedCreateNestedManyWithoutJob_openingsInput
+  }
+
+  export type job_openingsCreateOrConnectWithoutScreening_questionsInput = {
+    where: job_openingsWhereUniqueInput
+    create: XOR<job_openingsCreateWithoutScreening_questionsInput, job_openingsUncheckedCreateWithoutScreening_questionsInput>
+  }
+
+  export type job_openingsUpsertWithoutScreening_questionsInput = {
+    update: XOR<job_openingsUpdateWithoutScreening_questionsInput, job_openingsUncheckedUpdateWithoutScreening_questionsInput>
+    create: XOR<job_openingsCreateWithoutScreening_questionsInput, job_openingsUncheckedCreateWithoutScreening_questionsInput>
+    where?: job_openingsWhereInput
+  }
+
+  export type job_openingsUpdateToOneWithWhereWithoutScreening_questionsInput = {
+    where?: job_openingsWhereInput
+    data: XOR<job_openingsUpdateWithoutScreening_questionsInput, job_openingsUncheckedUpdateWithoutScreening_questionsInput>
+  }
+
+  export type job_openingsUpdateWithoutScreening_questionsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    employment_type?: Enumemployment_typeFieldUpdateOperationsInput | $Enums.employment_type
+    work_mode?: Enumwork_modeFieldUpdateOperationsInput | $Enums.work_mode
+    location?: NullableStringFieldUpdateOperationsInput | string | null
+    experience_min?: NullableIntFieldUpdateOperationsInput | number | null
+    experience_max?: NullableIntFieldUpdateOperationsInput | number | null
+    salary_min?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    salary_max?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    salary_currency?: NullableStringFieldUpdateOperationsInput | string | null
+    salary_visible?: BoolFieldUpdateOperationsInput | boolean
+    description?: StringFieldUpdateOperationsInput | string
+    positions?: IntFieldUpdateOperationsInput | number
+    status?: Enumopening_statusFieldUpdateOperationsInput | $Enums.opening_status
+    application_deadline?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    opened_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    closed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    memberships?: membershipsUpdateOneWithoutJob_openingsNestedInput
+    departments?: departmentsUpdateOneWithoutJob_openingsNestedInput
+    organizations?: organizationsUpdateOneRequiredWithoutJob_openingsNestedInput
+    job_requirements?: job_requirementsUpdateManyWithoutJob_openingsNestedInput
+  }
+
+  export type job_openingsUncheckedUpdateWithoutScreening_questionsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    organization_id?: StringFieldUpdateOperationsInput | string
+    department_id?: NullableStringFieldUpdateOperationsInput | string | null
+    created_by?: NullableStringFieldUpdateOperationsInput | string | null
+    title?: StringFieldUpdateOperationsInput | string
+    employment_type?: Enumemployment_typeFieldUpdateOperationsInput | $Enums.employment_type
+    work_mode?: Enumwork_modeFieldUpdateOperationsInput | $Enums.work_mode
+    location?: NullableStringFieldUpdateOperationsInput | string | null
+    experience_min?: NullableIntFieldUpdateOperationsInput | number | null
+    experience_max?: NullableIntFieldUpdateOperationsInput | number | null
+    salary_min?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    salary_max?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    salary_currency?: NullableStringFieldUpdateOperationsInput | string | null
+    salary_visible?: BoolFieldUpdateOperationsInput | boolean
+    description?: StringFieldUpdateOperationsInput | string
+    positions?: IntFieldUpdateOperationsInput | number
+    status?: Enumopening_statusFieldUpdateOperationsInput | $Enums.opening_status
+    application_deadline?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    opened_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    closed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    job_requirements?: job_requirementsUncheckedUpdateManyWithoutJob_openingsNestedInput
   }
 
   export type saml_relay_statesCreateManyFlow_stateInput = {
@@ -69475,6 +75982,30 @@ export namespace Prisma {
     updated_at?: Date | string
   }
 
+  export type job_openingsCreateManyDepartmentsInput = {
+    id?: string
+    organization_id: string
+    created_by?: string | null
+    title: string
+    employment_type?: $Enums.employment_type
+    work_mode?: $Enums.work_mode
+    location?: string | null
+    experience_min?: number | null
+    experience_max?: number | null
+    salary_min?: Decimal | DecimalJsLike | number | string | null
+    salary_max?: Decimal | DecimalJsLike | number | string | null
+    salary_currency?: string | null
+    salary_visible?: boolean
+    description?: string
+    positions?: number
+    status?: $Enums.opening_status
+    application_deadline?: Date | string | null
+    opened_at?: Date | string | null
+    closed_at?: Date | string | null
+    created_at?: Date | string
+    updated_at?: Date | string
+  }
+
   export type membershipsCreateManyDepartments_memberships_department_idTodepartmentsInput = {
     id?: string
     organization_id: string
@@ -69533,6 +76064,82 @@ export namespace Prisma {
     updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type job_openingsUpdateWithoutDepartmentsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    employment_type?: Enumemployment_typeFieldUpdateOperationsInput | $Enums.employment_type
+    work_mode?: Enumwork_modeFieldUpdateOperationsInput | $Enums.work_mode
+    location?: NullableStringFieldUpdateOperationsInput | string | null
+    experience_min?: NullableIntFieldUpdateOperationsInput | number | null
+    experience_max?: NullableIntFieldUpdateOperationsInput | number | null
+    salary_min?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    salary_max?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    salary_currency?: NullableStringFieldUpdateOperationsInput | string | null
+    salary_visible?: BoolFieldUpdateOperationsInput | boolean
+    description?: StringFieldUpdateOperationsInput | string
+    positions?: IntFieldUpdateOperationsInput | number
+    status?: Enumopening_statusFieldUpdateOperationsInput | $Enums.opening_status
+    application_deadline?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    opened_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    closed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    memberships?: membershipsUpdateOneWithoutJob_openingsNestedInput
+    organizations?: organizationsUpdateOneRequiredWithoutJob_openingsNestedInput
+    job_requirements?: job_requirementsUpdateManyWithoutJob_openingsNestedInput
+    screening_questions?: screening_questionsUpdateManyWithoutJob_openingsNestedInput
+  }
+
+  export type job_openingsUncheckedUpdateWithoutDepartmentsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    organization_id?: StringFieldUpdateOperationsInput | string
+    created_by?: NullableStringFieldUpdateOperationsInput | string | null
+    title?: StringFieldUpdateOperationsInput | string
+    employment_type?: Enumemployment_typeFieldUpdateOperationsInput | $Enums.employment_type
+    work_mode?: Enumwork_modeFieldUpdateOperationsInput | $Enums.work_mode
+    location?: NullableStringFieldUpdateOperationsInput | string | null
+    experience_min?: NullableIntFieldUpdateOperationsInput | number | null
+    experience_max?: NullableIntFieldUpdateOperationsInput | number | null
+    salary_min?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    salary_max?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    salary_currency?: NullableStringFieldUpdateOperationsInput | string | null
+    salary_visible?: BoolFieldUpdateOperationsInput | boolean
+    description?: StringFieldUpdateOperationsInput | string
+    positions?: IntFieldUpdateOperationsInput | number
+    status?: Enumopening_statusFieldUpdateOperationsInput | $Enums.opening_status
+    application_deadline?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    opened_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    closed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    job_requirements?: job_requirementsUncheckedUpdateManyWithoutJob_openingsNestedInput
+    screening_questions?: screening_questionsUncheckedUpdateManyWithoutJob_openingsNestedInput
+  }
+
+  export type job_openingsUncheckedUpdateManyWithoutDepartmentsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    organization_id?: StringFieldUpdateOperationsInput | string
+    created_by?: NullableStringFieldUpdateOperationsInput | string | null
+    title?: StringFieldUpdateOperationsInput | string
+    employment_type?: Enumemployment_typeFieldUpdateOperationsInput | $Enums.employment_type
+    work_mode?: Enumwork_modeFieldUpdateOperationsInput | $Enums.work_mode
+    location?: NullableStringFieldUpdateOperationsInput | string | null
+    experience_min?: NullableIntFieldUpdateOperationsInput | number | null
+    experience_max?: NullableIntFieldUpdateOperationsInput | number | null
+    salary_min?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    salary_max?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    salary_currency?: NullableStringFieldUpdateOperationsInput | string | null
+    salary_visible?: BoolFieldUpdateOperationsInput | boolean
+    description?: StringFieldUpdateOperationsInput | string
+    positions?: IntFieldUpdateOperationsInput | number
+    status?: Enumopening_statusFieldUpdateOperationsInput | $Enums.opening_status
+    application_deadline?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    opened_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    closed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type membershipsUpdateWithoutDepartments_memberships_department_idTodepartmentsInput = {
     id?: StringFieldUpdateOperationsInput | string
     job_title?: NullableStringFieldUpdateOperationsInput | string | null
@@ -69544,6 +76151,7 @@ export namespace Prisma {
     audit_log?: audit_logUpdateManyWithoutMembershipsNestedInput
     departments_departments_head_membership_idTomemberships?: departmentsUpdateManyWithoutMemberships_departments_head_membership_idTomembershipsNestedInput
     invitations?: invitationsUpdateManyWithoutMembershipsNestedInput
+    job_openings?: job_openingsUpdateManyWithoutMembershipsNestedInput
     organizations?: organizationsUpdateOneRequiredWithoutMembershipsNestedInput
     roles?: rolesUpdateOneWithoutMembershipsNestedInput
     profiles?: profilesUpdateOneRequiredWithoutMembershipsNestedInput
@@ -69565,6 +76173,7 @@ export namespace Prisma {
     audit_log?: audit_logUncheckedUpdateManyWithoutMembershipsNestedInput
     departments_departments_head_membership_idTomemberships?: departmentsUncheckedUpdateManyWithoutMemberships_departments_head_membership_idTomembershipsNestedInput
     invitations?: invitationsUncheckedUpdateManyWithoutMembershipsNestedInput
+    job_openings?: job_openingsUncheckedUpdateManyWithoutMembershipsNestedInput
     user_permission_overrides_user_permission_overrides_granted_byTomemberships?: user_permission_overridesUncheckedUpdateManyWithoutMemberships_user_permission_overrides_granted_byTomembershipsNestedInput
     user_permission_overrides_user_permission_overrides_membership_idTomemberships?: user_permission_overridesUncheckedUpdateManyWithoutMemberships_user_permission_overrides_membership_idTomembershipsNestedInput
   }
@@ -69618,6 +76227,30 @@ export namespace Prisma {
     expires_at: Date | string
     accepted_at?: Date | string | null
     accepted_by?: string | null
+    created_at?: Date | string
+    updated_at?: Date | string
+  }
+
+  export type job_openingsCreateManyMembershipsInput = {
+    id?: string
+    organization_id: string
+    department_id?: string | null
+    title: string
+    employment_type?: $Enums.employment_type
+    work_mode?: $Enums.work_mode
+    location?: string | null
+    experience_min?: number | null
+    experience_max?: number | null
+    salary_min?: Decimal | DecimalJsLike | number | string | null
+    salary_max?: Decimal | DecimalJsLike | number | string | null
+    salary_currency?: string | null
+    salary_visible?: boolean
+    description?: string
+    positions?: number
+    status?: $Enums.opening_status
+    application_deadline?: Date | string | null
+    opened_at?: Date | string | null
+    closed_at?: Date | string | null
     created_at?: Date | string
     updated_at?: Date | string
   }
@@ -69702,6 +76335,7 @@ export namespace Prisma {
     updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
     organizations?: organizationsUpdateOneRequiredWithoutDepartmentsNestedInput
     invitations?: invitationsUpdateManyWithoutDepartmentsNestedInput
+    job_openings?: job_openingsUpdateManyWithoutDepartmentsNestedInput
     memberships_memberships_department_idTodepartments?: membershipsUpdateManyWithoutDepartments_memberships_department_idTodepartmentsNestedInput
   }
 
@@ -69713,6 +76347,7 @@ export namespace Prisma {
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
     updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
     invitations?: invitationsUncheckedUpdateManyWithoutDepartmentsNestedInput
+    job_openings?: job_openingsUncheckedUpdateManyWithoutDepartmentsNestedInput
     memberships_memberships_department_idTodepartments?: membershipsUncheckedUpdateManyWithoutDepartments_memberships_department_idTodepartmentsNestedInput
   }
 
@@ -69766,6 +76401,82 @@ export namespace Prisma {
     expires_at?: DateTimeFieldUpdateOperationsInput | Date | string
     accepted_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     accepted_by?: NullableStringFieldUpdateOperationsInput | string | null
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type job_openingsUpdateWithoutMembershipsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    employment_type?: Enumemployment_typeFieldUpdateOperationsInput | $Enums.employment_type
+    work_mode?: Enumwork_modeFieldUpdateOperationsInput | $Enums.work_mode
+    location?: NullableStringFieldUpdateOperationsInput | string | null
+    experience_min?: NullableIntFieldUpdateOperationsInput | number | null
+    experience_max?: NullableIntFieldUpdateOperationsInput | number | null
+    salary_min?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    salary_max?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    salary_currency?: NullableStringFieldUpdateOperationsInput | string | null
+    salary_visible?: BoolFieldUpdateOperationsInput | boolean
+    description?: StringFieldUpdateOperationsInput | string
+    positions?: IntFieldUpdateOperationsInput | number
+    status?: Enumopening_statusFieldUpdateOperationsInput | $Enums.opening_status
+    application_deadline?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    opened_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    closed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    departments?: departmentsUpdateOneWithoutJob_openingsNestedInput
+    organizations?: organizationsUpdateOneRequiredWithoutJob_openingsNestedInput
+    job_requirements?: job_requirementsUpdateManyWithoutJob_openingsNestedInput
+    screening_questions?: screening_questionsUpdateManyWithoutJob_openingsNestedInput
+  }
+
+  export type job_openingsUncheckedUpdateWithoutMembershipsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    organization_id?: StringFieldUpdateOperationsInput | string
+    department_id?: NullableStringFieldUpdateOperationsInput | string | null
+    title?: StringFieldUpdateOperationsInput | string
+    employment_type?: Enumemployment_typeFieldUpdateOperationsInput | $Enums.employment_type
+    work_mode?: Enumwork_modeFieldUpdateOperationsInput | $Enums.work_mode
+    location?: NullableStringFieldUpdateOperationsInput | string | null
+    experience_min?: NullableIntFieldUpdateOperationsInput | number | null
+    experience_max?: NullableIntFieldUpdateOperationsInput | number | null
+    salary_min?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    salary_max?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    salary_currency?: NullableStringFieldUpdateOperationsInput | string | null
+    salary_visible?: BoolFieldUpdateOperationsInput | boolean
+    description?: StringFieldUpdateOperationsInput | string
+    positions?: IntFieldUpdateOperationsInput | number
+    status?: Enumopening_statusFieldUpdateOperationsInput | $Enums.opening_status
+    application_deadline?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    opened_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    closed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    job_requirements?: job_requirementsUncheckedUpdateManyWithoutJob_openingsNestedInput
+    screening_questions?: screening_questionsUncheckedUpdateManyWithoutJob_openingsNestedInput
+  }
+
+  export type job_openingsUncheckedUpdateManyWithoutMembershipsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    organization_id?: StringFieldUpdateOperationsInput | string
+    department_id?: NullableStringFieldUpdateOperationsInput | string | null
+    title?: StringFieldUpdateOperationsInput | string
+    employment_type?: Enumemployment_typeFieldUpdateOperationsInput | $Enums.employment_type
+    work_mode?: Enumwork_modeFieldUpdateOperationsInput | $Enums.work_mode
+    location?: NullableStringFieldUpdateOperationsInput | string | null
+    experience_min?: NullableIntFieldUpdateOperationsInput | number | null
+    experience_max?: NullableIntFieldUpdateOperationsInput | number | null
+    salary_min?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    salary_max?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    salary_currency?: NullableStringFieldUpdateOperationsInput | string | null
+    salary_visible?: BoolFieldUpdateOperationsInput | boolean
+    description?: StringFieldUpdateOperationsInput | string
+    positions?: IntFieldUpdateOperationsInput | number
+    status?: Enumopening_statusFieldUpdateOperationsInput | $Enums.opening_status
+    application_deadline?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    opened_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    closed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
     updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -69892,6 +76603,30 @@ export namespace Prisma {
     updated_at?: Date | string
   }
 
+  export type job_openingsCreateManyOrganizationsInput = {
+    id?: string
+    department_id?: string | null
+    created_by?: string | null
+    title: string
+    employment_type?: $Enums.employment_type
+    work_mode?: $Enums.work_mode
+    location?: string | null
+    experience_min?: number | null
+    experience_max?: number | null
+    salary_min?: Decimal | DecimalJsLike | number | string | null
+    salary_max?: Decimal | DecimalJsLike | number | string | null
+    salary_currency?: string | null
+    salary_visible?: boolean
+    description?: string
+    positions?: number
+    status?: $Enums.opening_status
+    application_deadline?: Date | string | null
+    opened_at?: Date | string | null
+    closed_at?: Date | string | null
+    created_at?: Date | string
+    updated_at?: Date | string
+  }
+
   export type membershipsCreateManyOrganizationsInput = {
     id?: string
     user_id: string
@@ -70003,6 +76738,7 @@ export namespace Prisma {
     updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
     memberships_departments_head_membership_idTomemberships?: membershipsUpdateOneWithoutDepartments_departments_head_membership_idTomembershipsNestedInput
     invitations?: invitationsUpdateManyWithoutDepartmentsNestedInput
+    job_openings?: job_openingsUpdateManyWithoutDepartmentsNestedInput
     memberships_memberships_department_idTodepartments?: membershipsUpdateManyWithoutDepartments_memberships_department_idTodepartmentsNestedInput
   }
 
@@ -70014,6 +76750,7 @@ export namespace Prisma {
     updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
     head_membership_id?: NullableStringFieldUpdateOperationsInput | string | null
     invitations?: invitationsUncheckedUpdateManyWithoutDepartmentsNestedInput
+    job_openings?: job_openingsUncheckedUpdateManyWithoutDepartmentsNestedInput
     memberships_memberships_department_idTodepartments?: membershipsUncheckedUpdateManyWithoutDepartments_memberships_department_idTodepartmentsNestedInput
   }
 
@@ -70071,6 +76808,82 @@ export namespace Prisma {
     updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type job_openingsUpdateWithoutOrganizationsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    employment_type?: Enumemployment_typeFieldUpdateOperationsInput | $Enums.employment_type
+    work_mode?: Enumwork_modeFieldUpdateOperationsInput | $Enums.work_mode
+    location?: NullableStringFieldUpdateOperationsInput | string | null
+    experience_min?: NullableIntFieldUpdateOperationsInput | number | null
+    experience_max?: NullableIntFieldUpdateOperationsInput | number | null
+    salary_min?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    salary_max?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    salary_currency?: NullableStringFieldUpdateOperationsInput | string | null
+    salary_visible?: BoolFieldUpdateOperationsInput | boolean
+    description?: StringFieldUpdateOperationsInput | string
+    positions?: IntFieldUpdateOperationsInput | number
+    status?: Enumopening_statusFieldUpdateOperationsInput | $Enums.opening_status
+    application_deadline?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    opened_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    closed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    memberships?: membershipsUpdateOneWithoutJob_openingsNestedInput
+    departments?: departmentsUpdateOneWithoutJob_openingsNestedInput
+    job_requirements?: job_requirementsUpdateManyWithoutJob_openingsNestedInput
+    screening_questions?: screening_questionsUpdateManyWithoutJob_openingsNestedInput
+  }
+
+  export type job_openingsUncheckedUpdateWithoutOrganizationsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    department_id?: NullableStringFieldUpdateOperationsInput | string | null
+    created_by?: NullableStringFieldUpdateOperationsInput | string | null
+    title?: StringFieldUpdateOperationsInput | string
+    employment_type?: Enumemployment_typeFieldUpdateOperationsInput | $Enums.employment_type
+    work_mode?: Enumwork_modeFieldUpdateOperationsInput | $Enums.work_mode
+    location?: NullableStringFieldUpdateOperationsInput | string | null
+    experience_min?: NullableIntFieldUpdateOperationsInput | number | null
+    experience_max?: NullableIntFieldUpdateOperationsInput | number | null
+    salary_min?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    salary_max?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    salary_currency?: NullableStringFieldUpdateOperationsInput | string | null
+    salary_visible?: BoolFieldUpdateOperationsInput | boolean
+    description?: StringFieldUpdateOperationsInput | string
+    positions?: IntFieldUpdateOperationsInput | number
+    status?: Enumopening_statusFieldUpdateOperationsInput | $Enums.opening_status
+    application_deadline?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    opened_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    closed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    job_requirements?: job_requirementsUncheckedUpdateManyWithoutJob_openingsNestedInput
+    screening_questions?: screening_questionsUncheckedUpdateManyWithoutJob_openingsNestedInput
+  }
+
+  export type job_openingsUncheckedUpdateManyWithoutOrganizationsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    department_id?: NullableStringFieldUpdateOperationsInput | string | null
+    created_by?: NullableStringFieldUpdateOperationsInput | string | null
+    title?: StringFieldUpdateOperationsInput | string
+    employment_type?: Enumemployment_typeFieldUpdateOperationsInput | $Enums.employment_type
+    work_mode?: Enumwork_modeFieldUpdateOperationsInput | $Enums.work_mode
+    location?: NullableStringFieldUpdateOperationsInput | string | null
+    experience_min?: NullableIntFieldUpdateOperationsInput | number | null
+    experience_max?: NullableIntFieldUpdateOperationsInput | number | null
+    salary_min?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    salary_max?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    salary_currency?: NullableStringFieldUpdateOperationsInput | string | null
+    salary_visible?: BoolFieldUpdateOperationsInput | boolean
+    description?: StringFieldUpdateOperationsInput | string
+    positions?: IntFieldUpdateOperationsInput | number
+    status?: Enumopening_statusFieldUpdateOperationsInput | $Enums.opening_status
+    application_deadline?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    opened_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    closed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type membershipsUpdateWithoutOrganizationsInput = {
     id?: StringFieldUpdateOperationsInput | string
     job_title?: NullableStringFieldUpdateOperationsInput | string | null
@@ -70082,6 +76895,7 @@ export namespace Prisma {
     audit_log?: audit_logUpdateManyWithoutMembershipsNestedInput
     departments_departments_head_membership_idTomemberships?: departmentsUpdateManyWithoutMemberships_departments_head_membership_idTomembershipsNestedInput
     invitations?: invitationsUpdateManyWithoutMembershipsNestedInput
+    job_openings?: job_openingsUpdateManyWithoutMembershipsNestedInput
     departments_memberships_department_idTodepartments?: departmentsUpdateOneWithoutMemberships_memberships_department_idTodepartmentsNestedInput
     roles?: rolesUpdateOneWithoutMembershipsNestedInput
     profiles?: profilesUpdateOneRequiredWithoutMembershipsNestedInput
@@ -70103,6 +76917,7 @@ export namespace Prisma {
     audit_log?: audit_logUncheckedUpdateManyWithoutMembershipsNestedInput
     departments_departments_head_membership_idTomemberships?: departmentsUncheckedUpdateManyWithoutMemberships_departments_head_membership_idTomembershipsNestedInput
     invitations?: invitationsUncheckedUpdateManyWithoutMembershipsNestedInput
+    job_openings?: job_openingsUncheckedUpdateManyWithoutMembershipsNestedInput
     user_permission_overrides_user_permission_overrides_granted_byTomemberships?: user_permission_overridesUncheckedUpdateManyWithoutMemberships_user_permission_overrides_granted_byTomembershipsNestedInput
     user_permission_overrides_user_permission_overrides_membership_idTomemberships?: user_permission_overridesUncheckedUpdateManyWithoutMemberships_user_permission_overrides_membership_idTomembershipsNestedInput
   }
@@ -70441,6 +77256,7 @@ export namespace Prisma {
     audit_log?: audit_logUpdateManyWithoutMembershipsNestedInput
     departments_departments_head_membership_idTomemberships?: departmentsUpdateManyWithoutMemberships_departments_head_membership_idTomembershipsNestedInput
     invitations?: invitationsUpdateManyWithoutMembershipsNestedInput
+    job_openings?: job_openingsUpdateManyWithoutMembershipsNestedInput
     departments_memberships_department_idTodepartments?: departmentsUpdateOneWithoutMemberships_memberships_department_idTodepartmentsNestedInput
     organizations?: organizationsUpdateOneRequiredWithoutMembershipsNestedInput
     roles?: rolesUpdateOneWithoutMembershipsNestedInput
@@ -70462,6 +77278,7 @@ export namespace Prisma {
     audit_log?: audit_logUncheckedUpdateManyWithoutMembershipsNestedInput
     departments_departments_head_membership_idTomemberships?: departmentsUncheckedUpdateManyWithoutMemberships_departments_head_membership_idTomembershipsNestedInput
     invitations?: invitationsUncheckedUpdateManyWithoutMembershipsNestedInput
+    job_openings?: job_openingsUncheckedUpdateManyWithoutMembershipsNestedInput
     user_permission_overrides_user_permission_overrides_granted_byTomemberships?: user_permission_overridesUncheckedUpdateManyWithoutMemberships_user_permission_overrides_granted_byTomembershipsNestedInput
     user_permission_overrides_user_permission_overrides_membership_idTomemberships?: user_permission_overridesUncheckedUpdateManyWithoutMemberships_user_permission_overrides_membership_idTomembershipsNestedInput
   }
@@ -70570,6 +77387,7 @@ export namespace Prisma {
     audit_log?: audit_logUpdateManyWithoutMembershipsNestedInput
     departments_departments_head_membership_idTomemberships?: departmentsUpdateManyWithoutMemberships_departments_head_membership_idTomembershipsNestedInput
     invitations?: invitationsUpdateManyWithoutMembershipsNestedInput
+    job_openings?: job_openingsUpdateManyWithoutMembershipsNestedInput
     departments_memberships_department_idTodepartments?: departmentsUpdateOneWithoutMemberships_memberships_department_idTodepartmentsNestedInput
     organizations?: organizationsUpdateOneRequiredWithoutMembershipsNestedInput
     profiles?: profilesUpdateOneRequiredWithoutMembershipsNestedInput
@@ -70591,6 +77409,7 @@ export namespace Prisma {
     audit_log?: audit_logUncheckedUpdateManyWithoutMembershipsNestedInput
     departments_departments_head_membership_idTomemberships?: departmentsUncheckedUpdateManyWithoutMemberships_departments_head_membership_idTomembershipsNestedInput
     invitations?: invitationsUncheckedUpdateManyWithoutMembershipsNestedInput
+    job_openings?: job_openingsUncheckedUpdateManyWithoutMembershipsNestedInput
     user_permission_overrides_user_permission_overrides_granted_byTomemberships?: user_permission_overridesUncheckedUpdateManyWithoutMemberships_user_permission_overrides_granted_byTomembershipsNestedInput
     user_permission_overrides_user_permission_overrides_membership_idTomemberships?: user_permission_overridesUncheckedUpdateManyWithoutMemberships_user_permission_overrides_membership_idTomembershipsNestedInput
   }
@@ -70627,6 +77446,70 @@ export namespace Prisma {
     allowed?: BoolFieldUpdateOperationsInput | boolean
     scope?: Enumpermission_scopeFieldUpdateOperationsInput | $Enums.permission_scope
     updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type job_requirementsCreateManyJob_openingsInput = {
+    id?: string
+    kind: $Enums.requirement_kind
+    label: string
+    sort_order?: number
+    created_at?: Date | string
+  }
+
+  export type screening_questionsCreateManyJob_openingsInput = {
+    id?: string
+    question: string
+    required?: boolean
+    sort_order?: number
+    created_at?: Date | string
+  }
+
+  export type job_requirementsUpdateWithoutJob_openingsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    kind?: Enumrequirement_kindFieldUpdateOperationsInput | $Enums.requirement_kind
+    label?: StringFieldUpdateOperationsInput | string
+    sort_order?: IntFieldUpdateOperationsInput | number
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type job_requirementsUncheckedUpdateWithoutJob_openingsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    kind?: Enumrequirement_kindFieldUpdateOperationsInput | $Enums.requirement_kind
+    label?: StringFieldUpdateOperationsInput | string
+    sort_order?: IntFieldUpdateOperationsInput | number
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type job_requirementsUncheckedUpdateManyWithoutJob_openingsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    kind?: Enumrequirement_kindFieldUpdateOperationsInput | $Enums.requirement_kind
+    label?: StringFieldUpdateOperationsInput | string
+    sort_order?: IntFieldUpdateOperationsInput | number
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type screening_questionsUpdateWithoutJob_openingsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    question?: StringFieldUpdateOperationsInput | string
+    required?: BoolFieldUpdateOperationsInput | boolean
+    sort_order?: IntFieldUpdateOperationsInput | number
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type screening_questionsUncheckedUpdateWithoutJob_openingsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    question?: StringFieldUpdateOperationsInput | string
+    required?: BoolFieldUpdateOperationsInput | boolean
+    sort_order?: IntFieldUpdateOperationsInput | number
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type screening_questionsUncheckedUpdateManyWithoutJob_openingsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    question?: StringFieldUpdateOperationsInput | string
+    required?: BoolFieldUpdateOperationsInput | boolean
+    sort_order?: IntFieldUpdateOperationsInput | number
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
 

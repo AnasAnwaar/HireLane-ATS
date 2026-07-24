@@ -591,6 +591,49 @@ exports.Prisma.User_permission_overridesScalarFieldEnum = {
   created_at: 'created_at'
 };
 
+exports.Prisma.Job_openingsScalarFieldEnum = {
+  id: 'id',
+  organization_id: 'organization_id',
+  department_id: 'department_id',
+  created_by: 'created_by',
+  title: 'title',
+  employment_type: 'employment_type',
+  work_mode: 'work_mode',
+  location: 'location',
+  experience_min: 'experience_min',
+  experience_max: 'experience_max',
+  salary_min: 'salary_min',
+  salary_max: 'salary_max',
+  salary_currency: 'salary_currency',
+  salary_visible: 'salary_visible',
+  description: 'description',
+  positions: 'positions',
+  status: 'status',
+  application_deadline: 'application_deadline',
+  opened_at: 'opened_at',
+  closed_at: 'closed_at',
+  created_at: 'created_at',
+  updated_at: 'updated_at'
+};
+
+exports.Prisma.Job_requirementsScalarFieldEnum = {
+  id: 'id',
+  job_opening_id: 'job_opening_id',
+  kind: 'kind',
+  label: 'label',
+  sort_order: 'sort_order',
+  created_at: 'created_at'
+};
+
+exports.Prisma.Screening_questionsScalarFieldEnum = {
+  id: 'id',
+  job_opening_id: 'job_opening_id',
+  question: 'question',
+  required: 'required',
+  sort_order: 'sort_order',
+  created_at: 'created_at'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -698,6 +741,35 @@ exports.permission_risk = exports.$Enums.permission_risk = {
   high: 'high'
 };
 
+exports.employment_type = exports.$Enums.employment_type = {
+  full_time: 'full_time',
+  part_time: 'part_time',
+  contract: 'contract',
+  internship: 'internship',
+  temporary: 'temporary'
+};
+
+exports.work_mode = exports.$Enums.work_mode = {
+  on_site: 'on_site',
+  hybrid: 'hybrid',
+  remote: 'remote'
+};
+
+exports.opening_status = exports.$Enums.opening_status = {
+  draft: 'draft',
+  pending_approval: 'pending_approval',
+  open: 'open',
+  on_hold: 'on_hold',
+  closed: 'closed'
+};
+
+exports.requirement_kind = exports.$Enums.requirement_kind = {
+  must_have: 'must_have',
+  nice_to_have: 'nice_to_have',
+  qualification: 'qualification',
+  certification: 'certification'
+};
+
 exports.Prisma.ModelName = {
   audit_log_entries: 'audit_log_entries',
   custom_oauth_providers: 'custom_oauth_providers',
@@ -735,7 +807,10 @@ exports.Prisma.ModelName = {
   profiles: 'profiles',
   role_permissions: 'role_permissions',
   roles: 'roles',
-  user_permission_overrides: 'user_permission_overrides'
+  user_permission_overrides: 'user_permission_overrides',
+  job_openings: 'job_openings',
+  job_requirements: 'job_requirements',
+  screening_questions: 'screening_questions'
 };
 
 /**

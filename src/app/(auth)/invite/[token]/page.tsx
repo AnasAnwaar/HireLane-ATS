@@ -31,9 +31,12 @@ export default async function AcceptInvitePage({
 
   // A lookup failure here (database unreachable, misconfigured keys) must not
   // crash the page — an invitee has no way to interpret a 500.
-  // Two queries rather than an embedded join: the hand-written database types
-  // declare no relationships, so `organizations(name)` cannot be typed until
-  // they are replaced by `supabase gen types`.
+  //
+  // NOTE: this is the legacy custom-token invite path from CP-3. CP-3b replaced
+  // team invitations with Supabase's native inviteUserByEmail, which lands on
+  // /set-password instead. This page and the `invitations` table are kept only
+  // until the two paths are consolidated (tracked for CP-5). Two plain queries
+  // rather than a join — clear enough, and this code is on its way out.
   let invite: {
     id: string;
     email: string;

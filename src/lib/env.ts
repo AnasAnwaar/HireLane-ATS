@@ -20,7 +20,13 @@ const clientSchema = z.object({
 
 const serverSchema = z.object({
   SUPABASE_SERVICE_ROLE_KEY: z.string().min(1, "is required"),
-  ANTHROPIC_API_KEY: z.string().min(1).optional(),
+  // Optional and not yet used (CP-11). Treat an empty value in .env.local the
+  // same as absent — `.optional()` alone only permits `undefined`, so a present
+  // but empty string would (wrongly) fail a `.min(1)` check.
+  ANTHROPIC_API_KEY: z
+    .string()
+    .optional()
+    .transform((v) => (v ? v : undefined)),
 });
 
 function parse<T extends z.ZodTypeAny>(schema: T, source: unknown, label: string): z.infer<T> {

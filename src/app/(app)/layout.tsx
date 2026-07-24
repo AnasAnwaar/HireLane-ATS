@@ -1,6 +1,8 @@
 import { redirect } from "next/navigation";
 
 import { AppShell } from "@/components/layout/app-shell";
+import { PermissionProvider } from "@/components/permissions/permission-provider";
+import { getMyPermissions } from "@/server/auth/authorize";
 import { getMfaStatus } from "@/server/auth/mfa-status";
 import { requireSession } from "@/server/auth/session";
 
@@ -13,16 +15,24 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   const mfa = await getMfaStatus();
   if (mfa.needsChallenge) redirect("/mfa");
 
+  // Resolve the viewer's permissions once, here, and hand them to the client
+  // provider as a serialisable array. Every in-app component can then gate UI
+  // without its own round trip.
+  const permissionMap = await getMyPermissions();
+  const permissions = Array.from(permissionMap, ([key, scope]) => ({ key, scope }));
+
   return (
-    <AppShell
-      user={{
-        name: session.fullName || session.email,
-        email: session.email,
-        role: session.roleName,
-        organization: session.organizationName,
-      }}
-    >
-      {children}
-    </AppShell>
+    <PermissionProvider permissions={permissions}>
+      <AppShell
+        user={{
+          name: session.fullName || session.email,
+          email: session.email,
+          role: session.roleName,
+          organization: session.organizationName,
+        }}
+      >
+        {children}
+      </AppShell>
+    </PermissionProvider>
   );
 }

@@ -1,4 +1,5 @@
 import { ShieldAlert } from "lucide-react";
+import Link from "next/link";
 
 import { PageBody, PageHeader } from "@/components/layout/app-shell";
 import { Alert } from "@/components/ui/alert";
@@ -6,7 +7,7 @@ import { Avatar } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { createAdminClient, createClient } from "@/lib/supabase/server";
-import { hasPermission } from "@/server/auth/permissions";
+import { can } from "@/server/auth/authorize";
 import { requireSession } from "@/server/auth/session";
 
 import { InviteMemberForm } from "./invite-member-dialog";
@@ -27,7 +28,7 @@ type MemberRow = {
 
 export default async function UsersPage() {
   const session = await requireSession("/admin/users");
-  const canManage = await hasPermission("administration.manage_users");
+  const canManage = await can("administration.manage_users");
 
   const supabase = await createClient();
 
@@ -115,10 +116,13 @@ export default async function UsersPage() {
                 {members.map((member) => (
                   <tr key={member.id} className="transition-colors hover:bg-muted/50">
                     <td className="px-5 py-3">
-                      <div className="flex items-center gap-3">
+                      <Link
+                        href={`/admin/users/${member.id}`}
+                        className="flex items-center gap-3"
+                      >
                         <Avatar name={member.name} size="sm" />
                         <div className="min-w-0">
-                          <p className="truncate font-medium">
+                          <p className="truncate font-medium hover:underline">
                             {member.name}
                             {member.id === session.membershipId && (
                               <span className="ml-1.5 text-xs font-normal text-muted-foreground">
@@ -130,7 +134,7 @@ export default async function UsersPage() {
                             {member.email}
                           </p>
                         </div>
-                      </div>
+                      </Link>
                     </td>
                     <td className="px-5 py-3">
                       <span className="flex items-center gap-1.5">

@@ -46,7 +46,7 @@ export function PageHeader({
   actions,
   className,
 }: {
-  eyebrow?: string;
+  eyebrow?: React.ReactNode;
   title: string;
   description?: string;
   actions?: React.ReactNode;
@@ -80,8 +80,11 @@ export function PageBody({
   className?: string;
 }) {
   return (
-    <div className={cn("px-6 py-6 sm:px-8", className)}>
-      <div className="mx-auto max-w-[84rem]">{children}</div>
+    <div className="px-6 py-6 sm:px-8">
+      {/* className merges onto the div that DIRECTLY wraps children, so a page's
+          `grid`/`space-y`/`max-w` classes actually apply to the content — not to
+          an outer shell with a single inner child (which silently no-ops them). */}
+      <div className={cn("mx-auto w-full max-w-[84rem]", className)}>{children}</div>
     </div>
   );
 }
