@@ -42,7 +42,7 @@ export default async function ApplicantsPage({
 
   if (!opening) notFound();
 
-  const [{ data: applications }, canImport, canViewContact] = await Promise.all([
+  const [{ data: applications }, canImport, canViewContact, canViewProfile] = await Promise.all([
     supabase
       .from("applications")
       .select("id, stage, source, applied_at, candidate_id, candidates(full_name, email, headline, location, years_experience)")
@@ -50,6 +50,7 @@ export default async function ApplicantsPage({
       .order("applied_at", { ascending: false }),
     can("applicants.import"),
     can("fields.view_candidate_contact"),
+    can("applicants.view_profile"),
   ]);
 
   // Which candidates have a CV on file (one query, then map).
@@ -110,51 +111,56 @@ export default async function ApplicantsPage({
             const c = app.candidates;
             const meta = STAGE_META[app.stage as ApplicationStage];
             const exp = experienceLabel(c?.years_experience ?? null, null);
-            return (
-              <Card key={app.id} className="transition-colors hover:border-primary/30">
-                <div className="flex items-center gap-4 p-4">
-                  <Avatar name={c?.full_name ?? "?"} />
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate font-medium">{c?.full_name}</p>
-                    <div className="mt-0.5 flex flex-wrap items-center gap-x-3 gap-y-0.5 text-xs text-muted-foreground">
-                      {c?.headline && <span className="truncate">{c.headline}</span>}
-                      {c?.location && <span>· {c.location}</span>}
-                      {exp && <span>· {exp}</span>}
-                      {canViewContact && c?.email && (
-                        <span className="inline-flex items-center gap-1">
-                          · <Mail className="size-3" /> {c.email}
-                        </span>
-                      )}
-                    </div>
-                  </div>
 
-                  <div className="flex shrink-0 items-center gap-3">
-                    {hasCv.has(app.candidate_id) && (
-                      <span className="inline-flex items-center gap-1 text-xs text-muted-foreground" title="CV on file">
-                        <FileText className="size-3.5" /> CV
+            const rowInner = (
+              <div className="flex items-center gap-4 p-4">
+                <Avatar name={c?.full_name ?? "?"} />
+                <div className="min-w-0 flex-1">
+                  <p className="truncate font-medium">{c?.full_name}</p>
+                  <div className="mt-0.5 flex flex-wrap items-center gap-x-3 gap-y-0.5 text-xs text-muted-foreground">
+                    {c?.headline && <span className="truncate">{c.headline}</span>}
+                    {c?.location && <span>· {c.location}</span>}
+                    {exp && <span>· {exp}</span>}
+                    {canViewContact && c?.email && (
+                      <span className="inline-flex items-center gap-1">
+                        · <Mail className="size-3" /> {c.email}
                       </span>
                     )}
-                    {app.source && (
-                      <Badge variant="outline" className="hidden sm:inline-flex">
-                        {app.source}
-                      </Badge>
-                    )}
-                    <span className="hidden text-xs text-muted-foreground md:inline">
-                      {formatDate(app.applied_at)}
-                    </span>
-                    <Badge variant={meta.variant} dot>
-                      {meta.label}
-                    </Badge>
                   </div>
                 </div>
+
+                <div className="flex shrink-0 items-center gap-3">
+                  {hasCv.has(app.candidate_id) && (
+                    <span className="inline-flex items-center gap-1 text-xs text-muted-foreground" title="CV on file">
+                      <FileText className="size-3.5" /> CV
+                    </span>
+                  )}
+                  {app.source && (
+                    <Badge variant="outline" className="hidden sm:inline-flex">
+                      {app.source}
+                    </Badge>
+                  )}
+                  <span className="hidden text-xs text-muted-foreground md:inline">
+                    {formatDate(app.applied_at)}
+                  </span>
+                  <Badge variant={meta.variant} dot>
+                    {meta.label}
+                  </Badge>
+                </div>
+              </div>
+            );
+
+            return (
+              <Card key={app.id} className="transition-colors hover:border-primary/30">
+                {canViewProfile ? (
+                  <Link href={`/candidates/${app.candidate_id}`}>{rowInner}</Link>
+                ) : (
+                  rowInner
+                )}
               </Card>
             );
           })
         )}
-
-        <p className="pt-2 text-center text-xs text-muted-foreground">
-          AI ranking, full candidate profiles and pipeline management arrive in CP-8 and CP-13.
-        </p>
       </PageBody>
     </>
   );

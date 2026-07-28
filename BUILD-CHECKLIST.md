@@ -26,16 +26,16 @@
 | Phase | Checkpoints | Status |
 |-------|-------------|--------|
 | **P0 — Tenancy, Auth & Admin** | CP-1 … CP-5 | ✅ **COMPLETE** |
-| **P1 — Job Openings & Applicants** | CP-6 … CP-9 | 🔄 **CP-6, CP-7 done** · CP-8–9 remaining |
+| **P1 — Job Openings & Applicants** | CP-6 … CP-9 | ✅ **COMPLETE** |
 | **P2 — Distribution (channels + AI posts)** | CP-10 … CP-12 | ⬜ Not started |
 | **P3 — AI Screening** | CP-13 … CP-14 | ⬜ Not started |
 | **P4 — Assessments** | CP-15 … CP-18 | ⬜ Not started |
 | **P5 — Proctoring & Interviews** | CP-19 … CP-22 | ⬜ Not started |
 | **P6 — Collaboration & Reporting** | CP-23 … CP-25 | ⬜ Not started |
 
-**Current checkpoint:** ✅ Phase 0 (CP-1–5) + **CP-6 (Openings)** + **CP-7 (Applicants)**
-**Environment:** 🟢 Database live · auth/admin proven · openings receive candidates · build clean — **zero blockers**
-**Next up:** CP-8 — Applicant list & profile shell (candidate profile, pipeline board, notes). Then CP-9 (candidate portal).
+**Current checkpoint:** ✅ **Phase 0 + Phase 1 COMPLETE** (CP-1 … CP-9)
+**Environment:** 🟢 Full recruiting loop live: setup → openings → apply → screen → profile → candidate portal · build clean — **zero blockers**
+**Next up:** **Phase 2 — Distribution** (CP-10 channels, CP-11 AI posts, CP-12 publishing). CP-11 needs the Anthropic key. This is the "connect LinkedIn/Indeed + AI-written posts" you asked about.
 
 ### 🖱️ Click it now — demo login
 Run `npm run dev`, open **http://localhost:3000/login**:
@@ -159,6 +159,9 @@ Phase 0 is done. The next recruiting feature gives openings candidates:
 | `npm run db:test:openings` | Job-opening RLS + data-scope — 10 assertions |
 | `npm run db:test:admin` | Admin write-paths + RLS guards — 9 assertions |
 | `npm run db:test:applicants` | Applicant RLS + opening-scope inheritance — 8 assertions |
+| `npm run db:test:notes` | Note visibility scopes (private/team/management) — 9 assertions |
+| `npm run db:test:portal` | Candidate portal invites (one-live, revoke, resolve) — 6 assertions |
+| `npm run demo-portal-link` | Print a ready candidate-portal link for the demo |
 | `npm run db:seed-demo` / `db:seed-team` | Demo workspace + 5 role accounts |
 | `npm run db:check-keys` | Fail if code permission keys ≠ database |
 | `npm run db:purge` | Remove test fixtures (trigger-aware) |
@@ -525,18 +528,71 @@ Fixed by transforming empty → undefined in [env.ts](src/lib/env.ts).
 - **Bulk import** (CSV) — deferred; manual add + public form cover ingestion.
 - **Full candidate profile & pipeline board** — that's **CP-8** (this checkpoint is ingestion + list).
 
-### ⬜ CP-8 — Applicant List & Profile Shell
-- [ ] Applicant list per opening: sort, filter, bulk select
-- [ ] Applicant profile layout with all spec §UC-6 sections stubbed
-- [ ] Stage advancement with permission checks
-- [ ] Immutable timeline / audit of candidate events
+### ✅ CP-8 — Applicant List & Profile Shell  *(complete — awaiting your review)*
+> The §UC-6 "single source of truth per candidate" — where hiring actually gets managed.
+> Makes the applicants CP-7 collects *actionable*.
 
-### ⬜ CP-9 — Candidate Portal & Invitations
-- [ ] "Connect with applicant" → creates profile, issues signed expiring link
-- [ ] Candidate portal: profile completion, document upload, status view
-- [ ] Email dispatch with templates
-- [ ] Link expiry / reissue flow
-- [ ] Withdraw flow
+- [x] **Candidate profile** at [/candidates/[id]](<src/app/(app)/candidates/[id]/page.tsx>) — the full §UC-6 layout: header, contact/links/skills, applications, documents, notes, timeline
+- [x] **Candidates list** at [/candidates](<src/app/(app)/candidates/page.tsx>) — fills the previously-stub nav item; search by name/email, latest stage per candidate
+- [x] **Pipeline stage management** — inline stage selector on the profile *and* per-opening list; gated on `pipeline.advance` / `pipeline.reject`; audited
+- [x] **Notes** ([migration 0014](supabase/migrations/0014_candidate_notes.sql)) with **three visibility scopes** — Private / Team / Management — enforced in RLS, add + delete-own
+- [x] **Immutable timeline** — applied events + stage-change audit + notes, merged and time-ordered (read-only, from the append-only log)
+- [x] **CV download** via short-lived (5-min) signed Storage URLs, permission-gated
+- [x] **Field-gated everywhere** — contact details and documents hidden unless the viewer holds the field permission ("hidden from your role" messaging)
+- [x] Per-opening applicant rows now link through to the profile
+- [x] Sample notes (team + management) seeded on the demo's top candidate
+
+**Review focus:** open a candidate, move them through stages, add notes at different visibilities.
+Sign in as `recruiter@hirelane.app` — they see team notes but **not** management/private ones.
+
+**Verification evidence:**
+| Check | Result |
+|-------|--------|
+| `npm run typecheck` / `lint` / `build` | ✅ clean — 28 routes |
+| `npm run db:test:notes` — **new** visibility suite | ✅ **9/9** |
+| ↳ author sees own · recruiter sees team-not-management-not-private · owner sees all · can't edit others' · cross-tenant | ✅ |
+| Full regression (isolation/openings/applicants/admin) | ✅ 26+10+8+9 |
+| Candidate routes gate unauthenticated → login | ✅ |
+
+**Deliberately deferred (noted):**
+- **@mentions + notifications** — notes carry visibility now; @mention routing joins the
+  notification work later.
+- **Structured scorecards / ratings** (spec §UC-6 Ratings) — land with interviews (CP-22/23).
+- **Bulk select on the list** — single-candidate actions cover the flow; bulk is a later nicety.
+- **Match report / assessments / interviews sections** are visibly stubbed on the profile,
+  filled by CP-13 / CP-15+ / CP-22.
+
+### ✅ CP-9 — Candidate Portal & Invitations  *(complete — awaiting your review)* — **finishes Phase 1**
+> The candidate-facing side. Candidates aren't auth users — access is by a signed, expiring,
+> hashed-token link (magic-link style), validated through the admin path.
+
+- [x] **"Connect with applicant"** → issues a signed expiring portal link ([migration 0015](supabase/migrations/0015_candidate_portal.sql)); only the SHA-256 hash is stored; **one live link per candidate** (partial unique index)
+- [x] **Candidate portal** at [/candidate/[token]](<src/app/candidate/[token]/page.tsx>) — status of each application (candidate-friendly labels), profile completion, CV upload, all unauthenticated
+- [x] Candidate **self-service actions** — update profile, upload CV, **withdraw** — every one re-validates the token and touches only that candidate (spec §UC-3 A4)
+- [x] **Link expiry / reissue / revoke** — reissue revokes the old link; invalid/expired/revoked links show a friendly wall
+- [x] **Invite management on the profile** ([portal-invite-card](<src/app/(app)/candidates/[id]/portal-invite-card.tsx>)) — create / reissue / revoke, URL shown once for copying; gated on `applicants.send_invitation`; audited
+- [x] Shared opaque-token helper ([token.ts](src/lib/token.ts)) — random token, store hash only
+
+**Review focus:** open a candidate → **Create portal link** → copy it → open in a new tab (no login)
+→ see their status, edit details, upload a CV, withdraw. `npm run demo-portal-link` prints a
+ready link for the top demo candidate.
+
+**Verification evidence:**
+| Check | Result |
+|-------|--------|
+| `npm run typecheck` / `lint` / `build` | ✅ clean — 29 routes |
+| `npm run db:test:portal` — **new** invite suite | ✅ **6/6** |
+| ↳ one-live-per-candidate · revoke frees slot · token-hash resolve · revoked stops resolving · cross-tenant | ✅ |
+| Full regression (isolation/applicants/notes/admin) | ✅ 26+8+9+9 |
+| Portal renders with a real token; invalid token → friendly wall | ✅ 200 |
+
+**⚠️ Deferred — automated email delivery of the portal link (GL-1).** The link is generated and
+copied by HR for now. Sending it automatically needs the email integration (a direct Resend API
+call for transactional mail — the current Resend SMTP config only covers Supabase *auth* emails,
+and candidates aren't auth users). Logged under go-live GL-1.
+
+**Also deferred:** email *templates* (join the email work), and "connect" auto-advancing the
+stage (kept as an explicit HR action).
 
 ---
 
@@ -732,6 +788,8 @@ Fixed by transforming empty → undefined in [env.ts](src/lib/env.ts).
 | Date | Checkpoint | Summary |
 |------|-----------|---------|
 | 2026-07-22 | — | Checklist created; stack and cadence agreed |
+| 2026-07-24 | CP-9 | Candidate portal — **Phase 1 complete.** Signed expiring hashed-token links (migration 0015, one-live-per-candidate), public portal (/candidate/[token]) with status + profile completion + CV upload + withdraw, invite management on profile (create/reissue/revoke, audited). New `db:test:portal` **6/6**. `demo-portal-link` script. 29 routes. Email delivery deferred to GL-1. |
+| 2026-07-24 | CP-8 | Candidate profile & pipeline — §UC-6 profile (contact/skills/apps/docs/notes/timeline), candidates list (fills nav), inline stage management (audited), notes with 3 visibility scopes (migration 0014), immutable timeline, CV signed-URL download, field-gated. New `db:test:notes` **9/9**. 28 routes. |
 | 2026-07-24 | CP-7 | Applicants — public apply form (`/apply/[id]`, first anon surface), CV upload to Storage, dedup by (org,email), applicant list per opening, manual add, copy-apply-link. Migration 0013 + storage bucket. New `db:test:applicants` **8/8** (app scope inherits opening). Fixed `ANTHROPIC_API_KEY` empty-string env bug that broke all admin-client paths. 26 routes. |
 | 2026-07-24 | UI fix | **Real layout bug fixed** (was misdiagnosed as hot-reload): `PageBody` applied the page's `className` to an outer wrapper, not the div directly containing children — so every page's `space-y-*` (list gaps) and the detail page's `grid lg:grid-cols-3` silently no-op'd. Symptoms: dashboard/list cards touching ("overlapping"), detail cards crammed into a 1/3-width left column. One-line fix in [app-shell.tsx](src/components/layout/app-shell.tsx) corrected every page. |
 | 2026-07-24 | CP-5 | Admin Portal — **Phase 0 complete.** Permission editor (87-key grid, scopes, risk flags), custom roles (create/clone/rename/delete/restore), per-user overrides with expiry, member role control, audit-log viewer. New `db:test:admin` write-path suite **9/9**. Migration 0012 silences provisioning audit noise (190→1). Fixed replica-mode teardown orphaning bug in dev scripts. 25 routes. |

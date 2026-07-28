@@ -50,6 +50,7 @@ export type ApplicationStage =
   | "on_hold"
   | "withdrawn";
 export type DocumentKind = "cv" | "portfolio" | "cover_letter" | "other";
+export type NoteVisibility = "private" | "team" | "management";
 
 type Timestamps = {
   created_at: string;
@@ -280,6 +281,28 @@ export type DocumentRow = {
   created_at: string;
 };
 
+export type CandidateNote = Timestamps & {
+  id: string;
+  organization_id: string;
+  candidate_id: string;
+  application_id: string | null;
+  author_membership_id: string | null;
+  body: string;
+  visibility: NoteVisibility;
+  edited_at: string | null;
+};
+
+export type CandidatePortalInvite = Timestamps & {
+  id: string;
+  organization_id: string;
+  candidate_id: string;
+  token_hash: string;
+  expires_at: string;
+  revoked_at: string | null;
+  last_accessed_at: string | null;
+  created_by: string | null;
+};
+
 /** Insert helper: server-defaulted columns are optional. */
 type Insertable<T, TRequired extends keyof T> = Pick<T, TRequired> &
   Partial<Omit<T, TRequired>>;
@@ -418,6 +441,20 @@ export type Database = {
           Rel<"candidate_id", "candidates">,
           Rel<"application_id", "applications">,
         ]
+      >;
+      candidate_notes: Table<
+        CandidateNote,
+        "organization_id" | "candidate_id" | "body",
+        [
+          Rel<"organization_id", "organizations">,
+          Rel<"candidate_id", "candidates">,
+          Rel<"author_membership_id", "memberships">,
+        ]
+      >;
+      candidate_portal_invites: Table<
+        CandidatePortalInvite,
+        "organization_id" | "candidate_id" | "token_hash" | "expires_at",
+        [Rel<"organization_id", "organizations">, Rel<"candidate_id", "candidates">]
       >;
     };
     Views: Record<string, never>;

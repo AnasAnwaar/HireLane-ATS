@@ -264,12 +264,13 @@ async function main() {
   if (firstOpening) {
     console.log("Seeding sample applicants…");
     const APPLICANTS = [
-      { full_name: "Ayesha Khan", email: "ayesha.khan@example.com", headline: "Senior React Engineer", location: "Lahore", years_experience: 6, stage: "interview_scheduled", source: "linkedin" },
+      { full_name: "Ayesha Khan", email: "ayesha.khan@example.com", headline: "Senior React Engineer", location: "Lahore", years_experience: 6, stage: "interview_scheduled", source: "linkedin", skills: ["React", "TypeScript", "Next.js", "GraphQL", "Testing"] },
       { full_name: "Bilal Ahmed", email: "bilal.ahmed@example.com", headline: "Frontend Developer", location: "Karachi", years_experience: 5, stage: "test_completed", source: "indeed" },
       { full_name: "Hina Raza", email: "hina.raza@example.com", headline: "React Developer", location: "Remote", years_experience: 4, stage: "shortlisted", source: "rozee.pk" },
       { full_name: "Usman Tariq", email: "usman.tariq@example.com", headline: "Full-stack Engineer", location: "Islamabad", years_experience: 7, stage: "screened", source: "careers-page" },
       { full_name: "Sara Malik", email: "sara.malik@example.com", headline: "Junior Frontend Dev", location: "Lahore", years_experience: 2, stage: "applied", source: "linkedin" },
     ];
+    let firstCandidateId = null;
     for (const a of APPLICANTS) {
       const { data: cand } = await supabase
         .from("candidates")
@@ -280,10 +281,12 @@ async function main() {
           headline: a.headline,
           location: a.location,
           years_experience: a.years_experience,
+          skills: a.skills ?? [],
         })
         .select("id")
         .single();
       if (cand) {
+        firstCandidateId ??= cand.id;
         await supabase.from("applications").insert({
           organization_id: orgId,
           candidate_id: cand.id,
@@ -294,6 +297,34 @@ async function main() {
       }
     }
     console.log(`  ✓ ${APPLICANTS.length} applicants on the first opening`);
+
+    // A couple of sample notes at different visibilities on the top candidate,
+    // authored by the owner.
+    if (firstCandidateId) {
+      const { data: ownerMem } = await supabase
+        .from("memberships")
+        .select("id")
+        .eq("organization_id", orgId)
+        .maybeSingle();
+      if (ownerMem) {
+        await supabase.from("candidate_notes").insert([
+          {
+            organization_id: orgId,
+            candidate_id: firstCandidateId,
+            author_membership_id: ownerMem.id,
+            visibility: "team",
+            body: "Strong portfolio — clean component architecture. Worth fast-tracking to a technical round.",
+          },
+          {
+            organization_id: orgId,
+            candidate_id: firstCandidateId,
+            author_membership_id: ownerMem.id,
+            visibility: "management",
+            body: "Salary expectation is at the top of our band; flag for sign-off if we proceed to offer.",
+          },
+        ]);
+      }
+    }
   }
 
   console.log("\n────────────────────────────────────────");
