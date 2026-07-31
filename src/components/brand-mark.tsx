@@ -1,12 +1,12 @@
+import { AnimatedLogo } from "@/components/animated-logo";
 import { cn } from "@/lib/utils";
 
 /**
- * Hirelane wordmark + logo.
+ * Hirelane wordmark + logo lockup.
  *
- * The mark is a stylised funnel — the pipeline narrowing from applicants to a
- * hire — set in brand red, with the palette's khaki band running beneath it.
- *
- * `onDark` swaps the lockup for placement on the black sidebar.
+ * The mark is the animated 3D funnel (see AnimatedLogo) — the pipeline narrowing
+ * from applicants to a hire. Used on every surface, so the logo is consistent
+ * everywhere. `onDark` only affects the wordmark colour.
  */
 export function BrandMark({
   className,
@@ -19,20 +19,7 @@ export function BrandMark({
 }) {
   return (
     <span className={cn("flex items-center gap-2.5", className)}>
-      <span className="relative flex size-9 items-center justify-center overflow-hidden rounded-[0.65rem] bg-primary shadow-card">
-        <svg viewBox="0 0 24 24" className="size-5" aria-hidden>
-          <path
-            d="M4 5h16L14.5 12v6.4L9.5 21v-9L4 5Z"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.9"
-            strokeLinejoin="round"
-            className="text-primary-foreground"
-          />
-        </svg>
-        {/* Khaki band, echoing the brand swatch. */}
-        <span aria-hidden className="absolute inset-x-0 bottom-0 h-[3px] bg-sand" />
-      </span>
+      <AnimatedLogo size={36} />
 
       {showWordmark && (
         <span className="flex flex-col leading-none">

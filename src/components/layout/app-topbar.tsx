@@ -3,7 +3,6 @@
 import { Bell, LogOut, Menu, Search, Settings, ShieldCheck, User } from "lucide-react";
 import Link from "next/link";
 
-import { ThemeToggle } from "@/components/theme-toggle";
 import { Avatar } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -61,8 +60,6 @@ export function AppTopbar({
           <Bell className="size-4" />
           <span className="absolute right-2 top-2 size-2 rounded-full bg-primary ring-2 ring-card" />
         </Button>
-
-        <ThemeToggle />
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>

@@ -23,6 +23,19 @@ const eslintConfig = defineConfig([
       "@typescript-eslint/no-require-imports": "off",
     },
   },
+  {
+    // Three.js / React Three Fiber components. R3F animates GPU buffers
+    // imperatively (mutating typed arrays every frame, seeding with random
+    // values, mount-gating the WebGL canvas) — patterns the React Compiler
+    // purity/immutability rules can't model. Relaxed only for this directory.
+    files: ["src/components/landing/**/*.tsx"],
+    rules: {
+      "react-hooks/purity": "off",
+      "react-hooks/immutability": "off",
+      "react-hooks/set-state-in-effect": "off",
+      "react-hooks/refs": "off",
+    },
+  },
 ]);
 
 export default eslintConfig;
