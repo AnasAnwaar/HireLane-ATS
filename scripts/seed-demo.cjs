@@ -327,6 +327,17 @@ async function main() {
     }
   }
 
+  // Connect a few channels so Integrations shows a realistic state.
+  console.log("Connecting sample channels…");
+  await supabase.from("channel_connections").insert(
+    ["careers_page", "linkedin", "indeed", "rozee"].map((channel_key) => ({
+      organization_id: orgId,
+      channel_key,
+      mode: "assisted",
+      status: "connected",
+    })),
+  );
+
   console.log("\n────────────────────────────────────────");
   console.log("Demo account ready. Log in at http://localhost:3000/login");
   console.log(`  Email:    ${DEMO_EMAIL}`);

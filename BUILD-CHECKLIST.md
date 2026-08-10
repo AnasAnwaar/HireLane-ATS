@@ -27,15 +27,15 @@
 |-------|-------------|--------|
 | **P0 — Tenancy, Auth & Admin** | CP-1 … CP-5 | ✅ **COMPLETE** |
 | **P1 — Job Openings & Applicants** | CP-6 … CP-9 | ✅ **COMPLETE** |
-| **P2 — Distribution (channels + AI posts)** | CP-10 … CP-12 | ⬜ Not started |
+| **P2 — Distribution (channels + AI posts)** | CP-10 … CP-12 | ✅ **COMPLETE** |
 | **P3 — AI Screening** | CP-13 … CP-14 | ⬜ Not started |
 | **P4 — Assessments** | CP-15 … CP-18 | ⬜ Not started |
 | **P5 — Proctoring & Interviews** | CP-19 … CP-22 | ⬜ Not started |
 | **P6 — Collaboration & Reporting** | CP-23 … CP-25 | ⬜ Not started |
 
-**Current checkpoint:** ✅ **Phase 0 + Phase 1 COMPLETE** (CP-1 … CP-9)
-**Environment:** 🟢 Full recruiting loop live: setup → openings → apply → screen → profile → candidate portal · build clean — **zero blockers**
-**Next up:** **Phase 2 — Distribution** (CP-10 channels, CP-11 AI posts, CP-12 publishing). CP-11 needs the Anthropic key. This is the "connect LinkedIn/Indeed + AI-written posts" you asked about.
+**Current checkpoint:** ✅ **Phases 0, 1 & 2 COMPLETE** (CP-1 … CP-12)
+**Environment:** 🟢 Full loop live: setup → openings → apply → screen → profile → candidate portal → channels → AI posts → **publish/schedule** · build clean — **zero blockers**
+**Next up:** **Phase 3 — AI Screening** (CP-13 screening agent, CP-14 match reports & ranking). Uses the Gemini key already configured.
 
 ### 🖱️ Click it now — demo login
 Run `npm run dev`, open **http://localhost:3000/login**:
@@ -599,25 +599,71 @@ stage (kept as an explicit HR action).
 ## Phase 2 — Distribution
 > *Maps to UC-1 and the publishing half of UC-2.*
 
-### ⬜ CP-10 — Channel Integration Framework
-- [ ] Schema: `channels`, `channel_connections`, `job_postings`
-- [ ] Adapter interface per platform (capabilities, limits, taxonomy)
-- [ ] OAuth connect/disconnect/re-authorise, encrypted token vault
-- [ ] Assisted mode for API-less boards (copy-to-clipboard + mark posted)
-- [ ] Connection health monitoring and expiry banners
+### ✅ CP-10 — Channel Integration Framework  *(complete — awaiting your review)* — **starts Phase 2**
+- [x] Schema [0016](supabase/migrations/0016_channels.sql): `channels` (global catalogue), `channel_connections`, `job_postings` shell + 3 enums + RLS
+- [x] **8 channels seeded** — Careers Page, LinkedIn, Indeed, Rozee.pk, Glassdoor, Bayt, Facebook Jobs, X — with per-channel **capability hints** (title/body limits, media) for AI generation (CP-11)
+- [x] **Assisted mode** connect/disconnect (spec §UC-1 A1) — works fully now without any API partnership
+- [x] Integrations page at [/admin/integrations](<src/app/(app)/admin/integrations/page.tsx>) — was a stub, now real: channel grid, status, connect/reconnect/disconnect, permission-gated
+- [x] **Connection health banner** — expired connections flagged with a re-authorise prompt
+- [x] `integrations.view` / `.connect` / `.disconnect` permission-gated throughout; connect/disconnect audited
+- [x] `job_postings` table ready for CP-11 (AI content) / CP-12 (publishing)
+- [x] 4 channels connected in the demo workspace
 
-### ⬜ CP-11 — AI Post Generation
-- [ ] Claude integration for per-channel post variants
-- [ ] SEO scoring and improvement hints
-- [ ] Side-by-side variant editor with inline edit + regenerate
-- [ ] Guardrail: generated content constrained to the canonical requisition
+**Review focus:** open **Integrations** in the sidebar — connect/disconnect boards, see status.
 
-### ⬜ CP-12 — Publishing
-- [ ] One-click multi-channel publish with per-channel status
-- [ ] Scheduled posting
-- [ ] Partial-failure handling and per-channel retry
-- [ ] Edit-after-publish and takedown on close
-- [ ] Source attribution tracking end-to-end
+**Verification evidence:**
+| Check | Result |
+|-------|--------|
+| `npm run typecheck` / `lint` / `build` | ✅ clean — 30 routes |
+| `npm run db:test:channels` — **new** | ✅ **6/6** (global catalogue, org-scoped connections, permission-gated, isolation) |
+| Full regression (isolation/openings/applicants/notes/portal/admin) | ✅ all green |
+
+**Deliberately deferred (spec-anticipated, go-live):**
+- **Real OAuth + encrypted token vault** — direct API posting to LinkedIn/Indeed needs partner
+  approval (a business process). The `*_cipher` columns and `oauth` mode are in place; the flow
+  slots in per platform at go-live. **Everything works in assisted mode meanwhile.**
+- **Multiple accounts per platform** (spec §UC-1 A3) — one connection per channel per org for now.
+- **Capability probe on connect** — capabilities are seeded statically rather than fetched live.
+
+### ✅ CP-11 — AI Post Generation  *(complete — awaiting your review)*
+> The "AI writes the post, you publish it" feature. **First live AI in the product** — and it
+> genuinely works: validated with a real Gemini call producing a real post.
+
+- [x] **Gemini (Google) integration** — [gemini.ts](src/server/ai/gemini.ts) client using `gemini-flash-latest`, structured-JSON output (responseSchema), graceful error mapping (rate-limit / bad-key / parse). Switched from Anthropic per your key.
+- [x] **Per-channel post variants** — one tuned post per *connected* channel, respecting each channel's title/body length limits (from CP-10's capability hints)
+- [x] **SEO score + improvement hints + hashtags** returned per post, shown with a colour-graded badge
+- [x] **Editor** ([posts](<src/app/(app)/openings/[id]/posts/page.tsx>)) — per-channel cards with editable title/body (live char counts), **regenerate**, **copy**, save-edits; a **Generate all** button does every connected channel
+- [x] **Guardrail (spec §UC-2 R4)** — the prompt hard-constrains the model to the canonical requisition: "do NOT invent skills, requirements or facts; only rephrase, format and SEO-optimise." Output also length-clamped server-side as a safety net.
+- [x] Reachable via **AI posts** button on the opening; degrades gracefully if no key / no channels connected
+- [x] Permission-gated: `post_generation.generate` / `.edit`
+
+**Review focus:** open the demo's **Senior React Developer** → **AI posts** → **Generate all** →
+watch tuned LinkedIn/Indeed/Rozee/Careers posts appear; edit and regenerate them.
+
+**Verification evidence:**
+| Check | Result |
+|-------|--------|
+| `npm run typecheck` / `lint` / `build` | ✅ clean — 31 routes |
+| `npm run test:gemini` — live key smoke test | ✅ **key + model working** |
+| Real end-to-end generation against a demo opening | ✅ post in ~7s (title, SEO 88, body, hints, hashtags), stayed on-facts |
+
+**Notes:**
+- **Model:** `gemini-flash-latest` (stable alias). The versioned names like `gemini-2.5-flash` are
+  deprecated for new keys; the `-latest` alias stays current.
+- **Rate limits:** "Generate all" runs sequentially to stay within the free-tier per-minute cap.
+- **Deferred:** live SEO keyword-trend data (score is the model's estimate for now); scheduled
+  regeneration. **Publishing** these posts to the boards is CP-12.
+
+### ✅ CP-12 — Publishing
+- [x] One-click multi-channel publish with per-channel status (**Publish all** + per-card Publish/Retry; `posting_status` state machine: draft → scheduled → published → closed, with `failed` off-ramp)
+- [x] Scheduled posting (per-channel schedule modal; `publishDuePostsAction` stand-in scheduler flips due posts live on page load — a real cron runs the same logic at go-live)
+- [x] Partial-failure handling and per-channel retry (`publishAllPostsAction` reports "published N, couldn't publish M (…)"; failed cards show the reason + **Retry**; disconnected/expired channels fail with an actionable message)
+- [x] Edit-after-publish and takedown on close (spec §UC-2 A3: editing a live post re-publishes on API channels, warns "update manually" on assisted; closing an opening marks its live/scheduled posts `closed`/unmanaged — never deletes)
+- [x] Source attribution end-to-end (per-channel tagged apply link `…/apply/{id}?src={channel}` → `applications.source`; verified stored and reportable)
+
+**Assisted-mode publish:** most boards are copy-paste — the Publish button opens a modal to copy the post, paste it on the board, and mark it posted (optionally with the live URL). API channels (careers_page) publish directly. Same action, drop-in OAuth branch per platform at go-live.
+
+**Verification:** `node scripts/test-publishing.cjs` → **13/13 pass** (schema, publish transition + attribution of `published_by`, schedule + due-sweep, takedown-on-close, RLS write gate, cross-org isolation, source attribution). Typecheck + lint + production build (31 routes) all clean.
 
 ---
 
@@ -776,7 +822,7 @@ stage (kept as an explicit HR action).
 | O11 | ~~**Rotate the password**~~ — **DONE 2026-07-23.** 16-char alphanumeric, set directly in `.env.local`, never sent through chat. Connection and full test suite re-verified. | ✅ Closed |
 | O6 | ~~**Apply + test the schema**~~ — **DONE 2026-07-23.** 10 migrations applied to `jertgmxuinzvvqrnhhub`; `npm run db:test` → 26 passed, 0 failed. | ✅ Closed |
 | O10 | ~~**Approval to apply migrations**~~ — database verified empty first (`P4001`), so there was nothing to lose. Applied. | ✅ Closed |
-| O2 | **Anthropic API key** — needed from CP-11 onward for AI post generation, screening and test creation. Not blocking until then. *(Your note: handle at go-live.)* | ⏸️ Needed by CP-11 |
+| O2 | **Gemini (Google) API key** — provided 2026-07-24 for CP-11 AI features (post generation, screening, tests). ⚠️ Value starts `AQ.` not the usual `AIza…` — verify it's a real AI Studio API key at https://aistudio.google.com/apikey before CP-11 relies on it. Now in `.env.local` as `GEMINI_API_KEY`. | ⏸️ Verify format before CP-11 |
 | O3 | **Spec §12 Q9** — sign-off on the four non-configurable guardrails (consent, append-only audit, Owner lockout, tenant isolation). | ⏸️ Awaiting decision |
 | O4 | **Branding** — brand colours. Currently the "Teal & Ember" palette; every colour is a token in [globals.css](src/app/globals.css), so swapping to your brand is a one-file change. | ⏸️ Optional |
 | O5 | ~~**Product name**~~ — **Resolved:** the product is **Hirelane**. | ✅ Decided |
@@ -790,6 +836,8 @@ stage (kept as an explicit HR action).
 | 2026-07-22 | — | Checklist created; stack and cadence agreed |
 | 2026-07-24 | Landing | Redesigned landing page — cleaner professional layout (split hero, stat strip, bento features, 4-step flow, screening preview, CTA). Added **Three.js hiring-funnel animation** (React Three Fiber): candidate nodes flow down and warm to brand red, converging on a "hire" point — ties to the product + funnel logo. Mount-gated (SSR-safe, page still static-prerendered), reduced-motion aware, mouse parallax. Targeted eslint override for R3F imperative code. |
 | 2026-07-24 | CP-9 | Candidate portal — **Phase 1 complete.** Signed expiring hashed-token links (migration 0015, one-live-per-candidate), public portal (/candidate/[token]) with status + profile completion + CV upload + withdraw, invite management on profile (create/reissue/revoke, audited). New `db:test:portal` **6/6**. `demo-portal-link` script. 29 routes. Email delivery deferred to GL-1. |
+| 2026-07-24 | CP-11 | AI post generation — **first live AI.** Gemini (`gemini-flash-latest`) via `@google/genai`, structured JSON, per-channel tuned posts with SEO score/hints/hashtags, editor (generate-all/regenerate/edit/copy), requisition guardrail. Switched AI provider Anthropic→Gemini + fixed the env var. Validated with a real generation (post in ~7s). 31 routes. |
+| 2026-07-24 | CP-10 | Channel framework — 8-channel catalogue, connections (assisted mode), integrations page (was a 404), job_postings shell, `db:test:channels` 6/6. Real OAuth deferred to go-live. |
 | 2026-07-24 | CP-8 | Candidate profile & pipeline — §UC-6 profile (contact/skills/apps/docs/notes/timeline), candidates list (fills nav), inline stage management (audited), notes with 3 visibility scopes (migration 0014), immutable timeline, CV signed-URL download, field-gated. New `db:test:notes` **9/9**. 28 routes. |
 | 2026-07-24 | CP-7 | Applicants — public apply form (`/apply/[id]`, first anon surface), CV upload to Storage, dedup by (org,email), applicant list per opening, manual add, copy-apply-link. Migration 0013 + storage bucket. New `db:test:applicants` **8/8** (app scope inherits opening). Fixed `ANTHROPIC_API_KEY` empty-string env bug that broke all admin-client paths. 26 routes. |
 | 2026-07-24 | UI fix | **Real layout bug fixed** (was misdiagnosed as hot-reload): `PageBody` applied the page's `className` to an outer wrapper, not the div directly containing children — so every page's `space-y-*` (list gaps) and the detail page's `grid lg:grid-cols-3` silently no-op'd. Symptoms: dashboard/list cards touching ("overlapping"), detail cards crammed into a 1/3-width left column. One-line fix in [app-shell.tsx](src/components/layout/app-shell.tsx) corrected every page. |

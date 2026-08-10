@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
 import { Toaster } from "sonner";
 
+import { ConfirmProvider } from "@/components/ui/confirm-dialog";
+
 import "./globals.css";
 
 const sans = Inter({ variable: "--font-sans", subsets: ["latin"] });
@@ -23,7 +25,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${sans.variable} ${mono.variable}`}>
       <body className="min-h-dvh">
-        {children}
+        <ConfirmProvider>{children}</ConfirmProvider>
         <Toaster richColors closeButton position="top-right" />
       </body>
     </html>

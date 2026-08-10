@@ -7,6 +7,7 @@ import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useConfirm } from "@/components/ui/confirm-dialog";
 import { formatDate } from "@/lib/utils";
 import {
   issuePortalInviteAction,
@@ -28,6 +29,7 @@ export function PortalInviteCard({
   expiresAt: string | null;
 }) {
   const router = useRouter();
+  const confirm = useConfirm();
   const [pending, setPending] = React.useState(false);
   const [url, setUrl] = React.useState<string | null>(null);
   const [copied, setCopied] = React.useState(false);
@@ -46,7 +48,13 @@ export function PortalInviteCard({
   }
 
   async function revoke() {
-    if (!confirm("Revoke this candidate's portal link? It will stop working immediately.")) return;
+    const ok = await confirm({
+      title: "Revoke portal link?",
+      description: "The candidate's link will stop working immediately. You can issue a new one later.",
+      confirmLabel: "Revoke link",
+      tone: "destructive",
+    });
+    if (!ok) return;
     setPending(true);
     const result = await revokePortalInviteAction(candidateId);
     setPending(false);

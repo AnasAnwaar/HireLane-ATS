@@ -203,7 +203,18 @@ export async function changeOpeningStatusAction(
   const { error } = await supabase.from("job_openings").update(patch).eq("id", openingId);
   if (error) return { ok: false, error: error.message };
 
+  // Takedown on close (spec §UC-2): closing an opening pulls its live and
+  // scheduled posts down — they're marked closed/unmanaged, not deleted.
+  if (status === "closed") {
+    await supabase
+      .from("job_postings")
+      .update({ status: "closed", scheduled_for: null })
+      .eq("job_opening_id", openingId)
+      .in("status", ["published", "scheduled"]);
+  }
+
   revalidatePath(`/openings/${openingId}`);
+  revalidatePath(`/openings/${openingId}/posts`);
   revalidatePath("/openings");
   return { ok: true, message: "Status updated." };
 }

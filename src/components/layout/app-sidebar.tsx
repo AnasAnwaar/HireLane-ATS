@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 import { BrandMark } from "@/components/brand-mark";
+import { SignOutButton } from "@/components/layout/sign-out-button";
 import { usePermissions } from "@/components/permissions/permission-provider";
 import { Button } from "@/components/ui/button";
 import { NAV_SECTIONS } from "@/lib/navigation";
@@ -15,7 +16,24 @@ function isActive(pathname: string, href: string) {
   return pathname === href || pathname.startsWith(`${href}/`);
 }
 
-export function AppSidebar({ className }: { className?: string }) {
+function initialsOf(name: string): string {
+  const letters = name
+    .replace(/[^A-Za-z0-9 ]/g, "")
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((w) => w[0]!.toUpperCase())
+    .join("");
+  return letters || "•";
+}
+
+export function AppSidebar({
+  className,
+  organization,
+}: {
+  className?: string;
+  organization: string;
+}) {
   const pathname = usePathname();
   const perms = usePermissions();
 
@@ -103,22 +121,27 @@ export function AppSidebar({ className }: { className?: string }) {
         ))}
       </nav>
 
-      <div className="border-t border-sidebar-border p-3">
+      <div className="space-y-1 border-t border-sidebar-border p-3">
         <Link
           href="/admin/company"
           className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors hover:bg-sidebar-accent/50"
         >
-          <span className="flex size-8 items-center justify-center rounded-lg bg-sand text-xs font-bold text-sand-foreground">
-            AT
+          <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-sand text-xs font-bold text-sand-foreground">
+            {initialsOf(organization)}
           </span>
           <span className="min-w-0 flex-1">
-            <span className="block truncate text-sm font-medium">Acme Tech</span>
-            <span className="block truncate text-xs text-sidebar-muted">
-              Free plan · 6 seats
+            <span className="block truncate text-sm font-medium text-sidebar-foreground">
+              {organization}
             </span>
+            <span className="block truncate text-xs text-sidebar-muted">Free plan</span>
           </span>
           <ChevronRight className="size-4 shrink-0 text-sidebar-muted" />
         </Link>
+
+        <SignOutButton
+          label="Sign out"
+          className="flex w-full cursor-pointer items-center gap-3 rounded-lg px-3 py-2 text-sm text-sidebar-muted transition-colors hover:bg-sidebar-accent/50 hover:text-sidebar-foreground disabled:opacity-60"
+        />
       </div>
     </aside>
   );

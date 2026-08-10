@@ -7,6 +7,7 @@ import { toast } from "sonner";
 
 import { Alert } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
+import { useConfirm } from "@/components/ui/confirm-dialog";
 import { Field } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import {
@@ -36,6 +37,7 @@ export function PortalClient({
   canWithdraw: boolean;
 }) {
   const router = useRouter();
+  const confirm = useConfirm();
   const [savingProfile, setSavingProfile] = React.useState(false);
   const [uploading, setUploading] = React.useState(false);
   const [fileName, setFileName] = React.useState<string | null>(null);
@@ -68,7 +70,13 @@ export function PortalClient({
   }
 
   async function withdraw() {
-    if (!confirm("Withdraw your application? This can't be undone.")) return;
+    const ok = await confirm({
+      title: "Withdraw your application?",
+      description: "This can't be undone. The employer will no longer consider you for this role.",
+      confirmLabel: "Withdraw",
+      tone: "destructive",
+    });
+    if (!ok) return;
     const result = await withdrawAction(token);
     if (result.ok) {
       toast.success(result.message ?? "Withdrawn.");

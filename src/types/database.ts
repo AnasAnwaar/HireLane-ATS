@@ -51,6 +51,9 @@ export type ApplicationStage =
   | "withdrawn";
 export type DocumentKind = "cv" | "portfolio" | "cover_letter" | "other";
 export type NoteVisibility = "private" | "team" | "management";
+export type ConnectionMode = "assisted" | "oauth";
+export type ConnectionStatus = "connected" | "expired" | "disconnected";
+export type PostingStatus = "draft" | "scheduled" | "published" | "failed" | "closed";
 
 type Timestamps = {
   created_at: string;
@@ -303,6 +306,52 @@ export type CandidatePortalInvite = Timestamps & {
   created_by: string | null;
 };
 
+export type Channel = {
+  key: string;
+  name: string;
+  category: string;
+  supports_api: boolean;
+  max_title_length: number | null;
+  max_body_length: number | null;
+  supports_media: boolean;
+  brand_color: string | null;
+  website: string | null;
+  sort_order: number;
+};
+
+export type ChannelConnection = Timestamps & {
+  id: string;
+  organization_id: string;
+  channel_key: string;
+  mode: ConnectionMode;
+  status: ConnectionStatus;
+  display_name: string | null;
+  access_token_cipher: string | null;
+  refresh_token_cipher: string | null;
+  token_expires_at: string | null;
+  connected_by: string | null;
+  connected_at: string;
+  disconnected_at: string | null;
+};
+
+export type JobPosting = Timestamps & {
+  id: string;
+  organization_id: string;
+  job_opening_id: string;
+  channel_key: string;
+  title: string | null;
+  body: string | null;
+  seo_score: number | null;
+  status: PostingStatus;
+  external_url: string | null;
+  external_id: string | null;
+  scheduled_for: string | null;
+  published_at: string | null;
+  error: string | null;
+  created_by: string | null;
+  published_by: string | null;
+};
+
 /** Insert helper: server-defaulted columns are optional. */
 type Insertable<T, TRequired extends keyof T> = Pick<T, TRequired> &
   Partial<Omit<T, TRequired>>;
@@ -455,6 +504,21 @@ export type Database = {
         CandidatePortalInvite,
         "organization_id" | "candidate_id" | "token_hash" | "expires_at",
         [Rel<"organization_id", "organizations">, Rel<"candidate_id", "candidates">]
+      >;
+      channels: Table<Channel, "key" | "name" | "category">;
+      channel_connections: Table<
+        ChannelConnection,
+        "organization_id" | "channel_key",
+        [Rel<"organization_id", "organizations">, Rel<"channel_key", "channels">]
+      >;
+      job_postings: Table<
+        JobPosting,
+        "organization_id" | "job_opening_id" | "channel_key",
+        [
+          Rel<"organization_id", "organizations">,
+          Rel<"job_opening_id", "job_openings">,
+          Rel<"channel_key", "channels">,
+        ]
       >;
     };
     Views: Record<string, never>;

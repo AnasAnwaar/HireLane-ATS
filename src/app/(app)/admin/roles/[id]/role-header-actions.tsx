@@ -6,6 +6,13 @@ import * as React from "react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
+import { useConfirm } from "@/components/ui/confirm-dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Field } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import {
@@ -33,6 +40,7 @@ export function RoleHeaderActions({
   isSystem: boolean;
 }) {
   const router = useRouter();
+  const confirm = useConfirm();
   const [editing, setEditing] = React.useState(false);
   const [pending, setPending] = React.useState(false);
 
@@ -50,7 +58,13 @@ export function RoleHeaderActions({
   }
 
   async function restore() {
-    if (!confirm("Reset this role to its preset defaults? Current changes will be lost.")) return;
+    const ok = await confirm({
+      title: "Reset this role to defaults?",
+      description: "Current changes to this role's permissions will be lost.",
+      confirmLabel: "Reset role",
+      tone: "destructive",
+    });
+    if (!ok) return;
     const result = await restoreRoleDefaultsAction(roleId);
     if (result.ok) {
       toast.success(result.message ?? "Reset.");
@@ -61,7 +75,13 @@ export function RoleHeaderActions({
   }
 
   async function remove() {
-    if (!confirm("Delete this role? Members must be reassigned first.")) return;
+    const ok = await confirm({
+      title: "Delete this role?",
+      description: "Members must be reassigned to another role first. This can't be undone.",
+      confirmLabel: "Delete role",
+      tone: "destructive",
+    });
+    if (!ok) return;
     const result = await deleteRoleAction(roleId);
     if (result.ok) {
       toast.success("Role deleted.");
@@ -95,30 +115,29 @@ export function RoleHeaderActions({
         </DropdownMenuContent>
       </DropdownMenu>
 
-      {editing && (
-        <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/40 p-4 pt-24">
-          <button className="absolute inset-0" aria-label="Close" onClick={() => setEditing(false)} />
-          <div className="relative z-10 w-full max-w-md rounded-xl border border-border bg-card p-5 shadow-card-lg">
-            <h2 className="font-semibold">Rename role</h2>
-            <form action={rename} className="mt-4 space-y-4" noValidate>
-              <Field id="name" label="Role name" required>
-                <Input name="name" defaultValue={name} required autoFocus />
-              </Field>
-              <Field id="description" label="Description">
-                <Input name="description" defaultValue={description} />
-              </Field>
-              <div className="flex justify-end gap-2">
-                <Button type="button" variant="ghost" onClick={() => setEditing(false)}>
-                  Cancel
-                </Button>
-                <Button type="submit" disabled={pending}>
-                  Save
-                </Button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+      <Dialog open={editing} onOpenChange={setEditing}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Rename role</DialogTitle>
+          </DialogHeader>
+          <form action={rename} className="space-y-4" noValidate>
+            <Field id="name" label="Role name" required>
+              <Input name="name" defaultValue={name} required autoFocus />
+            </Field>
+            <Field id="description" label="Description">
+              <Input name="description" defaultValue={description} />
+            </Field>
+            <div className="flex justify-end gap-2 pt-1">
+              <Button type="button" variant="outline" onClick={() => setEditing(false)}>
+                Cancel
+              </Button>
+              <Button type="submit" disabled={pending}>
+                Save
+              </Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }

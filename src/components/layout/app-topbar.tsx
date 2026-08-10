@@ -1,8 +1,9 @@
 "use client";
 
-import { Bell, LogOut, Menu, Search, Settings, ShieldCheck, User } from "lucide-react";
+import { Bell, Menu, Search, Settings, ShieldCheck, User } from "lucide-react";
 import Link from "next/link";
 
+import { SignOutButton } from "@/components/layout/sign-out-button";
 import { Avatar } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -13,7 +14,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { signOutAction } from "@/server/auth/actions";
 
 export type TopbarUser = {
   name: string;
@@ -100,14 +100,8 @@ export function AppTopbar({
               </Link>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem asChild>
-              {/* A form, not a link: sign-out mutates state, so it must not be
-                  reachable by GET (a prefetch would sign the user out). */}
-              <form action={signOutAction}>
-                <button type="submit" className="flex w-full items-center gap-2">
-                  <LogOut /> Sign out
-                </button>
-              </form>
+            <DropdownMenuItem asChild className="text-destructive focus:text-destructive">
+              <SignOutButton className="flex w-full cursor-pointer items-center gap-2" />
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

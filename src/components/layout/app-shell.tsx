@@ -17,7 +17,7 @@ export function AppShell({
 
   return (
     <div className="flex h-dvh overflow-hidden">
-      <AppSidebar className="hidden lg:flex" />
+      <AppSidebar className="hidden lg:flex" organization={user.organization} />
 
       {/* Mobile drawer */}
       {mobileNavOpen && (
@@ -27,7 +27,7 @@ export function AppShell({
             aria-label="Close navigation"
             onClick={() => setMobileNavOpen(false)}
           />
-          <AppSidebar className="relative z-10" />
+          <AppSidebar className="relative z-10" organization={user.organization} />
         </div>
       )}
 

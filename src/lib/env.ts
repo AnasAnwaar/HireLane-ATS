@@ -20,13 +20,14 @@ const clientSchema = z.object({
 
 const serverSchema = z.object({
   SUPABASE_SERVICE_ROLE_KEY: z.string().min(1, "is required"),
-  // Optional and not yet used (CP-11). Treat an empty value in .env.local the
-  // same as absent — `.optional()` alone only permits `undefined`, so a present
-  // but empty string would (wrongly) fail a `.min(1)` check.
-  ANTHROPIC_API_KEY: z
+  // Gemini (Google) powers AI post generation, screening and test authoring from
+  // CP-11. Optional until then. An empty value in .env.local is treated as absent
+  // — `.optional()` alone only permits `undefined`, so a present-but-empty string
+  // would (wrongly) fail a `.min(1)` check.
+  GEMINI_API_KEY: z
     .string()
     .optional()
-    .transform((v) => (v ? v : undefined)),
+    .transform((v) => (v ? v.trim() : undefined)),
 });
 
 function parse<T extends z.ZodTypeAny>(schema: T, source: unknown, label: string): z.infer<T> {
@@ -68,7 +69,7 @@ export function serverEnv() {
     serverSchema,
     {
       SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY,
-      ANTHROPIC_API_KEY: process.env.ANTHROPIC_API_KEY,
+      GEMINI_API_KEY: process.env.GEMINI_API_KEY,
     },
     "server",
   );

@@ -4,6 +4,7 @@ import {
   CalendarClock,
   MapPin,
   Pencil,
+  Sparkles,
   Users,
 } from "lucide-react";
 import Link from "next/link";
@@ -61,7 +62,7 @@ export default async function OpeningDetailPage({
 
   if (!opening) notFound();
 
-  const [{ data: requirements }, { data: questions }, { count: applicantCount }, fields, canEdit, canClose, canViewApplicants] =
+  const [{ data: requirements }, { data: questions }, { count: applicantCount }, fields, canEdit, canClose, canViewApplicants, canGeneratePosts] =
     await Promise.all([
       supabase
         .from("job_requirements")
@@ -81,6 +82,7 @@ export default async function OpeningDetailPage({
       can("job_openings.edit"),
       can("job_openings.close"),
       can("applicants.view_list"),
+      can("post_generation.generate"),
     ]);
 
   const meta = STATUS_META[opening.status];
@@ -116,6 +118,13 @@ export default async function OpeningDetailPage({
               canEdit={canEdit}
               canClose={canClose}
             />
+            {canGeneratePosts && (
+              <Button size="sm" variant="outline" asChild>
+                <Link href={`/openings/${opening.id}/posts`}>
+                  <Sparkles /> AI posts
+                </Link>
+              </Button>
+            )}
             {canEdit && (
               <Button size="sm" variant="ghost" asChild>
                 <Link href={`/openings/${opening.id}/edit`}>
