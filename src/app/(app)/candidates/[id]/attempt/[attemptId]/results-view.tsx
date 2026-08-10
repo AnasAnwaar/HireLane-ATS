@@ -195,7 +195,7 @@ function QuestionResultCard({
   async function confirm() {
     if (!r.answerId) return;
     setBusy(r.answerId);
-    const res = await confirmGradeAction(r.answerId, marks, r.marks);
+    const res = await confirmGradeAction(r.answerId, marks);
     setBusy(null);
     if (res.ok) {
       toast.success("Grade confirmed.");

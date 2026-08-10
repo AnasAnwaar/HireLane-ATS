@@ -242,6 +242,9 @@ async function main() {
       );
       await pg.query("delete from public.organizations where name like $1", [`%${stamp}%`]);
       await pg.query("delete from auth.users where email like $1", [`%${stamp}%`]);
+      // replica mode disables the profiles FK cascade, so remove any profile
+      // rows the deleted auth users left behind (prevents orphan accumulation).
+      await pg.query("delete from public.profiles where not exists (select 1 from auth.users u where u.id = profiles.id)");
       await pg.query("commit");
     } catch (cleanupErr) {
       await pg.query("rollback").catch(() => {});

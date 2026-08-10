@@ -95,6 +95,19 @@ export async function startAttemptAction(
   if (assignment.deadline) expires = Math.min(expires, new Date(assignment.deadline).getTime());
   const maxScore = snapshot.questions.reduce((s, q) => s + q.marks, 0);
 
+  // Atomically claim an attempt slot: the compare-and-swap on attempts_used
+  // (only bump when it still equals what we read, and stays under the cap) means
+  // two simultaneous "start" clicks can't both slip past the limit.
+  const { data: claimed } = await admin
+    .from("test_assignments")
+    .update({ status: "in_progress", attempts_used: assignment.attempts_used + 1 })
+    .eq("id", assignmentId)
+    .eq("attempts_used", assignment.attempts_used)
+    .lt("attempts_used", assignment.attempts_allowed)
+    .select("id")
+    .maybeSingle();
+  if (!claimed) return { ok: false, error: "You've used all your attempts." };
+
   const { data: attempt, error } = await admin
     .from("test_attempts")
     .insert({
@@ -112,12 +125,14 @@ export async function startAttemptAction(
     })
     .select("id")
     .single();
-  if (error || !attempt) return { ok: false, error: error?.message ?? "Couldn't start the test." };
-
-  await admin
-    .from("test_assignments")
-    .update({ status: "in_progress", attempts_used: assignment.attempts_used + 1 })
-    .eq("id", assignmentId);
+  if (error || !attempt) {
+    // Roll back the slot we claimed so a failed start doesn't burn an attempt.
+    await admin
+      .from("test_assignments")
+      .update({ attempts_used: assignment.attempts_used })
+      .eq("id", assignmentId);
+    return { ok: false, error: error?.message ?? "Couldn't start the test." };
+  }
 
   return { ok: true, attemptId: attempt.id };
 }

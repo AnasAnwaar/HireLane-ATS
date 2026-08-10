@@ -61,8 +61,12 @@ async function publishOne(
 ): Promise<{ ok: true } | { ok: false; error: string }> {
   const now = new Date().toISOString();
 
-  if (!posting.title?.trim() || !posting.body?.trim()) {
-    const error = `Generate the ${channelName} post before publishing.`;
+  // Guard against empty or trivially-short content reaching a live board.
+  const MIN_BODY = 30;
+  if (!posting.title?.trim() || (posting.body?.trim().length ?? 0) < MIN_BODY) {
+    const error = !posting.title?.trim()
+      ? `Add a headline for the ${channelName} post before publishing.`
+      : `The ${channelName} post is too short to publish — generate or write a fuller post first.`;
     await supabase.from("job_postings").update({ status: "failed", error }).eq("id", posting.id);
     return { ok: false, error };
   }

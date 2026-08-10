@@ -62,16 +62,40 @@ export async function gradeAttemptAction(attemptId: string): Promise<ActionResul
 }
 
 /** Confirm (or amend) one written answer's mark. */
-export async function confirmGradeAction(
-  answerId: string,
-  marks: number,
-  maxMarks: number,
-): Promise<ActionResult> {
+export async function confirmGradeAction(answerId: string, marks: number): Promise<ActionResult> {
   const g = await guard();
   if (!g.ok) return g;
 
-  const awarded = Math.max(0, Math.min(Math.max(0, maxMarks), Math.round(marks)));
   const db = await createClient();
+
+  // Never trust a client-supplied maximum: derive the question's marks from the
+  // pinned version snapshot and clamp to that (spec R3 — the version the
+  // candidate took is authoritative).
+  const { data: ans } = await db
+    .from("test_answers")
+    .select("attempt_id, question_id")
+    .eq("id", answerId)
+    .maybeSingle();
+  if (!ans) return { ok: false, error: "Answer not found." };
+
+  const { data: attempt } = await db
+    .from("test_attempts")
+    .select("test_id, version")
+    .eq("id", ans.attempt_id)
+    .maybeSingle();
+  let maxMarks = 0;
+  if (attempt) {
+    const { data: ver } = await db
+      .from("test_versions")
+      .select("snapshot")
+      .eq("test_id", attempt.test_id)
+      .eq("version", attempt.version)
+      .maybeSingle();
+    const questions = (ver?.snapshot as { questions?: { id: string; marks: number }[] } | undefined)?.questions ?? [];
+    maxMarks = questions.find((q) => q.id === ans.question_id)?.marks ?? 0;
+  }
+
+  const awarded = Math.max(0, Math.min(maxMarks, Math.round(marks)));
   const { data: updated, error } = await db
     .from("test_answers")
     .update({ awarded_marks: awarded, confirmed: true, graded_by: g.membershipId, graded_at: new Date().toISOString() })
