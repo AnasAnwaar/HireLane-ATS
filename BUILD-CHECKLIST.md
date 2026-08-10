@@ -32,6 +32,7 @@
 | **P4 — Assessments** | CP-15 … CP-18 | ✅ **COMPLETE** |
 | **P5 — Proctoring & Interviews** | CP-19 … CP-22 | ⬜ Not started |
 | **P6 — Collaboration & Reporting** | CP-23 … CP-25 | ⬜ Not started |
+| **P7 — Plans, Billing & Platform Admin** | CP-26 … CP-28 | ⬜ Not started |
 
 **Current checkpoint:** ✅ **Phases 0, 1 & 2 COMPLETE** (CP-1 … CP-12)
 **Environment:** 🟢 Full loop live: setup → openings → apply → screen → profile → candidate portal → channels → AI posts → **publish/schedule** · build clean — **zero blockers**
@@ -791,6 +792,48 @@ watch tuned LinkedIn/Indeed/Rozee/Careers posts appear; edit and regenerate them
 - [ ] Localisation: English + Urdu, RTL
 - [ ] Performance pass against the spec's NFR targets
 - [ ] Security review + penetration test prep
+
+---
+
+## Phase 7 — Plans, Billing & Platform Admin
+> *New scope beyond the original use-case spec — monetization. Three tiers (Free / Basic / Premium), per-seat add-ons, Stripe billing in **test mode** for now, and a platform-level super-admin. Every entitlement is enforced **server-side** on top of the CP-2 RLS boundary — a locked feature is refused in the action layer, never hidden in the UI alone.*
+
+### Plan matrix (target)
+
+| Capability | **Free** | **Basic** | **Premium** |
+|-----------|:--------:|:---------:|:-----------:|
+| Seats (users) | **1** (admin only) | **3** (admin + 2) | **up to 10** |
+| Job openings | **5** | Unlimited | Unlimited |
+| Channel / account integrations | ❌ | ✅ | ✅ |
+| AI job-post generation (CP-11) | ❌ | ✅ | ✅ |
+| AI screening + match reports (CP-13–14) | ❌ | ❌ | ✅ |
+| AI assessments (gen + grading, CP-15–17) | ❌ | ❌ | ✅ |
+| Additional seats (paid add-on) | ❌ | ✅ per-seat | ✅ per-seat (beyond 10) |
+
+*“All AI features” = Premium. Basic unlocks integrations + AI **post creation only**. Extra seats are a metered per-seat add-on billed on top of the plan.*
+
+### ⬜ CP-26 — Plans & Entitlements
+- [ ] Schema: `plans` (free/basic/premium — seat cap, opening cap, feature flags), `plan_prices`, `org_subscriptions` (plan, status, base seats, purchased add-on seats, current period)
+- [ ] Entitlement engine — one source of truth resolving an org's **limits** (seats, openings) and **feature flags** (`integrations`, `ai_posts`, `ai_screening`, `ai_assessments`) from its plan + add-ons
+- [ ] Server-side enforcement: block inviting a user past the seat limit; block creating a job opening past the cap (Free = 5); gate the AI actions (CP-11/13–17) and channel connections on the org's feature flags — layered on top of the existing permission + `isAiConfigured` checks, not UI-only
+- [ ] Usage surfacing: an org **billing/plan** page showing current plan, seats used/available, openings used vs. cap, and which features are locked (with an upgrade nudge)
+- [ ] Graceful downgrade: over-cap resources become read-only rather than deleted (e.g., openings beyond the new limit can't be reopened until upgrade)
+
+### ⬜ CP-27 — Stripe Billing (test mode)
+- [ ] Stripe integration in **test mode** (test keys + test cards); Products/Prices mirror the plan matrix
+- [ ] Upgrade / downgrade across Free / Basic / Premium via Stripe Checkout, with entitlements updated on success
+- [ ] Additional-seat purchase as a quantity-based subscription item (per-seat Price)
+- [ ] Subscription lifecycle via **signature-verified, idempotent webhooks** (`checkout.session.completed`, `customer.subscription.updated/deleted`, `invoice.paid/payment_failed`) → sync `org_subscriptions` + entitlements
+- [ ] Stripe **Customer Portal** for payment method, invoices and cancellation
+- [ ] Org billing admin page: current plan, seat usage, upgrade, buy seats, manage billing
+- [ ] Test-mode banner; go-live items (live keys, production webhook endpoint, tax/receipts) tracked under the go-live list
+
+### ⬜ CP-28 — Super-Admin Portal (platform)
+- [ ] A separate **cross-tenant** super-admin area for platform staff — hard-gated behind a dedicated super-admin capability (not a normal org role), bypassing org RLS only through an audited service path
+- [ ] Manage **plans & pricing** globally: create/edit tiers, limits, the feature matrix and per-seat pricing — kept in sync with Stripe Products/Prices
+- [ ] Platform **analytics**: organisations, active subscriptions, plan distribution, MRR, seats sold, AI usage, openings/applicants volume, churn
+- [ ] **API & integrations** management: platform API keys, channel/OAuth app credentials, webhook endpoints, and integration health
+- [ ] Org administration: view / suspend / comp / trial an organisation, adjust its plan, and audited impersonation for support
 
 ---
 
