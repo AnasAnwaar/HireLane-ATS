@@ -11,12 +11,15 @@ import { STAGE_META } from "@/lib/applicants-display";
 import { experienceLabel } from "@/lib/openings-display";
 import { formatDate } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/server";
+import { isAiConfigured } from "@/server/ai/gemini";
 import { can } from "@/server/auth/authorize";
 import { getFieldVisibility } from "@/server/auth/field-visibility";
 import { getCandidateProfile } from "@/server/candidates/queries";
 import { requireSession } from "@/server/auth/session";
+import type { ApplicationScreening } from "@/types/database";
 
 import { DocumentsSection } from "./documents-section";
+import { MatchReport, type MatchReportData } from "./match-report";
 import { NotesSection } from "./notes-section";
 import { PortalInviteCard } from "./portal-invite-card";
 import { StageControl } from "./stage-control";
@@ -42,26 +45,46 @@ export default async function CandidateProfilePage({
   }
 
   const supabase = await createClient();
-  const [profile, fields, canNote, canAdvance, canInvite, { data: liveInvite }] = await Promise.all([
-    getCandidateProfile(id, session.membershipId),
-    getFieldVisibility(),
-    can("profile.add_note"),
-    can("pipeline.advance"),
-    can("applicants.send_invitation"),
-    supabase
-      .from("candidate_portal_invites")
-      .select("expires_at")
-      .eq("candidate_id", id)
-      .is("revoked_at", null)
-      .gt("expires_at", new Date().toISOString())
-      .maybeSingle(),
-  ]);
+  const [profile, fields, canNote, canAdvance, canInvite, canViewReport, canOverride, canRerank, { data: liveInvite }] =
+    await Promise.all([
+      getCandidateProfile(id, session.membershipId),
+      getFieldVisibility(),
+      can("profile.add_note"),
+      can("pipeline.advance"),
+      can("applicants.send_invitation"),
+      can("screening.view_report"),
+      can("screening.override"),
+      can("screening.rerank"),
+      supabase
+        .from("candidate_portal_invites")
+        .select("expires_at")
+        .eq("candidate_id", id)
+        .is("revoked_at", null)
+        .gt("expires_at", new Date().toISOString())
+        .maybeSingle(),
+    ]);
 
   if (!profile) notFound();
   const { candidate, applications, documents, notes, timeline } = profile;
 
   const showContact = fields["fields.view_candidate_contact"];
   const exp = experienceLabel(candidate.years_experience, null);
+
+  // Match reports (spec §UC-4, CP-14) — one per application, if the viewer may
+  // see the full breakdown. RLS also hides them without screening.view_report.
+  const screeningByApp = new Map<string, ApplicationScreening>();
+  if (canViewReport && applications.length) {
+    const { data: screenings } = await supabase
+      .from("application_screenings")
+      .select("*")
+      .in(
+        "application_id",
+        applications.map((a) => a.id),
+      );
+    for (const s of (screenings ?? []) as ApplicationScreening[]) {
+      screeningByApp.set(s.application_id, s);
+    }
+  }
 
   return (
     <>
@@ -122,16 +145,48 @@ export default async function CandidateProfilePage({
             </CardContent>
           </Card>
 
+          {/* Match reports (CP-14) — one per screened application */}
+          {applications.map((app) => {
+            const s = screeningByApp.get(app.id);
+            if (!s) return null;
+            const report: MatchReportData = {
+              applicationId: app.id,
+              openingTitle: app.jobTitle,
+              status: s.status,
+              score: s.score,
+              recommendation: s.recommendation,
+              summary: s.summary,
+              mustHaves: s.must_haves ?? [],
+              niceToHaves: s.nice_to_haves ?? [],
+              criteria: s.criteria ?? [],
+              highlights: s.highlights ?? [],
+              concerns: s.concerns ?? [],
+              model: s.model,
+              stale: s.stale,
+              overrideRecommendation: s.override_recommendation,
+              overrideReason: s.override_reason,
+              overriddenAt: s.overridden_at,
+            };
+            return (
+              <MatchReport
+                key={app.id}
+                report={report}
+                canOverride={canOverride}
+                canRerank={canRerank && isAiConfigured()}
+              />
+            );
+          })}
+
           {/* Notes */}
           <NotesSection candidateId={candidate.id} notes={notes} canAdd={canNote} />
 
-          {/* Stubbed §UC-6 sections that arrive with later checkpoints. */}
+          {/* Stubbed sections that arrive with later checkpoints. */}
           <Card className="border-dashed">
             <CardContent className="p-5 text-sm text-muted-foreground">
-              <p className="font-medium text-foreground">Match report · Assessments · Interviews</p>
+              <p className="font-medium text-foreground">Assessments · Interviews</p>
               <p className="mt-1">
-                AI screening (CP-13), test results (CP-15+) and interview records (CP-22) attach
-                here as those checkpoints land.
+                Test results (CP-15+) and interview records (CP-22) attach here as those
+                checkpoints land.
               </p>
             </CardContent>
           </Card>

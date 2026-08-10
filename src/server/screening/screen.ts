@@ -3,11 +3,13 @@ import "server-only";
 import { Type, type Schema } from "@google/genai";
 
 import type { createClient } from "@/lib/supabase/server";
+import { coerceWeights, skillsScore, weightedScore } from "@/lib/scoring-weights";
 import { AiError, GEMINI_MODEL, generateJson, isAiConfigured } from "@/server/ai/gemini";
 import type {
   CoverageItem,
   CoverageStatus,
   CriterionScore,
+  ScoringWeights,
   ScreeningConcern,
   ScreeningHighlight,
   ScreeningRecommendation,
@@ -284,7 +286,7 @@ export async function screenApplication(
   const [{ data: opening }, { data: requirements }, { data: candidate }] = await Promise.all([
     db
       .from("job_openings")
-      .select("title, employment_type, work_mode, location, experience_min, experience_max, description")
+      .select("title, employment_type, work_mode, location, experience_min, experience_max, description, scoring_weights")
       .eq("id", application.job_opening_id)
       .maybeSingle(),
     db.from("job_requirements").select("kind, label").eq("job_opening_id", application.job_opening_id),
@@ -341,8 +343,22 @@ export async function screenApplication(
     return { ok: false, error: message };
   }
 
-  const score = clampScore(raw.score);
-  const recommendation = recommendationFor(score, raw.recommendation);
+  // Weighted overall score (spec §UC-4 A3): blend must-have coverage (skills),
+  // experience and qualification by the opening's configured weights, rather
+  // than trusting the model's own gestalt number. This makes the score
+  // deterministic and re-weightable.
+  const mustHaves = mapCoverage(raw.mustHaves);
+  const niceToHaves = mapCoverage(raw.niceToHaves);
+  const modelCriteria = mapCriteria(raw.criteria);
+  const weights = coerceWeights(opening.scoring_weights as ScoringWeights | null);
+
+  const skills = skillsScore(mustHaves);
+  const experience = modelCriteria.find((c) => c.key === "experience")?.score ?? null;
+  const qualification = modelCriteria.find((c) => c.key === "qualification")?.score ?? null;
+
+  const score = weightedScore({ skills, experience, qualification }, weights);
+  const recommendation = recommendationFor(score, undefined);
+  const criteria = buildWeightedCriteria(skills, modelCriteria, weights);
 
   return upsert(db, {
     organizationId,
@@ -352,18 +368,43 @@ export async function screenApplication(
     recommendation,
     scoredBy,
     summary: String(raw.summary ?? "").slice(0, 1000),
-    mustHaves: mapCoverage(raw.mustHaves),
-    niceToHaves: mapCoverage(raw.niceToHaves),
-    criteria: mapCriteria(raw.criteria),
+    mustHaves,
+    niceToHaves,
+    criteria,
     highlights: mapHighlights(raw.highlights),
     concerns: mapConcerns(raw.concerns),
     inputs: {
       model: GEMINI_MODEL,
+      weights,
       requirements: requirements ?? [],
       candidate: candidateView,
       application: { coverNote: application.cover_note, screeningAnswers },
     },
   });
+}
+
+/** Prepend a synthetic "skills" criterion and tag the weighted dimensions. */
+function buildWeightedCriteria(
+  skills: number | null,
+  modelCriteria: CriterionScore[],
+  weights: ScoringWeights,
+): CriterionScore[] {
+  const out: CriterionScore[] = [];
+  if (skills != null) {
+    out.push({
+      key: "skills",
+      label: "Skills (must-haves)",
+      score: skills,
+      note: "Weighted from must-have coverage.",
+      weight: weights.skills,
+    });
+  }
+  for (const c of modelCriteria) {
+    if (c.key === "experience") out.push({ ...c, weight: weights.experience });
+    else if (c.key === "qualification") out.push({ ...c, weight: weights.qualification });
+    else out.push(c);
+  }
+  return out;
 }
 
 type UpsertArgs = {
@@ -402,6 +443,7 @@ async function upsert(db: Db, a: UpsertArgs): Promise<ScreeningResult> {
       inputs: a.inputs ?? null,
       error: a.error ?? null,
       scored_by: a.scoredBy,
+      stale: false,
     },
     { onConflict: "application_id" },
   );

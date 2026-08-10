@@ -1,17 +1,27 @@
 "use client";
 
-import { Check, Link2, Loader2, Sparkles, UserPlus } from "lucide-react";
+import { Check, Link2, Loader2, SlidersHorizontal, Sparkles, UserPlus } from "lucide-react";
 import { useRouter } from "next/navigation";
 import * as React from "react";
 import { toast } from "sonner";
 
 import { Alert } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Field } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { WEIGHT_LABELS } from "@/lib/scoring-weights";
 import type { ActionResult } from "@/lib/validation/auth";
+import type { ScoringWeights } from "@/types/database";
 import { addCandidateAction } from "@/server/applicants/actions";
-import { rerankOpeningAction } from "@/server/screening/actions";
+import { rerankOpeningAction, updateScoringWeightsAction } from "@/server/screening/actions";
 
 export function ApplicantsToolbar({
   openingId,
@@ -19,18 +29,23 @@ export function ApplicantsToolbar({
   isOpen,
   canImport,
   canRerank,
+  canAdjustWeights,
+  weights,
 }: {
   openingId: string;
   applyUrl: string;
   isOpen: boolean;
   canImport: boolean;
   canRerank: boolean;
+  canAdjustWeights: boolean;
+  weights: ScoringWeights;
 }) {
   const router = useRouter();
   const [copied, setCopied] = React.useState(false);
   const [adding, setAdding] = React.useState(false);
   const [pending, setPending] = React.useState(false);
   const [reranking, setReranking] = React.useState(false);
+  const [showWeights, setShowWeights] = React.useState(false);
   const [error, setError] = React.useState<ActionResult | null>(null);
 
   async function rerank() {
@@ -79,11 +94,28 @@ export function ApplicantsToolbar({
           Copy apply link
         </Button>
       )}
+      {canAdjustWeights && (
+        <Button variant="outline" size="sm" onClick={() => setShowWeights(true)}>
+          <SlidersHorizontal /> Weights
+        </Button>
+      )}
       {canRerank && (
         <Button variant="outline" size="sm" onClick={rerank} disabled={reranking}>
           {reranking ? <Loader2 className="animate-spin" /> : <Sparkles />}
           Re-rank all
         </Button>
+      )}
+      {canAdjustWeights && (
+        <WeightsDialog
+          open={showWeights}
+          openingId={openingId}
+          initial={weights}
+          onClose={() => setShowWeights(false)}
+          onSaved={() => {
+            setShowWeights(false);
+            router.refresh();
+          }}
+        />
       )}
       {canImport && (
         <Button size="sm" onClick={() => setAdding(true)}>
@@ -145,5 +177,89 @@ export function ApplicantsToolbar({
         </div>
       )}
     </div>
+  );
+}
+
+function WeightsDialog({
+  open,
+  openingId,
+  initial,
+  onClose,
+  onSaved,
+}: {
+  open: boolean;
+  openingId: string;
+  initial: ScoringWeights;
+  onClose: () => void;
+  onSaved: () => void;
+}) {
+  const [w, setW] = React.useState<ScoringWeights>(initial);
+  const [saving, setSaving] = React.useState(false);
+  const total = w.skills + w.experience + w.qualification;
+
+  function set(key: keyof ScoringWeights, value: string) {
+    const n = Math.max(0, Math.min(100, Math.round(Number(value) || 0)));
+    setW((prev) => ({ ...prev, [key]: n }));
+  }
+
+  async function save() {
+    setSaving(true);
+    const result = await updateScoringWeightsAction(openingId, w);
+    setSaving(false);
+    if (result.ok) {
+      toast.success(result.message ?? "Saved.");
+      onSaved();
+    } else {
+      toast.error(result.error);
+    }
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
+      <DialogContent className="max-w-md">
+        <DialogHeader>
+          <DialogTitle>Scoring weights</DialogTitle>
+          <DialogDescription>
+            Tune how much each dimension counts toward the match score. Saving re-ranks every
+            applicant instantly — no re-screening needed.
+          </DialogDescription>
+        </DialogHeader>
+        <div className="space-y-3">
+          {(Object.keys(WEIGHT_LABELS) as (keyof ScoringWeights)[]).map((key) => (
+            <div key={key} className="flex items-center gap-3">
+              <label className="w-28 text-sm">{WEIGHT_LABELS[key]}</label>
+              <input
+                type="range"
+                min={0}
+                max={100}
+                value={w[key]}
+                onChange={(e) => set(key, e.target.value)}
+                className="flex-1 accent-primary"
+              />
+              <Input
+                type="number"
+                min={0}
+                max={100}
+                value={w[key]}
+                onChange={(e) => set(key, e.target.value)}
+                className="w-16"
+              />
+            </div>
+          ))}
+          <p className="text-xs text-muted-foreground">
+            Weights are relative (they don&rsquo;t need to total 100). Current total: {total}.
+          </p>
+        </div>
+        <DialogFooter>
+          <Button variant="outline" onClick={onClose}>
+            Cancel
+          </Button>
+          <Button onClick={save} disabled={saving || total === 0}>
+            {saving ? <Loader2 className="animate-spin" /> : <SlidersHorizontal />}
+            Save &amp; re-rank
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }

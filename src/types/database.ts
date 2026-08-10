@@ -60,7 +60,14 @@ export type CoverageStatus = "matched" | "partial" | "missing";
 
 /** Explainability payloads stored on a screening (spec §UC-4 R1). */
 export type CoverageItem = { requirement: string; status: CoverageStatus; evidence: string };
-export type CriterionScore = { key: string; label: string; score: number; note: string };
+export type CriterionScore = {
+  key: string;
+  label: string;
+  score: number;
+  note: string;
+  /** Percent weight in the overall score, if this dimension is weighted. */
+  weight?: number;
+};
 export type ScreeningHighlight = { text: string; evidence: string };
 export type ScreeningConcern = { text: string };
 
@@ -229,7 +236,11 @@ export type JobOpening = Timestamps & {
   application_deadline: string | null;
   opened_at: string | null;
   closed_at: string | null;
+  scoring_weights: ScoringWeights | null;
 };
+
+/** Per-opening weighting of the three primary screening dimensions (percent). */
+export type ScoringWeights = { skills: number; experience: number; qualification: number };
 
 export type JobRequirement = {
   id: string;
@@ -383,6 +394,7 @@ export type ApplicationScreening = Timestamps & {
   overridden_by: string | null;
   overridden_at: string | null;
   scored_by: string | null;
+  stale: boolean;
 };
 
 /** Insert helper: server-defaulted columns are optional. */

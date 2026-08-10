@@ -1,5 +1,10 @@
 import type { ScreeningRecommendation, ScreeningStatus } from "@/types/database";
 
+/** Map an overall 0-100 score to its recommendation band (spec §UC-4). */
+export function recommendationForScore(score: number): ScreeningRecommendation {
+  return score >= 75 ? "strong_fit" : score >= 50 ? "possible_fit" : "weak_fit";
+}
+
 export const RECOMMENDATION_META: Record<
   ScreeningRecommendation,
   { label: string; variant: "success" | "warning" | "secondary" }
@@ -21,3 +26,12 @@ export const COVERAGE_LABEL = {
   partial: "Partial",
   missing: "Missing",
 } as const;
+
+export const COVERAGE_META: Record<
+  "matched" | "partial" | "missing",
+  { label: string; variant: "success" | "warning" | "destructive" }
+> = {
+  matched: { label: "Matched", variant: "success" },
+  partial: { label: "Partial", variant: "warning" },
+  missing: { label: "Missing", variant: "destructive" },
+};

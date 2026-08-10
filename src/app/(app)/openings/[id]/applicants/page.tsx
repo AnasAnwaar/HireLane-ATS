@@ -12,6 +12,8 @@ import { createAdminClient, createClient } from "@/lib/supabase/server";
 import { STAGE_META } from "@/lib/applicants-display";
 import { experienceLabel } from "@/lib/openings-display";
 import { RECOMMENDATION_META } from "@/lib/screening-display";
+import { coerceWeights } from "@/lib/scoring-weights";
+import { Alert } from "@/components/ui/alert";
 import { clientEnv } from "@/lib/env";
 import { formatDate } from "@/lib/utils";
 import { isAiConfigured } from "@/server/ai/gemini";
@@ -39,7 +41,7 @@ export default async function ApplicantsPage({
 
   const { data: opening } = await supabase
     .from("job_openings")
-    .select("id, title, status")
+    .select("id, title, status, scoring_weights")
     .eq("id", id)
     .maybeSingle();
 
@@ -53,6 +55,7 @@ export default async function ApplicantsPage({
     canViewProfile,
     canViewScore,
     canRerank,
+    canAdjustWeights,
   ] = await Promise.all([
     supabase
       .from("applications")
@@ -61,25 +64,28 @@ export default async function ApplicantsPage({
       .order("applied_at", { ascending: false }),
     supabase
       .from("application_screenings")
-      .select("application_id, score, recommendation, status")
+      .select("application_id, score, recommendation, status, stale")
       .eq("job_opening_id", id),
     can("applicants.import"),
     can("fields.view_candidate_contact"),
     can("applicants.view_profile"),
     can("screening.view_score"),
     can("screening.rerank"),
+    can("screening.adjust_weights"),
   ]);
 
   // Map screenings by application; RLS already hid them if the viewer lacks
   // screening.view_score, so `screenings` is empty in that case.
-  const screeningByApp = new Map(
-    ((screenings ?? []) as {
-      application_id: string;
-      score: number | null;
-      recommendation: ScreeningRecommendation | null;
-      status: ScreeningStatus;
-    }[]).map((s) => [s.application_id, s]),
-  );
+  const screeningRows = (screenings ?? []) as {
+    application_id: string;
+    score: number | null;
+    recommendation: ScreeningRecommendation | null;
+    status: ScreeningStatus;
+    stale: boolean;
+  }[];
+  const screeningByApp = new Map(screeningRows.map((s) => [s.application_id, s]));
+  const anyStale = screeningRows.some((s) => s.stale);
+  const weights = coerceWeights(opening.scoring_weights);
 
   // Default sort: highest score first (spec §UC-4 step 4), unscored last,
   // then most-recent. Only re-sort when the viewer can actually see scores.
@@ -128,11 +134,20 @@ export default async function ApplicantsPage({
             isOpen={opening.status === "open"}
             canImport={canImport}
             canRerank={canRerank && isAiConfigured()}
+            canAdjustWeights={canAdjustWeights}
+            weights={weights}
           />
         }
       />
 
       <PageBody className="space-y-2.5">
+        {canViewScore && anyStale && (
+          <Alert variant="warning" title="Requirements changed since last screening">
+            The scores below may be out of date.{" "}
+            {canRerank ? "Use “Re-rank all” to refresh them." : "Ask a recruiter to re-rank."}
+          </Alert>
+        )}
+
         {!applications?.length ? (
           <Card className="flex flex-col items-center gap-3 py-16 text-center">
             <span className="flex size-12 items-center justify-center rounded-full bg-muted">

@@ -28,7 +28,7 @@
 | **P0 — Tenancy, Auth & Admin** | CP-1 … CP-5 | ✅ **COMPLETE** |
 | **P1 — Job Openings & Applicants** | CP-6 … CP-9 | ✅ **COMPLETE** |
 | **P2 — Distribution (channels + AI posts)** | CP-10 … CP-12 | ✅ **COMPLETE** |
-| **P3 — AI Screening** | CP-13 … CP-14 | 🔄 **CP-13 done** · CP-14 remaining |
+| **P3 — AI Screening** | CP-13 … CP-14 | ✅ **COMPLETE** |
 | **P4 — Assessments** | CP-15 … CP-18 | ⬜ Not started |
 | **P5 — Proctoring & Interviews** | CP-19 … CP-22 | ⬜ Not started |
 | **P6 — Collaboration & Reporting** | CP-23 … CP-25 | ⬜ Not started |
@@ -681,12 +681,16 @@ watch tuned LinkedIn/Indeed/Rozee/Careers posts appear; edit and regenerate them
 
 **Verification:** `node scripts/test-screening.cjs` → **11/11 pass** (schema, write via rerank perm, evidence payloads round-trip, stage untouched, view_score gate, write gate, cross-org isolation). `node scripts/test-screening-smoke.cjs` → live Gemini run separates a strong candidate (**95 / strong_fit**, all must-haves matched) from a weak one (**30 / weak_fit**, TypeScript + 5-yrs + state-mgmt correctly missing, 3 concerns). Typecheck + lint + build all clean. Migration: 0018_screening.
 
-### ⬜ CP-14 — Match Reports & Ranking UI
-- [ ] Ranked list with colour-coded bands
-- [ ] Match report view, side-by-side with requirements
-- [ ] Configurable scoring weights per opening
-- [ ] Re-rank on requirement change
-- [ ] Human override with recorded reason
+### ✅ CP-14 — Match Reports & Ranking UI
+- [x] Ranked list with colour-coded bands (ScoreRing + recommendation, sorted by score — CP-13, carried forward)
+- [x] Match report view, side-by-side with requirements ([match-report.tsx](<src/app/(app)/candidates/[id]/match-report.tsx>) on the candidate profile: weighted score breakdown, must/nice coverage with per-requirement matched/partial/missing + evidence, highlights, concerns, model attribution)
+- [x] Configurable scoring weights per opening (skills / experience / qualification sliders in a dialog off the applicants toolbar; stored on `job_openings.scoring_weights`). Overall score is a **weighted blend** of stored sub-scores, so re-weighting is an **instant, AI-free recompute** ([scoring-weights.ts](src/lib/scoring-weights.ts))
+- [x] Re-rank on requirement change (a DB trigger on `job_requirements` flips `application_screenings.stale`; the applicants page shows a "Requirements changed — re-rank" banner — spec A1, covers every edit path)
+- [x] Human override with recorded reason (spec step 7 — reviewer picks a recommendation + reason on the match report; recorded with who/when, reversible, gated on `screening.override`; never changes the pipeline stage)
+
+**Verification:** `node scripts/test-scoring.cjs` → **11/11 pass** (weight formula incl. missing-dimension renormalisation, weights persistence, stale trigger on add/edit/delete requirement, override write + reason, override write-gate, stage-untouched). Typecheck + lint + build all clean. Migration: 0019_scoring_weights.
+
+> Note: screenings created before CP-14 keep their CP-13 scores until re-ranked — click **Re-rank all** once to pick up weighted scores + the skills criterion.
 
 ---
 
