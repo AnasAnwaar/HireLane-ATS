@@ -29,7 +29,7 @@
 | **P1 — Job Openings & Applicants** | CP-6 … CP-9 | ✅ **COMPLETE** |
 | **P2 — Distribution (channels + AI posts)** | CP-10 … CP-12 | ✅ **COMPLETE** |
 | **P3 — AI Screening** | CP-13 … CP-14 | ✅ **COMPLETE** |
-| **P4 — Assessments** | CP-15 … CP-18 | ⬜ Not started |
+| **P4 — Assessments** | CP-15 … CP-18 | 🔄 **CP-15, CP-16 done** · CP-17–18 remaining |
 | **P5 — Proctoring & Interviews** | CP-19 … CP-22 | ⬜ Not started |
 | **P6 — Collaboration & Reporting** | CP-23 … CP-25 | ⬜ Not started |
 
@@ -697,14 +697,29 @@ watch tuned LinkedIn/Indeed/Rozee/Careers posts appear; edit and regenerate them
 ## Phase 4 — Assessments
 > *Maps to UC-5.1 and UC-5.2.*
 
-### ⬜ CP-15 — Test Authoring
-- [ ] Schema: `tests`, `questions`, `question_bank`, `test_versions`
-- [ ] Manual authoring UI, all 6 question types
-- [ ] AI test generation from the job requirements
-- [ ] Per-question regenerate, reorder, marks, rubrics
-- [ ] Versioning on edit-after-publish
+### ✅ CP-15 — Test Authoring
+- [x] Schema: `tests`, `test_questions`, `test_versions`, `question_bank` (+ enums `question_type`, `test_status`, `question_difficulty`, `proctoring_level`; migration 0020). Delivery settings (duration, threshold, shuffle, backtrack, attempts, proctoring level) live on `tests`, set at authoring, consumed in CP-16
+- [x] Manual authoring UI, all 6 question types (editor at [openings/[id]/tests/[testId]](<src/app/(app)/openings/[id]/tests/[testId]/test-editor.tsx>): single/multiple choice with tick-correct, true/false, short/long/scenario with rubric)
+- [x] AI test generation from the job requirements ([generate.ts](src/server/assessments/generate.ts) → structured-JSON questions with options + answer key or rubric, marks, skill, difficulty; lands as a **draft** — spec R1, nothing goes live unreviewed)
+- [x] Per-question regenerate, reorder, marks, rubrics (up/down reorder, per-question AI regenerate, marks/skill/difficulty, save-to-bank)
+- [x] Versioning on edit-after-publish (spec R3 — publishing snapshots the test into `test_versions` and bumps `tests.version`; editing a published test flags `has_unpublished_changes`; a re-publish appends the next immutable version)
 
-### ⬜ CP-16 — Test Assignment & Delivery
+**Guardrails:** correct answers + rubrics are stored but flagged "never shown to the candidate" and will be stripped in the CP-16 delivery query (spec R2).
+
+**Verification:** `node scripts/test-assessments.cjs` → **13/13 pass** (schema, authoring, version snapshots + unique-version constraint, RLS write-gate for view-only roles, question-bank gate, cross-org isolation). Typecheck + lint + build (33 routes) all clean. `scripts/test-assessments-smoke.cjs` (live AI gen) is quota-limited today (Gemini free tier 20 req/day) — same proven path as CP-11/13; retry when quota resets.
+
+### ✅ CP-16 — Test Assignment & Delivery
+- [x] Assign to candidates with deadline (Assessments card on the candidate profile → pick a published test + deadline; migration 0021: `test_assignments`, `test_attempts`, `test_answers`)
+- [x] Candidate test runner: full-screen, timer, auto-save ([test-runner.tsx](<src/app/candidate/[token]/test/[assignmentId]/test-runner.tsx>): fixed full-viewport, server-authoritative countdown, per-answer auto-save with debounced text). Consent + rules screen before start (spec step 3)
+- [x] Shuffling, navigation rules, attempt limits (question/option shuffle stored on the attempt for resume-stability; one-way vs back-navigation from the test's `allow_backtrack`; `attempts_used`/`attempts_allowed`)
+- [x] Disconnect/resume with grace window (attempt persists server-side; answers auto-save; reopening resumes at saved state within the time limit — spec A1)
+- [x] Auto-submit on expiry (client submits at zero; `getRunnerData`/`saveAnswer` also finalise server-side if the clock has already passed — belt and braces)
+
+**Guardrails:** delivery payload strips `correct_answers` + `rubric` before it reaches the browser (spec R2, `toDeliveryQuestions`). Attempts pin to the published **version** (spec R3). Submitting auto-scores choice/true-false instantly (full + partial credit); written answers await CP-17. Candidate access is via the existing portal token on the service role — no new auth surface.
+
+**Verification:** `node scripts/test-delivery.cjs` → **15/15 pass** (key-stripping, single + partial-credit scoring, RLS assign-gate, answer reads gated on `view_answers`, version pinning, cross-org isolation). Typecheck + lint + build (35 routes) all clean.
+
+> Deferred to Phase 5: real proctoring capture + hardware/system check (UC-5.3). The consent screen and `proctoring_level` are wired; monitoring itself lands in CP-19–22.
 - [ ] Assign to candidates with deadline
 - [ ] Candidate test runner: full-screen, timer, auto-save
 - [ ] Shuffling, navigation rules, attempt limits

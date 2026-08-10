@@ -57,6 +57,26 @@ export type PostingStatus = "draft" | "scheduled" | "published" | "failed" | "cl
 export type ScreeningStatus = "scored" | "needs_manual_review" | "failed";
 export type ScreeningRecommendation = "strong_fit" | "possible_fit" | "weak_fit";
 export type CoverageStatus = "matched" | "partial" | "missing";
+export type QuestionType =
+  | "single_choice"
+  | "multiple_choice"
+  | "true_false"
+  | "short_answer"
+  | "long_answer"
+  | "scenario";
+export type TestStatus = "draft" | "published" | "archived";
+export type QuestionDifficulty = "easy" | "medium" | "hard";
+export type ProctoringLevel = "off" | "basic" | "standard" | "strict";
+export type TestAssignmentStatus =
+  | "assigned"
+  | "in_progress"
+  | "submitted"
+  | "expired"
+  | "cancelled";
+export type TestAttemptStatus = "in_progress" | "submitted" | "expired";
+
+/** A choice option for MCQ/true-false questions. */
+export type QuestionOption = { id: string; text: string };
 
 /** Explainability payloads stored on a screening (spec §UC-4 R1). */
 export type CoverageItem = { requirement: string; status: CoverageStatus; evidence: string };
@@ -397,6 +417,111 @@ export type ApplicationScreening = Timestamps & {
   stale: boolean;
 };
 
+export type Test = Timestamps & {
+  id: string;
+  organization_id: string;
+  job_opening_id: string | null;
+  title: string;
+  instructions: string | null;
+  status: TestStatus;
+  version: number;
+  has_unpublished_changes: boolean;
+  duration_minutes: number | null;
+  passing_threshold: number | null;
+  shuffle_questions: boolean;
+  shuffle_options: boolean;
+  allow_backtrack: boolean;
+  attempts_allowed: number;
+  proctoring_level: ProctoringLevel;
+  is_bank_template: boolean;
+  created_by: string | null;
+  published_at: string | null;
+};
+
+export type TestQuestion = Timestamps & {
+  id: string;
+  organization_id: string;
+  test_id: string;
+  sort_order: number;
+  type: QuestionType;
+  prompt: string;
+  options: QuestionOption[];
+  correct_answers: string[];
+  rubric: string | null;
+  marks: number;
+  skill: string | null;
+  difficulty: QuestionDifficulty;
+};
+
+export type TestVersion = {
+  id: string;
+  organization_id: string;
+  test_id: string;
+  version: number;
+  snapshot: unknown;
+  published_by: string | null;
+  created_at: string;
+};
+
+export type QuestionBankItem = Timestamps & {
+  id: string;
+  organization_id: string;
+  type: QuestionType;
+  prompt: string;
+  options: QuestionOption[];
+  correct_answers: string[];
+  rubric: string | null;
+  marks: number;
+  skill: string | null;
+  difficulty: QuestionDifficulty;
+  tags: string[];
+  created_by: string | null;
+};
+
+export type TestAssignment = Timestamps & {
+  id: string;
+  organization_id: string;
+  test_id: string;
+  application_id: string;
+  candidate_id: string;
+  status: TestAssignmentStatus;
+  deadline: string | null;
+  attempts_allowed: number;
+  attempts_used: number;
+  extra_time_minutes: number;
+  screen_reader_mode: boolean;
+  assigned_by: string | null;
+};
+
+export type TestAttempt = Timestamps & {
+  id: string;
+  organization_id: string;
+  assignment_id: string;
+  test_id: string;
+  version: number;
+  question_order: string[];
+  option_orders: Record<string, string[]>;
+  status: TestAttemptStatus;
+  started_at: string;
+  expires_at: string;
+  submitted_at: string | null;
+  consent_at: string | null;
+  auto_score: number | null;
+  max_score: number | null;
+};
+
+export type TestAnswerResponse = { selected?: string[]; text?: string };
+
+export type TestAnswer = Timestamps & {
+  id: string;
+  organization_id: string;
+  attempt_id: string;
+  question_id: string;
+  response: TestAnswerResponse;
+  awarded_marks: number | null;
+  is_correct: boolean | null;
+};
+
 /** Insert helper: server-defaulted columns are optional. */
 type Insertable<T, TRequired extends keyof T> = Pick<T, TRequired> &
   Partial<Omit<T, TRequired>>;
@@ -573,6 +698,50 @@ export type Database = {
           Rel<"application_id", "applications">,
           Rel<"job_opening_id", "job_openings">,
         ]
+      >;
+      tests: Table<
+        Test,
+        "organization_id" | "title",
+        [Rel<"organization_id", "organizations">, Rel<"job_opening_id", "job_openings">]
+      >;
+      test_questions: Table<
+        TestQuestion,
+        "organization_id" | "test_id" | "type" | "prompt",
+        [Rel<"organization_id", "organizations">, Rel<"test_id", "tests">]
+      >;
+      test_versions: Table<
+        TestVersion,
+        "organization_id" | "test_id" | "version" | "snapshot",
+        [Rel<"organization_id", "organizations">, Rel<"test_id", "tests">]
+      >;
+      question_bank: Table<
+        QuestionBankItem,
+        "organization_id" | "type" | "prompt",
+        [Rel<"organization_id", "organizations">]
+      >;
+      test_assignments: Table<
+        TestAssignment,
+        "organization_id" | "test_id" | "application_id" | "candidate_id",
+        [
+          Rel<"organization_id", "organizations">,
+          Rel<"test_id", "tests">,
+          Rel<"application_id", "applications">,
+          Rel<"candidate_id", "candidates">,
+        ]
+      >;
+      test_attempts: Table<
+        TestAttempt,
+        "organization_id" | "assignment_id" | "test_id" | "version" | "expires_at",
+        [
+          Rel<"organization_id", "organizations">,
+          Rel<"assignment_id", "test_assignments">,
+          Rel<"test_id", "tests">,
+        ]
+      >;
+      test_answers: Table<
+        TestAnswer,
+        "organization_id" | "attempt_id" | "question_id",
+        [Rel<"organization_id", "organizations">, Rel<"attempt_id", "test_attempts">]
       >;
     };
     Views: Record<string, never>;

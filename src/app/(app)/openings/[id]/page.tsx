@@ -2,6 +2,7 @@ import {
   ArrowLeft,
   Banknote,
   CalendarClock,
+  ClipboardList,
   MapPin,
   Pencil,
   Sparkles,
@@ -62,7 +63,7 @@ export default async function OpeningDetailPage({
 
   if (!opening) notFound();
 
-  const [{ data: requirements }, { data: questions }, { count: applicantCount }, fields, canEdit, canClose, canViewApplicants, canGeneratePosts] =
+  const [{ data: requirements }, { data: questions }, { count: applicantCount }, fields, canEdit, canClose, canViewApplicants, canGeneratePosts, canViewTests] =
     await Promise.all([
       supabase
         .from("job_requirements")
@@ -83,6 +84,7 @@ export default async function OpeningDetailPage({
       can("job_openings.close"),
       can("applicants.view_list"),
       can("post_generation.generate"),
+      can("assessments.view"),
     ]);
 
   const meta = STATUS_META[opening.status];
@@ -122,6 +124,13 @@ export default async function OpeningDetailPage({
               <Button size="sm" variant="outline" asChild>
                 <Link href={`/openings/${opening.id}/posts`}>
                   <Sparkles /> AI posts
+                </Link>
+              </Button>
+            )}
+            {canViewTests && (
+              <Button size="sm" variant="outline" asChild>
+                <Link href={`/openings/${opening.id}/tests`}>
+                  <ClipboardList /> Tests
                 </Link>
               </Button>
             )}

@@ -1,9 +1,12 @@
-import { CheckCircle2, Clock } from "lucide-react";
+import { CheckCircle2, ClipboardList, Clock } from "lucide-react";
+import Link from "next/link";
 
 import { BrandMark } from "@/components/brand-mark";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { formatDate } from "@/lib/utils";
 import type { ApplicationStage } from "@/types/database";
+import { getPortalAssignments } from "@/server/assessments/delivery";
 import { resolvePortalSession } from "@/server/candidates/portal-access";
 
 import { PortalClient } from "./portal-client";
@@ -60,6 +63,7 @@ export default async function CandidatePortalPage({
   }
 
   const firstName = portal.candidate.fullName.split(" ")[0] || "there";
+  const assignments = await getPortalAssignments(token);
 
   return (
     <div className="min-h-dvh bg-background">
@@ -111,6 +115,53 @@ export default async function CandidatePortalPage({
             })
           )}
         </section>
+
+        {/* Assessments to complete (spec §UC-5.2) */}
+        {assignments.length > 0 && (
+          <section className="mt-8 space-y-3">
+            <h2 className="text-sm font-semibold">Assessments</h2>
+            {assignments.map((a) => {
+              const done = a.status === "submitted";
+              const expired = a.status === "expired";
+              const overdue = a.overdue;
+              const canTake = !done && !expired && !overdue && (a.activeAttemptId || a.attemptsUsed < a.attemptsAllowed);
+              return (
+                <div key={a.id} className="flex items-center gap-3 rounded-xl border border-border bg-card p-4 shadow-card">
+                  <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary-soft text-primary">
+                    <ClipboardList className="size-5" />
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate font-medium">{a.testTitle}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {a.questionCount} {a.questionCount === 1 ? "question" : "questions"}
+                      {a.durationMinutes ? ` · ${a.durationMinutes} min` : ""}
+                      {a.deadline ? ` · due ${formatDate(a.deadline)}` : ""}
+                    </p>
+                  </div>
+                  {done ? (
+                    <Badge variant="success" dot>
+                      Submitted
+                    </Badge>
+                  ) : expired || overdue ? (
+                    <Badge variant="secondary" dot>
+                      {expired ? "Expired" : "Missed"}
+                    </Badge>
+                  ) : canTake ? (
+                    <Button size="sm" asChild>
+                      <Link href={`/candidate/${token}/test/${a.id}`}>
+                        {a.activeAttemptId ? "Resume" : "Start test"}
+                      </Link>
+                    </Button>
+                  ) : (
+                    <Badge variant="secondary" dot>
+                      No attempts left
+                    </Badge>
+                  )}
+                </div>
+              );
+            })}
+          </section>
+        )}
 
         <PortalClient
           token={token}

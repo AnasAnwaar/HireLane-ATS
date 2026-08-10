@@ -18,6 +18,7 @@ import { getCandidateProfile } from "@/server/candidates/queries";
 import { requireSession } from "@/server/auth/session";
 import type { ApplicationScreening } from "@/types/database";
 
+import { AssessmentsCard, type AssignableTest, type AssignmentView } from "./assessments-card";
 import { DocumentsSection } from "./documents-section";
 import { MatchReport, type MatchReportData } from "./match-report";
 import { NotesSection } from "./notes-section";
@@ -45,7 +46,7 @@ export default async function CandidateProfilePage({
   }
 
   const supabase = await createClient();
-  const [profile, fields, canNote, canAdvance, canInvite, canViewReport, canOverride, canRerank, { data: liveInvite }] =
+  const [profile, fields, canNote, canAdvance, canInvite, canViewReport, canOverride, canRerank, canViewAssessments, canAssign, canGrantRetake, { data: liveInvite }] =
     await Promise.all([
       getCandidateProfile(id, session.membershipId),
       getFieldVisibility(),
@@ -55,6 +56,9 @@ export default async function CandidateProfilePage({
       can("screening.view_report"),
       can("screening.override"),
       can("screening.rerank"),
+      can("assessments.view"),
+      can("assessments.assign"),
+      can("assessments.grant_retake"),
       supabase
         .from("candidate_portal_invites")
         .select("expires_at")
@@ -83,6 +87,63 @@ export default async function CandidateProfilePage({
       );
     for (const s of (screenings ?? []) as ApplicationScreening[]) {
       screeningByApp.set(s.application_id, s);
+    }
+  }
+
+  // Assessments (spec §UC-5.2, CP-16) — this candidate's test assignments + the
+  // published tests HR can assign for their openings.
+  let assignments: AssignmentView[] = [];
+  const assignableTests: AssignableTest[] = [];
+  if (canViewAssessments) {
+    const { data: aRows } = await supabase
+      .from("test_assignments")
+      .select("id, status, deadline, attempts_used, attempts_allowed, test_id, tests(title)")
+      .eq("candidate_id", id)
+      .order("created_at", { ascending: false });
+
+    const aList = aRows ?? [];
+    const attemptByAssignment = new Map<string, { auto_score: number | null; max_score: number | null }>();
+    if (aList.length) {
+      const { data: atts } = await supabase
+        .from("test_attempts")
+        .select("assignment_id, auto_score, max_score, created_at")
+        .in(
+          "assignment_id",
+          aList.map((a) => a.id),
+        )
+        .order("created_at", { ascending: false });
+      for (const at of atts ?? []) {
+        if (!attemptByAssignment.has(at.assignment_id)) {
+          attemptByAssignment.set(at.assignment_id, { auto_score: at.auto_score, max_score: at.max_score });
+        }
+      }
+    }
+    assignments = aList.map((a) => ({
+      id: a.id,
+      testTitle: a.tests?.title ?? "Assessment",
+      status: a.status,
+      deadline: a.deadline,
+      attemptsUsed: a.attempts_used,
+      attemptsAllowed: a.attempts_allowed,
+      autoScore: attemptByAssignment.get(a.id)?.auto_score ?? null,
+      maxScore: attemptByAssignment.get(a.id)?.max_score ?? null,
+    }));
+
+    if (canAssign) {
+      const openingIds = [...new Set(applications.map((a) => a.jobOpeningId))];
+      if (openingIds.length) {
+        const { data: pubTests } = await supabase
+          .from("tests")
+          .select("id, title, job_opening_id")
+          .eq("status", "published")
+          .in("job_opening_id", openingIds);
+        for (const t of pubTests ?? []) {
+          const app = applications.find((a) => a.jobOpeningId === t.job_opening_id);
+          if (app) {
+            assignableTests.push({ testId: t.id, title: t.title, applicationId: app.id, openingTitle: app.jobTitle });
+          }
+        }
+      }
     }
   }
 
@@ -176,6 +237,16 @@ export default async function CandidateProfilePage({
               />
             );
           })}
+
+          {/* Assessments (CP-16) */}
+          {canViewAssessments && (
+            <AssessmentsCard
+              assignments={assignments}
+              assignableTests={assignableTests}
+              canAssign={canAssign}
+              canGrantRetake={canGrantRetake}
+            />
+          )}
 
           {/* Notes */}
           <NotesSection candidateId={candidate.id} notes={notes} canAdd={canNote} />
