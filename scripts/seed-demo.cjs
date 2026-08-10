@@ -263,12 +263,13 @@ async function main() {
 
   if (firstOpening) {
     console.log("Seeding sample applicants…");
+    // Skills + cover notes are tuned to spread AI screening scores (CP-13).
     const APPLICANTS = [
-      { full_name: "Ayesha Khan", email: "ayesha.khan@example.com", headline: "Senior React Engineer", location: "Lahore", years_experience: 6, stage: "interview_scheduled", source: "linkedin", skills: ["React", "TypeScript", "Next.js", "GraphQL", "Testing"] },
-      { full_name: "Bilal Ahmed", email: "bilal.ahmed@example.com", headline: "Frontend Developer", location: "Karachi", years_experience: 5, stage: "test_completed", source: "indeed" },
-      { full_name: "Hina Raza", email: "hina.raza@example.com", headline: "React Developer", location: "Remote", years_experience: 4, stage: "shortlisted", source: "rozee.pk" },
-      { full_name: "Usman Tariq", email: "usman.tariq@example.com", headline: "Full-stack Engineer", location: "Islamabad", years_experience: 7, stage: "screened", source: "careers-page" },
-      { full_name: "Sara Malik", email: "sara.malik@example.com", headline: "Junior Frontend Dev", location: "Lahore", years_experience: 2, stage: "applied", source: "linkedin" },
+      { full_name: "Ayesha Khan", email: "ayesha.khan@example.com", headline: "Senior React Engineer", location: "Lahore", years_experience: 6, stage: "interview_scheduled", source: "linkedin", skills: ["React", "TypeScript", "Redux", "Next.js", "GraphQL", "Jest"], cover_note: "Senior React engineer with 6 years building TypeScript design systems and state-heavy dashboards. Led a team migrating a large app to Next.js." },
+      { full_name: "Bilal Ahmed", email: "bilal.ahmed@example.com", headline: "Frontend Developer", location: "Karachi", years_experience: 5, stage: "test_completed", source: "indeed", skills: ["React", "TypeScript", "Redux", "CSS", "REST APIs"], cover_note: "Frontend developer, 5 years in React + TypeScript. Comfortable with Redux state management; some Next.js on side projects." },
+      { full_name: "Hina Raza", email: "hina.raza@example.com", headline: "React Developer", location: "Remote", years_experience: 4, stage: "shortlisted", source: "rozee.pk", skills: ["React", "JavaScript", "Redux", "HTML", "CSS"], cover_note: "React developer with 4 years' experience. Mostly JavaScript; picking up TypeScript over the last few months." },
+      { full_name: "Usman Tariq", email: "usman.tariq@example.com", headline: "Full-stack Engineer", location: "Islamabad", years_experience: 7, stage: "screened", source: "careers-page", skills: ["React", "TypeScript", "Node.js", "GraphQL", "Playwright", "PostgreSQL"], cover_note: "Full-stack engineer (7 yrs). Strong React + TypeScript frontend plus Node/GraphQL services. Write end-to-end tests with Playwright." },
+      { full_name: "Sara Malik", email: "sara.malik@example.com", headline: "Junior Frontend Dev", location: "Lahore", years_experience: 2, stage: "applied", source: "linkedin", skills: ["React", "JavaScript", "HTML", "CSS"], cover_note: "Junior frontend developer, 2 years. Keen to grow into a senior React role; no professional TypeScript yet." },
     ];
     let firstCandidateId = null;
     for (const a of APPLICANTS) {
@@ -293,6 +294,7 @@ async function main() {
           job_opening_id: firstOpening.id,
           stage: a.stage,
           source: a.source,
+          cover_note: a.cover_note ?? null,
         });
       }
     }

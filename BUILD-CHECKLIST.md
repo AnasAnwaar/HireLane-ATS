@@ -28,7 +28,7 @@
 | **P0 — Tenancy, Auth & Admin** | CP-1 … CP-5 | ✅ **COMPLETE** |
 | **P1 — Job Openings & Applicants** | CP-6 … CP-9 | ✅ **COMPLETE** |
 | **P2 — Distribution (channels + AI posts)** | CP-10 … CP-12 | ✅ **COMPLETE** |
-| **P3 — AI Screening** | CP-13 … CP-14 | ⬜ Not started |
+| **P3 — AI Screening** | CP-13 … CP-14 | 🔄 **CP-13 done** · CP-14 remaining |
 | **P4 — Assessments** | CP-15 … CP-18 | ⬜ Not started |
 | **P5 — Proctoring & Interviews** | CP-19 … CP-22 | ⬜ Not started |
 | **P6 — Collaboration & Reporting** | CP-23 … CP-25 | ⬜ Not started |
@@ -670,12 +670,16 @@ watch tuned LinkedIn/Indeed/Rozee/Careers posts appear; edit and regenerate them
 ## Phase 3 — AI Screening
 > *Maps to UC-4.*
 
-### ⬜ CP-13 — Screening Agent
-- [ ] Scoring pipeline against must-haves / nice-to-haves
-- [ ] Per-criterion breakdown with cited CV evidence
-- [ ] Highlights, concerns, recommendation
-- [ ] Protected-attribute exclusion
-- [ ] Model version + inputs logged per run
+### ✅ CP-13 — Screening Agent
+- [x] Scoring pipeline against must-haves / nice-to-haves (Gemini structured-JSON engine in [screen.ts](src/server/screening/screen.ts); per-requirement matched/partial/missing coverage; auto-screens on application arrival via `after()`, plus **Re-rank all** on demand)
+- [x] Per-criterion breakdown with cited evidence (experience / qualification / stability / logistics scores + must/nice coverage, each carrying the data point it came from — spec R1). CVs are stored as files (unparsed), so evidence cites the structured profile + application answers
+- [x] Highlights, concerns, recommendation (3–5 evidence-cited highlights; concerns; `strong_fit` / `possible_fit` / `weak_fit`)
+- [x] Protected-attribute exclusion (spec R3 — `buildCandidateView` sends only job-relevant fields: no name, gender, age, nationality, marital status or photo; the prompt forbids inferring them)
+- [x] Model version + inputs logged per run (spec R4 — `model` + full `inputs` snapshot stored on every screening row). Never touches `application.stage` (spec R2 — recommends only, no auto-reject)
+
+**Surfacing:** applicants list now shows a colour-banded ScoreRing + recommendation and sorts by score (gated on `screening.view_score`). The full match-report view, filters and configurable weights are **CP-14**.
+
+**Verification:** `node scripts/test-screening.cjs` → **11/11 pass** (schema, write via rerank perm, evidence payloads round-trip, stage untouched, view_score gate, write gate, cross-org isolation). `node scripts/test-screening-smoke.cjs` → live Gemini run separates a strong candidate (**95 / strong_fit**, all must-haves matched) from a weak one (**30 / weak_fit**, TypeScript + 5-yrs + state-mgmt correctly missing, 3 concerns). Typecheck + lint + build all clean. Migration: 0018_screening.
 
 ### ⬜ CP-14 — Match Reports & Ranking UI
 - [ ] Ranked list with colour-coded bands

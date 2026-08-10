@@ -190,13 +190,17 @@ export const listCandidates = cache(
       location: string | null;
       applicationCount: number;
       latestStage: ApplicationStage | null;
+      latestOpening: { id: string; title: string } | null;
+      openingCount: number;
     }[]
   > => {
     const supabase = await createClient();
 
     let query = supabase
       .from("candidates")
-      .select("id, full_name, email, headline, location, applications(stage, applied_at)")
+      .select(
+        "id, full_name, email, headline, location, applications(stage, applied_at, job_openings(id, title))",
+      )
       .order("created_at", { ascending: false });
 
     if (search?.trim()) {
@@ -206,10 +210,18 @@ export const listCandidates = cache(
     const { data } = await query;
 
     return (data ?? []).map((c) => {
-      const apps = (c.applications ?? []) as { stage: ApplicationStage; applied_at: string }[];
-      const latest = apps
+      const apps = (c.applications ?? []) as {
+        stage: ApplicationStage;
+        applied_at: string;
+        job_openings: { id: string; title: string } | null;
+      }[];
+      const sorted = apps
         .slice()
-        .sort((a, b) => new Date(b.applied_at).getTime() - new Date(a.applied_at).getTime())[0];
+        .sort((a, b) => new Date(b.applied_at).getTime() - new Date(a.applied_at).getTime());
+      const latest = sorted[0];
+      const distinctOpenings = new Set(
+        apps.map((a) => a.job_openings?.id).filter(Boolean) as string[],
+      );
       return {
         id: c.id,
         fullName: c.full_name,
@@ -218,6 +230,8 @@ export const listCandidates = cache(
         location: c.location,
         applicationCount: apps.length,
         latestStage: latest?.stage ?? null,
+        latestOpening: latest?.job_openings ?? null,
+        openingCount: distinctOpenings.size,
       };
     });
   },

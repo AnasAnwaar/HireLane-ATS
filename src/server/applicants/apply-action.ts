@@ -1,5 +1,7 @@
 "use server";
 
+import { after } from "next/server";
+
 import { createAdminClient } from "@/lib/supabase/server";
 import {
   ALLOWED_CV_TYPES,
@@ -7,6 +9,8 @@ import {
   applySchema,
 } from "@/lib/validation/apply";
 import { toFieldErrors, type ActionResult } from "@/lib/validation/auth";
+import { isAiConfigured } from "@/server/ai/gemini";
+import { screenApplication } from "@/server/screening/screen";
 
 /**
  * Public application submission (spec §UC-3).
@@ -153,6 +157,21 @@ export async function submitApplicationAction(
     }
     // A failed CV upload doesn't fail the whole application — the candidate is
     // still recorded and can be asked for their CV later.
+  }
+
+  // Auto-screen on arrival (spec §UC-4 step 1). Runs AFTER the response so the
+  // applicant isn't kept waiting on the model; the service-role client is used
+  // because the applicant has no session. HR can always re-rank on demand.
+  if (isAiConfigured() && applicationId) {
+    const appId = applicationId;
+    after(async () => {
+      try {
+        await screenApplication(admin, orgId, appId, null);
+      } catch {
+        // Best-effort — a failed auto-screen leaves the applicant unscored until
+        // the next Re-rank; it must never surface to the applicant.
+      }
+    });
   }
 
   return {

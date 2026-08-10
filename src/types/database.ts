@@ -54,6 +54,15 @@ export type NoteVisibility = "private" | "team" | "management";
 export type ConnectionMode = "assisted" | "oauth";
 export type ConnectionStatus = "connected" | "expired" | "disconnected";
 export type PostingStatus = "draft" | "scheduled" | "published" | "failed" | "closed";
+export type ScreeningStatus = "scored" | "needs_manual_review" | "failed";
+export type ScreeningRecommendation = "strong_fit" | "possible_fit" | "weak_fit";
+export type CoverageStatus = "matched" | "partial" | "missing";
+
+/** Explainability payloads stored on a screening (spec §UC-4 R1). */
+export type CoverageItem = { requirement: string; status: CoverageStatus; evidence: string };
+export type CriterionScore = { key: string; label: string; score: number; note: string };
+export type ScreeningHighlight = { text: string; evidence: string };
+export type ScreeningConcern = { text: string };
 
 type Timestamps = {
   created_at: string;
@@ -352,6 +361,30 @@ export type JobPosting = Timestamps & {
   published_by: string | null;
 };
 
+export type ApplicationScreening = Timestamps & {
+  id: string;
+  organization_id: string;
+  application_id: string;
+  job_opening_id: string;
+  status: ScreeningStatus;
+  score: number | null;
+  recommendation: ScreeningRecommendation | null;
+  summary: string | null;
+  must_haves: CoverageItem[];
+  nice_to_haves: CoverageItem[];
+  criteria: CriterionScore[];
+  highlights: ScreeningHighlight[];
+  concerns: ScreeningConcern[];
+  model: string | null;
+  inputs: unknown | null;
+  error: string | null;
+  override_recommendation: ScreeningRecommendation | null;
+  override_reason: string | null;
+  overridden_by: string | null;
+  overridden_at: string | null;
+  scored_by: string | null;
+};
+
 /** Insert helper: server-defaulted columns are optional. */
 type Insertable<T, TRequired extends keyof T> = Pick<T, TRequired> &
   Partial<Omit<T, TRequired>>;
@@ -518,6 +551,15 @@ export type Database = {
           Rel<"organization_id", "organizations">,
           Rel<"job_opening_id", "job_openings">,
           Rel<"channel_key", "channels">,
+        ]
+      >;
+      application_screenings: Table<
+        ApplicationScreening,
+        "organization_id" | "application_id" | "job_opening_id",
+        [
+          Rel<"organization_id", "organizations">,
+          Rel<"application_id", "applications">,
+          Rel<"job_opening_id", "job_openings">,
         ]
       >;
     };

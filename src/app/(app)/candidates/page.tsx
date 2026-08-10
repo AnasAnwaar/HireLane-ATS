@@ -1,4 +1,4 @@
-import { Search, Users } from "lucide-react";
+import { Briefcase, Search, Users } from "lucide-react";
 import Link from "next/link";
 
 import { PageBody, PageHeader } from "@/components/layout/app-shell";
@@ -68,9 +68,18 @@ export default async function CandidatesPage({
                       {c.headline ? `${c.headline} · ` : ""}
                       {c.email}
                     </p>
+                    {c.latestOpening && (
+                      <span className="mt-1.5 inline-flex max-w-full items-center gap-1 rounded-md bg-secondary px-2 py-0.5 text-xs font-medium text-secondary-foreground">
+                        <Briefcase className="size-3 shrink-0 text-muted-foreground" />
+                        <span className="truncate">{c.latestOpening.title}</span>
+                        {c.openingCount > 1 && (
+                          <span className="text-muted-foreground">+{c.openingCount - 1}</span>
+                        )}
+                      </span>
+                    )}
                   </div>
                   <div className="flex shrink-0 items-center gap-3 text-xs text-muted-foreground">
-                    <span>
+                    <span className="hidden sm:inline">
                       {c.applicationCount}{" "}
                       {c.applicationCount === 1 ? "application" : "applications"}
                     </span>

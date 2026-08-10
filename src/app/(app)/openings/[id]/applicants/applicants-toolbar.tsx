@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, Link2, Loader2, UserPlus } from "lucide-react";
+import { Check, Link2, Loader2, Sparkles, UserPlus } from "lucide-react";
 import { useRouter } from "next/navigation";
 import * as React from "react";
 import { toast } from "sonner";
@@ -11,23 +11,39 @@ import { Field } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import type { ActionResult } from "@/lib/validation/auth";
 import { addCandidateAction } from "@/server/applicants/actions";
+import { rerankOpeningAction } from "@/server/screening/actions";
 
 export function ApplicantsToolbar({
   openingId,
   applyUrl,
   isOpen,
   canImport,
+  canRerank,
 }: {
   openingId: string;
   applyUrl: string;
   isOpen: boolean;
   canImport: boolean;
+  canRerank: boolean;
 }) {
   const router = useRouter();
   const [copied, setCopied] = React.useState(false);
   const [adding, setAdding] = React.useState(false);
   const [pending, setPending] = React.useState(false);
+  const [reranking, setReranking] = React.useState(false);
   const [error, setError] = React.useState<ActionResult | null>(null);
+
+  async function rerank() {
+    setReranking(true);
+    const result = await rerankOpeningAction(openingId);
+    setReranking(false);
+    if (result.ok) {
+      toast.success(result.message ?? "Re-ranked.");
+      router.refresh();
+    } else {
+      toast.error(result.error);
+    }
+  }
 
   // A manual submit handler (not useActionState) so success-side UI changes —
   // closing the modal, refreshing — happen in an event handler, not an effect.
@@ -61,6 +77,12 @@ export function ApplicantsToolbar({
         <Button variant="outline" size="sm" onClick={copyLink}>
           {copied ? <Check className="text-success" /> : <Link2 />}
           Copy apply link
+        </Button>
+      )}
+      {canRerank && (
+        <Button variant="outline" size="sm" onClick={rerank} disabled={reranking}>
+          {reranking ? <Loader2 className="animate-spin" /> : <Sparkles />}
+          Re-rank all
         </Button>
       )}
       {canImport && (

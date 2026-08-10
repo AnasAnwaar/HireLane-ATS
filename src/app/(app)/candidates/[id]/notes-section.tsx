@@ -35,7 +35,10 @@ export function NotesSection({
   const router = useRouter();
   const [body, setBody] = React.useState("");
   const [visibility, setVisibility] = React.useState<NoteVisibility>("team");
+  const [filter, setFilter] = React.useState<NoteVisibility | "all">("all");
   const [pending, setPending] = React.useState(false);
+
+  const filteredNotes = filter === "all" ? notes : notes.filter((n) => n.visibility === filter);
 
   async function submit() {
     if (!body.trim()) return;
@@ -81,6 +84,7 @@ export function NotesSection({
             />
             <div className="flex flex-wrap items-center justify-between gap-2">
               <div className="flex items-center gap-1.5">
+                <span className="mr-0.5 text-xs text-muted-foreground">Visible to:</span>
                 {(Object.keys(VIS_META) as NoteVisibility[]).map((v) => {
                   const M = VIS_META[v];
                   const active = visibility === v;
@@ -113,8 +117,38 @@ export function NotesSection({
         {notes.length === 0 ? (
           <p className="text-sm text-muted-foreground">No notes yet.</p>
         ) : (
-          <ul className="space-y-3">
-            {notes.map((n) => {
+          <>
+            {/* Filter the list by audience. Distinct from the composer picker
+                above, which sets a new note's visibility. */}
+            <div className="flex flex-wrap items-center gap-1.5 border-t border-border pt-3">
+              <span className="mr-0.5 text-xs text-muted-foreground">Show:</span>
+              {(["all", "private", "team", "management"] as const).map((f) => {
+                const count = f === "all" ? notes.length : notes.filter((n) => n.visibility === f).length;
+                const label = f === "all" ? "All" : VIS_META[f].label;
+                const active = filter === f;
+                return (
+                  <button
+                    key={f}
+                    type="button"
+                    onClick={() => setFilter(f)}
+                    className={
+                      active
+                        ? "inline-flex items-center gap-1 rounded-md border border-primary bg-primary-soft px-2 py-1 text-xs font-medium text-primary"
+                        : "inline-flex items-center gap-1 rounded-md border border-border px-2 py-1 text-xs text-muted-foreground hover:bg-accent"
+                    }
+                  >
+                    {label}
+                    <span className="tabular-nums opacity-70">{count}</span>
+                  </button>
+                );
+              })}
+            </div>
+
+            {filteredNotes.length === 0 ? (
+              <p className="text-sm text-muted-foreground">No {filter} notes.</p>
+            ) : (
+              <ul className="space-y-3">
+                {filteredNotes.map((n) => {
               const M = VIS_META[n.visibility];
               return (
                 <li key={n.id} className="flex gap-3">
@@ -139,9 +173,11 @@ export function NotesSection({
                     <p className="mt-1 whitespace-pre-wrap text-sm">{n.body}</p>
                   </div>
                 </li>
-              );
-            })}
-          </ul>
+                  );
+                })}
+              </ul>
+            )}
+          </>
         )}
       </CardContent>
     </Card>
