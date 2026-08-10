@@ -46,7 +46,7 @@ export type ResolvedAttempt = {
   candidateId: string;
   organizationId: string;
   attempt: TestAttempt;
-  assignment: { id: string; test_id: string; deadline: string | null };
+  assignment: { id: string; test_id: string; deadline: string | null; screenReaderMode: boolean };
 };
 
 const AUTO_TYPES: QuestionType[] = ["single_choice", "multiple_choice", "true_false"];
@@ -199,7 +199,7 @@ export async function resolveAttempt(
 
   const { data: assignment } = await admin
     .from("test_assignments")
-    .select("id, test_id, candidate_id, deadline")
+    .select("id, test_id, candidate_id, deadline, screen_reader_mode")
     .eq("id", attempt.assignment_id)
     .maybeSingle();
   if (!assignment || assignment.candidate_id !== session.candidateId) return null;
@@ -208,7 +208,12 @@ export async function resolveAttempt(
     candidateId: session.candidateId,
     organizationId: session.organizationId,
     attempt: attempt as TestAttempt,
-    assignment: { id: assignment.id, test_id: assignment.test_id, deadline: assignment.deadline },
+    assignment: {
+      id: assignment.id,
+      test_id: assignment.test_id,
+      deadline: assignment.deadline,
+      screenReaderMode: assignment.screen_reader_mode,
+    },
   };
 }
 
@@ -250,6 +255,7 @@ export type RunnerData =
       testTitle: string;
       instructions: string | null;
       allowBacktrack: boolean;
+      screenReaderMode: boolean;
       expiresAt: string;
       questions: DeliveryQuestion[];
       answers: Record<string, TestAnswerResponse>;
@@ -290,6 +296,7 @@ export async function getRunnerData(rawToken: string, attemptId: string): Promis
     testTitle: snapshot.test.title,
     instructions: snapshot.test.instructions,
     allowBacktrack: snapshot.test.allow_backtrack,
+    screenReaderMode: r.assignment.screenReaderMode,
     expiresAt: r.attempt.expires_at,
     questions,
     answers,
@@ -372,7 +379,10 @@ export async function finalizeAttempt(
     const { marks, correct } = scoreChoice(q, selected);
     autoScore += marks;
     if (ans) {
-      await admin.from("test_answers").update({ awarded_marks: marks, is_correct: correct }).eq("id", ans.id);
+      await admin
+        .from("test_answers")
+        .update({ awarded_marks: marks, is_correct: correct, confirmed: true })
+        .eq("id", ans.id);
     } else {
       // Unanswered auto question → record a zero so the report is complete.
       await admin.from("test_answers").insert({
@@ -382,6 +392,7 @@ export async function finalizeAttempt(
         response: {},
         awarded_marks: 0,
         is_correct: false,
+        confirmed: true,
       });
     }
   }

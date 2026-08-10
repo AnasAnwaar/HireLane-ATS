@@ -17,6 +17,19 @@ import type {
 } from "@/types/database";
 
 import { generateTestQuestions, regenerateQuestion, type QuestionDraft } from "./generate";
+import { getAssessmentPolicy, type PolicyDefaults } from "./policy";
+
+/** Test columns seeded from the org's assessment policy (spec §UC-5, CP-18). */
+function policyColumns(policy: PolicyDefaults) {
+  return {
+    proctoring_level: policy.proctoringLevel,
+    duration_minutes: policy.durationMinutes,
+    passing_threshold: policy.passingThreshold,
+    attempts_allowed: policy.attempts,
+    allow_backtrack: policy.allowBacktrack,
+    shuffle_questions: policy.shuffleQuestions,
+  };
+}
 
 type Session = { organizationId: string; membershipId: string };
 
@@ -63,6 +76,7 @@ export async function createManualTestAction(
   }
 
   const db = await createClient();
+  const policy = await getAssessmentPolicy(db, s.organizationId);
   const { data, error } = await db
     .from("tests")
     .insert({
@@ -70,6 +84,7 @@ export async function createManualTestAction(
       job_opening_id: openingId,
       title: title.trim() || "Untitled test",
       created_by: s.membershipId,
+      ...policyColumns(policy),
     })
     .select("id")
     .single();
@@ -119,14 +134,16 @@ export async function createAiTestAction(
   }
   if (drafts.length === 0) return { ok: false, error: "The AI returned no questions. Try again." };
 
+  const policy = await getAssessmentPolicy(db, s.organizationId);
   const { data: test, error } = await db
     .from("tests")
     .insert({
       organization_id: s.organizationId,
       job_opening_id: openingId,
       title: params.title.trim() || `${ctx.title} — Assessment`,
-      duration_minutes: params.durationMinutes ?? null,
       created_by: s.membershipId,
+      ...policyColumns(policy),
+      duration_minutes: params.durationMinutes ?? policy.durationMinutes,
     })
     .select("id")
     .single();

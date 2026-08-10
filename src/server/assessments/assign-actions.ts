@@ -8,6 +8,8 @@ import type { ActionResult } from "@/lib/validation/auth";
 import { authorize } from "@/server/auth/authorize";
 import { getSessionContext } from "@/server/auth/session";
 
+import { getAssessmentPolicy } from "./policy";
+
 /**
  * Test assignment (spec §UC-5.2). HR gives a PUBLISHED test to an applicant with
  * a deadline. The candidate takes it through their portal; the attempt binds to
@@ -107,6 +109,12 @@ export async function grantRetakeAction(assignmentId: string): Promise<ActionRes
     .eq("id", assignmentId)
     .maybeSingle();
   if (!a) return { ok: false, error: "Assignment not found." };
+
+  // Enforce the org's retake cap (spec §UC-5, CP-18).
+  const policy = await getAssessmentPolicy(db, g.organizationId);
+  if (a.attempts_allowed >= policy.maxAttempts) {
+    return { ok: false, error: `The assessment policy caps attempts at ${policy.maxAttempts}.` };
+  }
 
   const { error } = await db
     .from("test_assignments")

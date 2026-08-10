@@ -133,16 +133,24 @@ export function TestRunner({ token, data }: { token: string; data: ActiveRunner 
   const meta = QUESTION_TYPE_META[q.type];
   const selected = answers[q.id]?.selected ?? [];
   const low = remaining <= 60_000;
+  const sr = data.screenReaderMode;
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col bg-background">
+    <div className={cn("fixed inset-0 z-50 flex flex-col bg-background", sr && "text-[1.0625rem]")}>
       {/* Header */}
       <header className="flex items-center gap-3 border-b border-border bg-card px-4 py-3 sm:px-6">
         <p className="truncate text-sm font-semibold">{testTitle}</p>
-        <span className="ml-auto text-xs text-muted-foreground">
+        {sr && (
+          <span className="rounded bg-primary-soft px-1.5 py-0.5 text-[0.625rem] font-medium text-primary">
+            Screen-reader mode
+          </span>
+        )}
+        <span className="ml-auto text-xs text-muted-foreground" aria-live="polite">
           {saving ? "Saving…" : "Saved"}
         </span>
         <span
+          role="timer"
+          aria-label={`Time remaining ${fmt(remaining)}`}
           className={cn(
             "flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-sm font-semibold tabular-nums",
             low ? "bg-destructive/10 text-destructive" : "bg-muted text-foreground",
@@ -173,9 +181,12 @@ export function TestRunner({ token, data }: { token: string; data: ActiveRunner 
                     <button
                       key={o.id}
                       type="button"
+                      role={meta.multi ? "checkbox" : "radio"}
+                      aria-checked={on}
                       onClick={() => setChoice(o.id, meta.multi)}
                       className={cn(
-                        "flex w-full items-center gap-3 rounded-lg border px-4 py-3 text-left text-sm transition-colors",
+                        "flex w-full items-center gap-3 rounded-lg border px-4 py-3 text-left transition-colors",
+                        sr ? "text-base" : "text-sm",
                         on ? "border-primary bg-primary-soft" : "border-border hover:bg-accent",
                       )}
                     >

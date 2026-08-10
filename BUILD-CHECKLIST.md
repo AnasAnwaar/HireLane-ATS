@@ -29,7 +29,7 @@
 | **P1 — Job Openings & Applicants** | CP-6 … CP-9 | ✅ **COMPLETE** |
 | **P2 — Distribution (channels + AI posts)** | CP-10 … CP-12 | ✅ **COMPLETE** |
 | **P3 — AI Screening** | CP-13 … CP-14 | ✅ **COMPLETE** |
-| **P4 — Assessments** | CP-15 … CP-18 | 🔄 **CP-15, CP-16 done** · CP-17–18 remaining |
+| **P4 — Assessments** | CP-15 … CP-18 | ✅ **COMPLETE** |
 | **P5 — Proctoring & Interviews** | CP-19 … CP-22 | ⬜ Not started |
 | **P6 — Collaboration & Reporting** | CP-23 … CP-25 | ⬜ Not started |
 
@@ -720,22 +720,21 @@ watch tuned LinkedIn/Indeed/Rozee/Careers posts appear; edit and regenerate them
 **Verification:** `node scripts/test-delivery.cjs` → **15/15 pass** (key-stripping, single + partial-credit scoring, RLS assign-gate, answer reads gated on `view_answers`, version pinning, cross-org isolation). Typecheck + lint + build (35 routes) all clean.
 
 > Deferred to Phase 5: real proctoring capture + hardware/system check (UC-5.3). The consent screen and `proctoring_level` are wired; monitoring itself lands in CP-19–22.
-- [ ] Assign to candidates with deadline
-- [ ] Candidate test runner: full-screen, timer, auto-save
-- [ ] Shuffling, navigation rules, attempt limits
-- [ ] Disconnect/resume with grace window
-- [ ] Auto-submit on expiry
 
-### ⬜ CP-17 — Scoring
-- [ ] Auto-scoring for MCQ / true-false (incl. partial credit)
-- [ ] AI-assisted grading of written answers against rubrics
-- [ ] Human confirmation step
-- [ ] Per-skill breakdown on the profile
+### ✅ CP-17 — Scoring
+- [x] Auto-scoring for MCQ / true-false (incl. partial credit) — done in CP-16 (`finalizeAttempt`), now marked `confirmed` by construction so it's final without a human step
+- [x] AI-assisted grading of written answers against rubrics ([grade.ts](src/server/assessments/grade.ts) → Gemini grades each short/long/scenario answer 0–max against its rubric with a rationale; **suggestion only**)
+- [x] Human confirmation step (spec §UC-5.2 step 7 — the results view shows the AI suggestion + rationale; HR confirms or amends the mark; nothing counts until `confirmed`, gated on `assessments.confirm_grades`; "Confirm all" accepts every suggestion at once)
+- [x] Per-skill breakdown on the profile (results view at [candidates/[id]/attempt/[attemptId]](<src/app/(app)/candidates/[id]/attempt/[attemptId]/results-view.tsx>): overall score, per-skill bars, per-question detail with the candidate's answer, correct answer for auto items, and grading controls for written items; reachable via **Results** on the Assessments card)
 
-### ⬜ CP-18 — Assessment Policy & Accessibility
-- [ ] Admin-configurable assessment policy
-- [ ] Accommodations: extra time, screen-reader mode
-- [ ] Retake grants
+**Verification:** `node scripts/test-grading.cjs` → **10/10 pass** (total counts only confirmed marks, per-skill grouping, AI suggestion doesn't count until confirmed, HR confirm write, `confirm_grades` RLS gate, cross-org isolation). Migration 0022 (grading columns). Typecheck + lint + build (36 routes) all clean.
+
+### ✅ CP-18 — Assessment Policy & Accessibility
+- [x] Admin-configurable assessment policy (org-wide defaults for proctoring, duration, pass %, attempts, backtrack, shuffle + the retake cap — [Administration → Assessment policy](<src/app/(app)/admin/assessments/policy-form.tsx>); migration 0023 `assessment_policies`, gated on `administration.configure_ai_policy`). New tests inherit these defaults on creation
+- [x] Accommodations: extra time, screen-reader mode (spec §UC-5.2 A4 — per-assignment on the Assign dialog; extra minutes fold into the attempt's `expires_at`; screen-reader mode flows to the runner which applies larger type + ARIA roles/`aria-checked` on options + a labelled `timer`)
+- [x] Retake grants (Grant retake / Extend deadline on the Assessments card; retakes are **capped by the policy's `max_attempts`** — enforced in `grantRetakeAction`)
+
+**Verification:** `node scripts/test-policy.cjs` → **8/8 pass** (retake-cap logic, policy schema, admin-only write with member read, `max_attempts` constraint, cross-org isolation). Typecheck + lint + build (37 routes) all clean. **Phase 4 complete.**
 
 ---
 

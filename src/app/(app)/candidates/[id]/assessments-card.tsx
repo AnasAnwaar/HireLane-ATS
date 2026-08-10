@@ -1,6 +1,7 @@
 "use client";
 
 import { ClipboardList, Loader2, MoreVertical, Plus } from "lucide-react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import * as React from "react";
 import { toast } from "sonner";
@@ -28,6 +29,7 @@ import { cn, formatDate } from "@/lib/utils";
 import {
   assignTestAction,
   cancelAssignmentAction,
+  extendDeadlineAction,
   grantRetakeAction,
 } from "@/server/assessments/assign-actions";
 
@@ -40,6 +42,7 @@ export type AssignmentView = {
   attemptsAllowed: number;
   autoScore: number | null;
   maxScore: number | null;
+  attemptId: string | null;
 };
 
 export type AssignableTest = {
@@ -58,11 +61,13 @@ const STATUS_META: Record<string, { label: string; variant: "secondary" | "warni
 };
 
 export function AssessmentsCard({
+  candidateId,
   assignments,
   assignableTests,
   canAssign,
   canGrantRetake,
 }: {
+  candidateId: string;
   assignments: AssignmentView[];
   assignableTests: AssignableTest[];
   canAssign: boolean;
@@ -71,6 +76,7 @@ export function AssessmentsCard({
   const router = useRouter();
   const confirm = useConfirm();
   const [assigning, setAssigning] = React.useState(false);
+  const [extendingId, setExtendingId] = React.useState<string | null>(null);
   const [busy, setBusy] = React.useState<string | null>(null);
 
   async function cancel(id: string) {
@@ -142,6 +148,11 @@ export function AssessmentsCard({
                     )}
                   </div>
                 </div>
+                {a.attemptId && (a.status === "submitted" || a.status === "expired" || a.status === "in_progress") && (
+                  <Button variant="outline" size="sm" asChild>
+                    <Link href={`/candidates/${candidateId}/attempt/${a.attemptId}`}>Results</Link>
+                  </Button>
+                )}
                 <Badge variant={meta.variant} dot>
                   {meta.label}
                 </Badge>
@@ -155,6 +166,9 @@ export function AssessmentsCard({
                     <DropdownMenuContent align="end">
                       {canGrantRetake && a.status === "submitted" && (
                         <DropdownMenuItem onClick={() => retake(a.id)}>Grant retake</DropdownMenuItem>
+                      )}
+                      {canAssign && a.status !== "cancelled" && a.status !== "submitted" && (
+                        <DropdownMenuItem onClick={() => setExtendingId(a.id)}>Extend deadline</DropdownMenuItem>
                       )}
                       {canAssign && a.status !== "cancelled" && (
                         <DropdownMenuItem className="text-destructive focus:text-destructive" onClick={() => cancel(a.id)}>
@@ -179,7 +193,69 @@ export function AssessmentsCard({
           router.refresh();
         }}
       />
+
+      <ExtendDialog
+        assignmentId={extendingId}
+        onClose={() => setExtendingId(null)}
+        onDone={() => {
+          setExtendingId(null);
+          router.refresh();
+        }}
+      />
     </Card>
+  );
+}
+
+function ExtendDialog({
+  assignmentId,
+  onClose,
+  onDone,
+}: {
+  assignmentId: string | null;
+  onClose: () => void;
+  onDone: () => void;
+}) {
+  const [deadline, setDeadline] = React.useState("");
+  const [busy, setBusy] = React.useState(false);
+
+  async function extend() {
+    if (!assignmentId || !deadline) {
+      toast.error("Pick a new deadline.");
+      return;
+    }
+    setBusy(true);
+    const r = await extendDeadlineAction(assignmentId, new Date(deadline).toISOString());
+    setBusy(false);
+    if (r.ok) {
+      toast.success(r.message ?? "Deadline extended.");
+      onDone();
+    } else {
+      toast.error(r.error);
+    }
+  }
+
+  return (
+    <Dialog open={assignmentId != null} onOpenChange={(o) => !o && onClose()}>
+      <DialogContent className="max-w-sm">
+        <DialogHeader>
+          <DialogTitle>Extend deadline</DialogTitle>
+          <DialogDescription>Give the candidate more time to complete the test.</DialogDescription>
+        </DialogHeader>
+        <div>
+          <label className="mb-1 block text-xs font-medium text-muted-foreground">New deadline</label>
+          <Input type="datetime-local" value={deadline} onChange={(e) => setDeadline(e.target.value)} />
+        </div>
+        <DialogFooter>
+          <Button variant="outline" onClick={onClose}>
+            Cancel
+          </Button>
+          <Button onClick={extend} disabled={busy}>
+            {busy ? <Loader2 className="animate-spin" /> : null}
+            Extend
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }
 
@@ -196,6 +272,8 @@ function AssignDialog({
 }) {
   const [testKey, setTestKey] = React.useState(tests[0] ? `${tests[0].applicationId}::${tests[0].testId}` : "");
   const [deadline, setDeadline] = React.useState("");
+  const [extraTime, setExtraTime] = React.useState(0);
+  const [screenReader, setScreenReader] = React.useState(false);
   const [busy, setBusy] = React.useState(false);
 
   async function assign() {
@@ -207,6 +285,8 @@ function AssignDialog({
     setBusy(true);
     const r = await assignTestAction(t.applicationId, t.testId, {
       deadline: deadline ? new Date(deadline).toISOString() : null,
+      extraTimeMinutes: extraTime,
+      screenReaderMode: screenReader,
     });
     setBusy(false);
     if (r.ok) {
@@ -254,6 +334,35 @@ function AssignDialog({
               Deadline (optional)
             </label>
             <Input type="datetime-local" value={deadline} onChange={(e) => setDeadline(e.target.value)} />
+          </div>
+
+          {/* Accommodations (spec §UC-5.2 A4) */}
+          <div className="rounded-lg border border-border bg-muted/30 p-3">
+            <p className="mb-2 text-xs font-medium text-muted-foreground">Accommodations</p>
+            <div className="flex items-center gap-2">
+              <label className="text-sm" htmlFor="extra-time">
+                Extra time
+              </label>
+              <Input
+                id="extra-time"
+                type="number"
+                min={0}
+                max={240}
+                value={extraTime}
+                onChange={(e) => setExtraTime(Math.max(0, Number(e.target.value) || 0))}
+                className="h-8 w-20"
+              />
+              <span className="text-xs text-muted-foreground">min</span>
+            </div>
+            <label className="mt-2 flex cursor-pointer items-center gap-2 text-sm">
+              <input
+                type="checkbox"
+                checked={screenReader}
+                onChange={(e) => setScreenReader(e.target.checked)}
+                className="size-4 accent-primary"
+              />
+              Screen-reader friendly mode
+            </label>
           </div>
         </div>
         <DialogFooter>

@@ -510,6 +510,18 @@ export type TestAttempt = Timestamps & {
   max_score: number | null;
 };
 
+export type AssessmentPolicy = Timestamps & {
+  organization_id: string;
+  default_proctoring_level: ProctoringLevel;
+  default_duration_minutes: number;
+  default_passing_threshold: number | null;
+  default_attempts: number;
+  default_allow_backtrack: boolean;
+  default_shuffle_questions: boolean;
+  max_attempts: number;
+  updated_by: string | null;
+};
+
 export type TestAnswerResponse = { selected?: string[]; text?: string };
 
 export type TestAnswer = Timestamps & {
@@ -520,6 +532,11 @@ export type TestAnswer = Timestamps & {
   response: TestAnswerResponse;
   awarded_marks: number | null;
   is_correct: boolean | null;
+  ai_suggested_marks: number | null;
+  ai_rationale: string | null;
+  confirmed: boolean;
+  graded_by: string | null;
+  graded_at: string | null;
 };
 
 /** Insert helper: server-defaulted columns are optional. */
@@ -742,6 +759,11 @@ export type Database = {
         TestAnswer,
         "organization_id" | "attempt_id" | "question_id",
         [Rel<"organization_id", "organizations">, Rel<"attempt_id", "test_attempts">]
+      >;
+      assessment_policies: Table<
+        AssessmentPolicy,
+        "organization_id",
+        [Rel<"organization_id", "organizations">]
       >;
     };
     Views: Record<string, never>;

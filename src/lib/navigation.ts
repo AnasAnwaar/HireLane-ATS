@@ -109,6 +109,12 @@ export const NAV_SECTIONS: NavSection[] = [
         icon: Plug,
         permission: "integrations.view",
       },
+      {
+        label: "Assessment policy",
+        href: "/admin/assessments",
+        icon: ClipboardList,
+        permission: "administration.configure_ai_policy",
+      },
     ],
   },
 ];

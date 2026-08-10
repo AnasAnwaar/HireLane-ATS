@@ -102,11 +102,14 @@ export default async function CandidateProfilePage({
       .order("created_at", { ascending: false });
 
     const aList = aRows ?? [];
-    const attemptByAssignment = new Map<string, { auto_score: number | null; max_score: number | null }>();
+    const attemptByAssignment = new Map<
+      string,
+      { id: string; auto_score: number | null; max_score: number | null }
+    >();
     if (aList.length) {
       const { data: atts } = await supabase
         .from("test_attempts")
-        .select("assignment_id, auto_score, max_score, created_at")
+        .select("id, assignment_id, auto_score, max_score, created_at")
         .in(
           "assignment_id",
           aList.map((a) => a.id),
@@ -114,7 +117,11 @@ export default async function CandidateProfilePage({
         .order("created_at", { ascending: false });
       for (const at of atts ?? []) {
         if (!attemptByAssignment.has(at.assignment_id)) {
-          attemptByAssignment.set(at.assignment_id, { auto_score: at.auto_score, max_score: at.max_score });
+          attemptByAssignment.set(at.assignment_id, {
+            id: at.id,
+            auto_score: at.auto_score,
+            max_score: at.max_score,
+          });
         }
       }
     }
@@ -127,6 +134,7 @@ export default async function CandidateProfilePage({
       attemptsAllowed: a.attempts_allowed,
       autoScore: attemptByAssignment.get(a.id)?.auto_score ?? null,
       maxScore: attemptByAssignment.get(a.id)?.max_score ?? null,
+      attemptId: attemptByAssignment.get(a.id)?.id ?? null,
     }));
 
     if (canAssign) {
@@ -241,6 +249,7 @@ export default async function CandidateProfilePage({
           {/* Assessments (CP-16) */}
           {canViewAssessments && (
             <AssessmentsCard
+              candidateId={candidate.id}
               assignments={assignments}
               assignableTests={assignableTests}
               canAssign={canAssign}
