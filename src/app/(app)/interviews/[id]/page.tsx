@@ -69,6 +69,25 @@ export default async function InterviewPage({ params }: { params: Promise<{ id: 
     recordingUrl = signed?.signedUrl ?? null;
   }
 
+  // Async answers (candidate video responses) with signed playback URLs.
+  const asyncQuestions = interview.is_async ? interview.async_questions : [];
+  const asyncAnswerUrl = new Map<number, string>();
+  if (interview.is_async) {
+    const { data: answerRows } = await supabase
+      .from("interview_answers")
+      .select("question_index, video_path")
+      .eq("interview_id", id);
+    if (answerRows?.length) {
+      const admin = createAdminClient();
+      for (const a of answerRows) {
+        const { data: signed } = await admin.storage
+          .from("interview-recordings")
+          .createSignedUrl(a.video_path, 3600);
+        if (signed?.signedUrl) asyncAnswerUrl.set(a.question_index, signed.signedUrl);
+      }
+    }
+  }
+
   let openingTitle: string | null = null;
   if (interview.job_opening_id) {
     const { data: o } = await supabase
@@ -189,8 +208,42 @@ export default async function InterviewPage({ params }: { params: Promise<{ id: 
           />
         )}
 
+        {/* Async video answers */}
+        {interview.is_async && (
+          <Card className="p-5">
+            <div className="flex items-center gap-2">
+              <Video className="size-4 text-muted-foreground" />
+              <p className="text-sm font-semibold">Async video answers</p>
+              <Badge variant="secondary" className="ml-auto">
+                {asyncAnswerUrl.size}/{asyncQuestions.length} answered
+              </Badge>
+            </div>
+            <p className="mt-1.5 text-xs text-muted-foreground">
+              The candidate records these from their portal link.
+            </p>
+            <ol className="mt-4 space-y-4">
+              {asyncQuestions.map((q, i) => (
+                <li key={i}>
+                  <p className="text-sm font-medium">
+                    Q{i + 1}. {q.prompt}
+                  </p>
+                  {asyncAnswerUrl.has(i) ? (
+                    <video
+                      controls
+                      src={asyncAnswerUrl.get(i)}
+                      className="mt-2 w-full max-w-lg rounded-lg border border-border"
+                    />
+                  ) : (
+                    <p className="mt-1 text-xs text-muted-foreground">Not answered yet.</p>
+                  )}
+                </li>
+              ))}
+            </ol>
+          </Card>
+        )}
+
         {/* Recording + transcript (consent-gated) */}
-        {(canRecord || interview.recording_path) && (
+        {!interview.is_async && (canRecord || interview.recording_path) && (
           <RecordingPanel
             interviewId={id}
             orgId={interview.organization_id}

@@ -51,6 +51,10 @@ export function ScheduleDialog({
   const [duration, setDuration] = React.useState(45);
   const [videoLink, setVideoLink] = React.useState("");
   const [panelists, setPanelists] = React.useState<string[]>([]);
+  const [isAsync, setIsAsync] = React.useState(false);
+  const [questions, setQuestions] = React.useState<{ prompt: string; maxSeconds: number }[]>([
+    { prompt: "", maxSeconds: 120 },
+  ]);
 
   function togglePanelist(id: string) {
     setPanelists((p) => (p.includes(id) ? p.filter((x) => x !== id) : [...p, id]));
@@ -63,6 +67,10 @@ export function ScheduleDialog({
     }
     if (!when) {
       toast.error("Pick a date and time.");
+      return;
+    }
+    if (isAsync && !questions.some((q) => q.prompt.trim())) {
+      toast.error("Add at least one question.");
       return;
     }
     setBusy(true);
@@ -78,6 +86,10 @@ export function ScheduleDialog({
       timezone,
       videoLink,
       panelistIds: panelists,
+      isAsync,
+      asyncQuestions: questions
+        .filter((q) => q.prompt.trim())
+        .map((q) => ({ prompt: q.prompt, max_seconds: q.maxSeconds })),
     });
     setBusy(false);
     if (r.ok) {
@@ -166,7 +178,7 @@ export function ScheduleDialog({
               </div>
             </div>
 
-            {mode === "video" && (
+            {mode === "video" && !isAsync && (
               <Field id="videoLink" label="Video link" hint="Paste a Zoom / Meet / Teams link">
                 <Input
                   value={videoLink}
@@ -174,6 +186,76 @@ export function ScheduleDialog({
                   placeholder="https://meet.google.com/…"
                 />
               </Field>
+            )}
+
+            <label className="flex cursor-pointer items-start gap-2.5 rounded-lg border border-border p-3 text-sm">
+              <input
+                type="checkbox"
+                checked={isAsync}
+                onChange={(e) => setIsAsync(e.target.checked)}
+                className="mt-0.5 size-4 accent-primary"
+              />
+              <span>
+                Async video interview
+                <span className="block text-xs text-muted-foreground">
+                  No live call — the candidate records answers to your questions on their own time.
+                </span>
+              </span>
+            </label>
+
+            {isAsync && (
+              <div className="space-y-2">
+                <label className="block text-xs font-medium text-muted-foreground">Questions</label>
+                {questions.map((q, i) => (
+                  <div key={i} className="flex items-start gap-2">
+                    <textarea
+                      value={q.prompt}
+                      onChange={(e) =>
+                        setQuestions((qs) => qs.map((x, j) => (j === i ? { ...x, prompt: e.target.value } : x)))
+                      }
+                      rows={2}
+                      placeholder={`Question ${i + 1}`}
+                      className="min-w-0 flex-1 rounded-md border border-input bg-background px-3 py-2 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                    />
+                    <div className="flex flex-col items-stretch gap-1">
+                      <Input
+                        type="number"
+                        min={30}
+                        max={600}
+                        value={q.maxSeconds}
+                        onChange={(e) =>
+                          setQuestions((qs) =>
+                            qs.map((x, j) =>
+                              j === i
+                                ? { ...x, maxSeconds: Math.max(30, Math.min(600, Number(e.target.value) || 120)) }
+                                : x,
+                            ),
+                          )
+                        }
+                        className="w-20"
+                        title="Max seconds"
+                      />
+                      {questions.length > 1 && (
+                        <button
+                          type="button"
+                          onClick={() => setQuestions((qs) => qs.filter((_, j) => j !== i))}
+                          className="text-xs text-muted-foreground hover:text-destructive"
+                        >
+                          Remove
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                ))}
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setQuestions((qs) => [...qs, { prompt: "", maxSeconds: 120 }])}
+                >
+                  Add question
+                </Button>
+              </div>
             )}
 
             <div>

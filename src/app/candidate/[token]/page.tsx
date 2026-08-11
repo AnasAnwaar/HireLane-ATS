@@ -1,11 +1,12 @@
-import { CheckCircle2, ClipboardList, Clock } from "lucide-react";
+import { CheckCircle2, ClipboardList, Clock, Video } from "lucide-react";
 import Link from "next/link";
 
 import { BrandMark } from "@/components/brand-mark";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { createAdminClient } from "@/lib/supabase/server";
 import { formatDate } from "@/lib/utils";
-import type { ApplicationStage } from "@/types/database";
+import type { ApplicationStage, AsyncQuestion } from "@/types/database";
 import { getPortalAssignments } from "@/server/assessments/delivery";
 import { resolvePortalSession } from "@/server/candidates/portal-access";
 
@@ -64,6 +65,25 @@ export default async function CandidatePortalPage({
 
   const firstName = portal.candidate.fullName.split(" ")[0] || "there";
   const assignments = await getPortalAssignments(token);
+
+  // Async video interviews this candidate can record.
+  const admin = createAdminClient();
+  const { data: asyncRows } = await admin
+    .from("interviews")
+    .select("id, title, async_questions")
+    .eq("candidate_id", portal.candidateId)
+    .eq("is_async", true)
+    .neq("status", "cancelled");
+  const asyncInterviews = await Promise.all(
+    (asyncRows ?? []).map(async (iv) => {
+      const { count } = await admin
+        .from("interview_answers")
+        .select("id", { count: "exact", head: true })
+        .eq("interview_id", iv.id);
+      const total = ((iv.async_questions ?? []) as AsyncQuestion[]).length;
+      return { id: iv.id, title: iv.title, total, answered: count ?? 0 };
+    }),
+  );
 
   return (
     <div className="min-h-dvh bg-background">
@@ -156,6 +176,40 @@ export default async function CandidatePortalPage({
                     <Badge variant="secondary" dot>
                       No attempts left
                     </Badge>
+                  )}
+                </div>
+              );
+            })}
+          </section>
+        )}
+
+        {/* Async video interviews (spec §UC-7) */}
+        {asyncInterviews.length > 0 && (
+          <section className="mt-8 space-y-3">
+            <h2 className="text-sm font-semibold">Video interviews</h2>
+            {asyncInterviews.map((iv) => {
+              const done = iv.total > 0 && iv.answered >= iv.total;
+              return (
+                <div key={iv.id} className="flex items-center gap-3 rounded-xl border border-border bg-card p-4 shadow-card">
+                  <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary-soft text-primary">
+                    <Video className="size-5" />
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate font-medium">{iv.title}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {iv.answered}/{iv.total} answered · record on your own time
+                    </p>
+                  </div>
+                  {done ? (
+                    <Badge variant="success" dot>
+                      Submitted
+                    </Badge>
+                  ) : (
+                    <Button size="sm" asChild>
+                      <Link href={`/candidate/${token}/interview/${iv.id}`}>
+                        {iv.answered > 0 ? "Continue" : "Record answers"}
+                      </Link>
+                    </Button>
                   )}
                 </div>
               );

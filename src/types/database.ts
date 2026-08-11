@@ -664,6 +664,20 @@ export type Interview = Timestamps & {
   recording_path: string | null;
   recording_uploaded_at: string | null;
   transcript: string | null;
+  is_async: boolean;
+  async_questions: AsyncQuestion[];
+};
+
+export type AsyncQuestion = { prompt: string; max_seconds: number };
+
+export type InterviewAnswer = {
+  id: string;
+  organization_id: string;
+  interview_id: string;
+  question_index: number;
+  video_path: string;
+  duration_seconds: number | null;
+  created_at: string;
 };
 
 export type InterviewPanelist = {
@@ -911,6 +925,11 @@ export type Database = {
       interview_scorecards: Table<
         InterviewScorecard,
         "organization_id" | "interview_id" | "membership_id",
+        [Rel<"organization_id", "organizations">, Rel<"interview_id", "interviews">]
+      >;
+      interview_answers: Table<
+        InterviewAnswer,
+        "organization_id" | "interview_id" | "question_index" | "video_path",
         [Rel<"organization_id", "organizations">, Rel<"interview_id", "interviews">]
       >;
     };

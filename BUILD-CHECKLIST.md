@@ -781,7 +781,7 @@ watch tuned LinkedIn/Indeed/Rozee/Careers posts appear; edit and regenerate them
 - [x] Reschedule / no-show — full lifecycle (scheduled → completed / cancelled / no-show, reschedule/reopen)
 - [x] `0028_interviews.sql` + `0029` blind-fix; `scripts/test-interviews.cjs` (12 assertions — scheduling RLS, blind rule, own-only writes, lifecycle) green
 - [x] Consent-gated recording + transcription — consent gate on the interview; the recording from the external call tool is uploaded to a private bucket (RLS: `enable_recording` to write, `view_recording` to play/download) and transcribed by Gemini (`view_transcript`). `0032_interview_recording.sql`
-- [ ] Async video interviews — deferred: needs candidate-side media capture + storage (the chosen model is live external + in-app collaboration)
+- [x] Async video interviews — HR sets questions on an async interview; the candidate records a video answer to each (MediaRecorder) from their portal and uploads via signed upload URLs; the panel reviews the clips on the interview page. `0033_async_interviews.sql`
 
 ---
 

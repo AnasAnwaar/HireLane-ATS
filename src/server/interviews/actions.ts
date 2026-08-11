@@ -44,6 +44,8 @@ type ScheduleInput = {
   videoLink?: string;
   location?: string;
   panelistIds: string[];
+  isAsync?: boolean;
+  asyncQuestions?: { prompt: string; max_seconds: number }[];
 };
 
 type ScheduleResult = { ok: true; interviewId: string } | { ok: false; error: string };
@@ -68,6 +70,19 @@ export async function scheduleInterviewAction(input: ScheduleInput): Promise<Sch
     .maybeSingle();
   if (!application) return { ok: false, error: "Application not found." };
 
+  const asyncQuestions = input.isAsync
+    ? (input.asyncQuestions ?? [])
+        .map((q) => ({
+          prompt: q.prompt.trim().slice(0, 500),
+          max_seconds: Math.max(30, Math.min(600, Math.round(q.max_seconds) || 120)),
+        }))
+        .filter((q) => q.prompt)
+        .slice(0, 20)
+    : [];
+  if (input.isAsync && asyncQuestions.length === 0) {
+    return { ok: false, error: "Add at least one question for an async interview." };
+  }
+
   const { data: interview, error } = await db
     .from("interviews")
     .insert({
@@ -83,6 +98,8 @@ export async function scheduleInterviewAction(input: ScheduleInput): Promise<Sch
       timezone: input.timezone || "UTC",
       video_link: input.videoLink?.trim() || null,
       location: input.location?.trim() || null,
+      is_async: Boolean(input.isAsync),
+      async_questions: asyncQuestions,
       created_by: session.membershipId,
     })
     .select("id")
