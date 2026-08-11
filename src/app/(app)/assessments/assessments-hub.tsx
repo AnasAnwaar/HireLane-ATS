@@ -5,17 +5,22 @@ import {
   Clock,
   Eye,
   FileQuestion,
+  Library,
   ListChecks,
+  Pencil,
   ShieldAlert,
 } from "lucide-react";
 import Link from "next/link";
 import * as React from "react";
 
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ATTEMPT_STATUS_META, TEST_STATUS_META } from "@/lib/assessments-display";
 import { cn, formatDate } from "@/lib/utils";
 import type { TestAttemptStatus, TestStatus } from "@/types/database";
+
+import { UseInRoleButton } from "./use-in-role-button";
 
 export type AttemptRow = {
   attemptId: string;
@@ -41,16 +46,30 @@ export type TestRow = {
   questionCount: number;
 };
 
-type Tab = "attempts" | "grading" | "tests";
+export type LibraryRow = {
+  id: string;
+  title: string;
+  status: TestStatus;
+  version: number;
+  questionCount: number;
+};
+
+type Tab = "attempts" | "grading" | "tests" | "library";
 
 export function AssessmentsHub({
   attempts,
   tests,
+  library,
+  openings,
   canViewAnswers,
+  canManageLibrary,
 }: {
   attempts: AttemptRow[];
   tests: TestRow[];
+  library: LibraryRow[];
+  openings: { id: string; title: string }[];
   canViewAnswers: boolean;
+  canManageLibrary: boolean;
 }) {
   const gradingRows = React.useMemo(() => attempts.filter((a) => a.pending > 0), [attempts]);
   const flaggedCount = attempts.filter((a) => a.flagged).length;
@@ -98,11 +117,22 @@ export function AssessmentsHub({
         <TabButton active={tab === "tests"} onClick={() => setTab("tests")}>
           Tests
         </TabButton>
+        <TabButton active={tab === "library"} onClick={() => setTab("library")}>
+          Library
+          {library.length > 0 && (
+            <span className="ml-1.5 rounded-full bg-secondary px-1.5 text-xs text-muted-foreground">
+              {library.length}
+            </span>
+          )}
+        </TabButton>
       </div>
 
       {tab === "attempts" && <AttemptsTab rows={attempts} canViewAnswers={canViewAnswers} />}
       {tab === "grading" && canViewAnswers && <GradingTab rows={gradingRows} />}
       {tab === "tests" && <TestsTab rows={tests} />}
+      {tab === "library" && (
+        <LibraryTab rows={library} openings={openings} canManage={canManageLibrary} />
+      )}
     </div>
   );
 }
@@ -180,6 +210,70 @@ function TestsTab({ rows }: { rows: TestRow[] }) {
         </div>
       )}
     </div>
+  );
+}
+
+function LibraryTab({
+  rows,
+  openings,
+  canManage,
+}: {
+  rows: LibraryRow[];
+  openings: { id: string; title: string }[];
+  canManage: boolean;
+}) {
+  if (rows.length === 0) {
+    return (
+      <Empty label="No library assessments yet — create one to reuse across roles." />
+    );
+  }
+  return (
+    <div className="space-y-2">
+      {rows.map((r) => (
+        <LibraryCard key={r.id} row={r} openings={openings} canManage={canManage} />
+      ))}
+    </div>
+  );
+}
+
+function LibraryCard({
+  row,
+  openings,
+  canManage,
+}: {
+  row: LibraryRow;
+  openings: { id: string; title: string }[];
+  canManage: boolean;
+}) {
+  const meta = TEST_STATUS_META[row.status];
+  return (
+    <Card className="flex items-center gap-4 p-4 transition-colors hover:border-primary/30">
+      <span className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-primary-soft text-primary">
+        <Library className="size-5" />
+      </span>
+      <div className="min-w-0 flex-1">
+        <p className="truncate font-medium">{row.title}</p>
+        <div className="mt-0.5 flex flex-wrap items-center gap-x-3 gap-y-0.5 text-xs text-muted-foreground">
+          <span className="inline-flex items-center gap-1">
+            <FileQuestion className="size-3" /> {row.questionCount}
+          </span>
+          <span>Reusable template</span>
+        </div>
+      </div>
+      <Badge variant={meta.variant} dot>
+        {meta.label}
+      </Badge>
+      {canManage && (
+        <>
+          <UseInRoleButton templateId={row.id} openings={openings} />
+          <Button asChild variant="ghost" size="sm">
+            <Link href={`/assessments/library/${row.id}`}>
+              <Pencil /> Edit
+            </Link>
+          </Button>
+        </>
+      )}
+    </Card>
   );
 }
 

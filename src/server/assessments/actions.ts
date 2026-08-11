@@ -337,9 +337,21 @@ export async function regenerateQuestionAction(
     .maybeSingle();
   if (!q) return { ok: false, error: "Question not found." };
 
-  const { data: test } = await db.from("tests").select("job_opening_id").eq("id", q.test_id).maybeSingle();
-  if (!test?.job_opening_id) return { ok: false, error: "This test isn't linked to an opening." };
-  const ctx = await loadOpeningContext(db, test.job_opening_id);
+  const { data: test } = await db
+    .from("tests")
+    .select("job_opening_id, title")
+    .eq("id", q.test_id)
+    .maybeSingle();
+  if (!test) return { ok: false, error: "Test not found." };
+  // Library templates have no opening — synthesize a context from the test title
+  // and the question's own skill so AI regeneration still works.
+  const ctx = test.job_opening_id
+    ? await loadOpeningContext(db, test.job_opening_id)
+    : {
+        title: test.title,
+        description: null,
+        requirements: q.skill ? [{ kind: "must_have", label: q.skill }] : [],
+      };
   if (!ctx) return { ok: false, error: "Opening not found." };
 
   let draft: QuestionDraft;

@@ -5,8 +5,8 @@ import { can } from "@/server/auth/authorize";
 import { requireSession } from "@/server/auth/session";
 import type { Test, TestAttempt } from "@/types/database";
 
-import { AssessmentsHub, type AttemptRow, type TestRow } from "./assessments-hub";
-import { NewTestButton } from "./new-test-button";
+import { AssessmentsHub, type AttemptRow, type LibraryRow, type TestRow } from "./assessments-hub";
+import { NewAssessmentButton } from "./new-assessment-button";
 
 export const metadata = { title: "Assessments" };
 
@@ -23,7 +23,7 @@ export default async function AssessmentsPage() {
     await Promise.all([
     supabase
       .from("tests")
-      .select("id, title, status, version, job_opening_id, duration_minutes")
+      .select("id, title, status, version, job_opening_id, duration_minutes, is_bank_template")
       .order("created_at", { ascending: false }),
     supabase
       .from("test_attempts")
@@ -36,10 +36,13 @@ export default async function AssessmentsPage() {
   ]);
   const canCreate = canManual || canAi;
 
-  const tests = (testsData ?? []) as Pick<
+  const allTests = (testsData ?? []) as Pick<
     Test,
-    "id" | "title" | "status" | "version" | "job_opening_id" | "duration_minutes"
+    "id" | "title" | "status" | "version" | "job_opening_id" | "duration_minutes" | "is_bank_template"
   >[];
+  // Templates live in the Library tab; opening-scoped tests in the Tests tab.
+  const tests = allTests.filter((t) => !t.is_bank_template);
+  const templates = allTests.filter((t) => t.is_bank_template);
   const attempts = (attemptsData ?? []) as Pick<
     TestAttempt,
     "id" | "assignment_id" | "test_id" | "status" | "flagged" | "breach_count" | "max_score" | "submitted_at" | "started_at"
@@ -47,7 +50,7 @@ export default async function AssessmentsPage() {
 
   // ---- Resolve the lookups the rows need (openings, candidates, question counts).
   const openingIds = [...new Set(tests.map((t) => t.job_opening_id).filter(Boolean))] as string[];
-  const testIds = tests.map((t) => t.id);
+  const testIds = allTests.map((t) => t.id); // question counts for tests + templates
   const assignmentIds = [...new Set(attempts.map((a) => a.assignment_id))];
 
   const [{ data: openings }, { data: allOpenings }, { data: questionRows }, { data: assignments }] =
@@ -72,7 +75,7 @@ export default async function AssessmentsPage() {
   ]);
 
   const openingTitle = new Map((openings ?? []).map((o) => [o.id, o.title]));
-  const testTitle = new Map(tests.map((t) => [t.id, t.title]));
+  const testTitle = new Map(allTests.map((t) => [t.id, t.title]));
   const questionCount = new Map<string, number>();
   for (const q of questionRows ?? []) questionCount.set(q.test_id, (questionCount.get(q.test_id) ?? 0) + 1);
   const assignment = new Map((assignments ?? []).map((a) => [a.id, a]));
@@ -136,16 +139,31 @@ export default async function AssessmentsPage() {
     questionCount: questionCount.get(t.id) ?? 0,
   }));
 
+  const libraryRows: LibraryRow[] = templates.map((t) => ({
+    id: t.id,
+    title: t.title,
+    status: t.status,
+    version: t.version,
+    questionCount: questionCount.get(t.id) ?? 0,
+  }));
+
   return (
     <>
       <PageHeader
         eyebrow="Recruiting"
         title="Assessments"
         description="Every test, attempt and grading task across all openings in one place."
-        actions={canCreate ? <NewTestButton openings={allOpenings ?? []} /> : undefined}
+        actions={canCreate ? <NewAssessmentButton canManual={canManual} canAi={canAi} /> : undefined}
       />
       <PageBody>
-        <AssessmentsHub attempts={attemptRows} tests={testRows} canViewAnswers={canViewAnswers} />
+        <AssessmentsHub
+          attempts={attemptRows}
+          tests={testRows}
+          library={libraryRows}
+          openings={allOpenings ?? []}
+          canViewAnswers={canViewAnswers}
+          canManageLibrary={canManual}
+        />
       </PageBody>
     </>
   );
