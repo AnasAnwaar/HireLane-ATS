@@ -177,6 +177,7 @@ export default async function AttemptResultsPage({
             attempt.check_in_photo_path ||
             analysis) && (
             <IntegrityCard
+              candidateId={id}
               attemptId={attemptId}
               flagged={attempt.flagged}
               events={events}
@@ -191,12 +192,14 @@ export default async function AttemptResultsPage({
 }
 
 function IntegrityCard({
+  candidateId,
   attemptId,
   flagged,
   events,
   analysis,
   aiConfigured,
 }: {
+  candidateId: string;
   attemptId: string;
   flagged: boolean;
   events: ProctoringEvent[];
@@ -235,6 +238,12 @@ function IntegrityCard({
           ) : (
             <span className="ml-auto text-xs text-muted-foreground">No escalation</span>
           )}
+          <Link
+            href={`/candidates/${candidateId}/attempt/${attemptId}/integrity`}
+            className={`text-xs font-medium text-primary hover:underline ${flagged ? "" : "ml-2"}`}
+          >
+            Full report →
+          </Link>
         </div>
 
         {rows.length === 0 ? (

@@ -518,7 +518,13 @@ export type TestAttempt = Timestamps & {
   last_ip_hash: string | null;
   breach_count: number;
   flagged: boolean;
+  integrity_decision: IntegrityDecision;
+  integrity_reason: string | null;
+  integrity_decided_by: string | null;
+  integrity_decided_at: string | null;
 };
+
+export type IntegrityDecision = "pending" | "accepted" | "invalidated" | "rejected";
 
 export type ProctoringSeverity = "low" | "medium" | "high";
 

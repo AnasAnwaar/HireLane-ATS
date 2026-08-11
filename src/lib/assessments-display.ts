@@ -1,4 +1,5 @@
 import type {
+  IntegrityDecision,
   IntegrityLevel,
   ProctoringLevel,
   ProctoringSeverity,
@@ -93,6 +94,20 @@ export const INTEGRITY_LEVEL_META: Record<
   medium: { label: "Medium concern", variant: "warning", blurb: "Patterns worth a human review." },
   high: { label: "High concern", variant: "destructive", blurb: "Strong signals — review before deciding." },
 };
+
+/** The reviewer's decision on an attempt (CP-21) — human-made, never automatic. */
+export const INTEGRITY_DECISION_META: Record<
+  IntegrityDecision,
+  { label: string; variant: "secondary" | "success" | "warning" | "destructive"; blurb: string }
+> = {
+  pending: { label: "Awaiting review", variant: "secondary", blurb: "No decision recorded yet." },
+  accepted: { label: "Accepted", variant: "success", blurb: "Integrity is sound — the result stands." },
+  invalidated: { label: "Result invalidated", variant: "warning", blurb: "The result is void on integrity grounds." },
+  rejected: { label: "Rejected", variant: "destructive", blurb: "The candidate was rejected on integrity grounds." },
+};
+
+/** How long check-in evidence is retained before the purge job deletes it. */
+export const EVIDENCE_RETENTION_DAYS = 180;
 
 const BROWSER_SIGNALS = [
   "Switching tabs or leaving the test window",

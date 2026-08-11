@@ -30,7 +30,7 @@
 | **P2 — Distribution (channels + AI posts)** | CP-10 … CP-12 | ✅ **COMPLETE** |
 | **P3 — AI Screening** | CP-13 … CP-14 | ✅ **COMPLETE** |
 | **P4 — Assessments** | CP-15 … CP-18 | ✅ **COMPLETE** |
-| **P5 — Proctoring & Interviews** | CP-19 … CP-22 | 🚧 In progress (CP-19, CP-20 done) |
+| **P5 — Proctoring & Interviews** | CP-19 … CP-22 | 🚧 In progress (CP-19–21 done) |
 | **P6 — Collaboration & Reporting** | CP-23 … CP-25 | ⬜ Not started |
 | **P7 — Plans, Billing & Platform Admin** | CP-26 … CP-28 | ⬜ Not started |
 
@@ -767,11 +767,12 @@ watch tuned LinkedIn/Indeed/Rozee/Careers posts appear; edit and regenerate them
 - [ ] Audio: additional voices — deferred: needs continuous audio capture (lands with recording in CP-22)
 - [ ] Identity match to a reference photo — deferred: no reference image on file yet
 
-### ⬜ CP-21 — Integrity Reports
-- [ ] Event timeline aligned to questions
-- [ ] Evidence storage, watermarking, access control, auto-deletion
-- [ ] Overall integrity level + plain-language summary
-- [ ] HR decision: accept / invalidate / reject
+### ✅ CP-21 — Integrity Reports
+- [x] Event timeline aligned to questions — chronological, relative-to-start, best-effort "on Q_n_" correlation from answer save-times (view-answers gated)
+- [x] Evidence storage, watermarking, access control, auto-deletion — check-in photo via short-lived signed URL, gated on `proctoring.view_evidence`; display-time viewer-identity watermark; 180-day retention with `scripts/purge-proctoring-evidence.cjs`
+- [x] Overall integrity level + plain-language summary — surfaces the CP-20 verdict (level, confidence, findings) at the top of the report
+- [x] HR decision: accept / invalidate / reject — `recordIntegrityDecisionAction` gated on `proctoring.invalidate`, reason required for invalidate/reject, written with who/when/why to `audit_log`
+- [x] Report at `/candidates/[id]/attempt/[attemptId]/integrity`; decision never moves the application stage (R2); `0027_integrity_reports.sql`; `scripts/test-integrity.cjs` (8 assertions green)
 
 ### ⬜ CP-22 — Video Interviews
 - [ ] Scheduling with availability and calendar invites
