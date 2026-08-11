@@ -107,6 +107,12 @@ export type Organization = Timestamps & {
   currency: string;
   locale: string;
   onboarding_completed_at: string | null;
+  tagline: string | null;
+  description: string | null;
+  brand_color: string | null;
+  email_from_name: string | null;
+  email_reply_to: string | null;
+  careers_url: string | null;
 };
 
 export type Profile = Timestamps & {

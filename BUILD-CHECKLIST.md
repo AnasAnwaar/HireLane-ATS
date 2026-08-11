@@ -739,6 +739,12 @@ watch tuned LinkedIn/Indeed/Rozee/Careers posts appear; edit and regenerate them
 
 ---
 
+## Platform pages (standalone — outside the numbered CPs)
+- [x] **Assessments hub** (`/assessments`) — org-wide index over every test, attempt and grading task: stat tiles, tabbed Attempts / Grading queue / Tests with status filters, integrity flags, and a "New test" opening-picker entry point. Replaces the placeholder.
+- [x] **Company profile** (`/admin/company`) — editable org identity (name, tagline, about, industry, website), branding (logo URL, brand colour) with a live candidate-facing preview, localization and candidate-email sender fields. `0026_company_profile.sql` adds the columns; RLS gates writes on `administration.manage_company_profile`; `scripts/test-company.cjs` (7 assertions green).
+- [ ] **Assessment library** — create standalone assessments in the hub and attach them to job roles later (requested; pending model confirmation).
+- Coming-soon placeholders remain for `/interviews` (CP-22) and `/reports` (Phase 6).
+
 ## Phase 5 — Proctoring & Interviews
 > *Maps to UC-5.3 and UC-7.*
 

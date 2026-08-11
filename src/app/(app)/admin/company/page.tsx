@@ -1,33 +1,40 @@
-import { Building2 } from "lucide-react";
-
-import { ComingSoon } from "@/components/coming-soon";
-import { PageBody } from "@/components/layout/app-shell";
+import { PageBody, PageHeader } from "@/components/layout/app-shell";
 import { NoAccess } from "@/components/permissions/no-access";
+import { createClient } from "@/lib/supabase/server";
 import { can } from "@/server/auth/authorize";
+import { saveCompanyProfileAction } from "@/server/company/actions";
 import { requireSession } from "@/server/auth/session";
+import type { Organization } from "@/types/database";
+
+import { CompanyForm } from "./company-form";
 
 export const metadata = { title: "Company" };
 
 export default async function CompanyPage() {
-  await requireSession("/admin/company");
-  if (!(await can("administration.manage_company_profile"))) {
-    return <NoAccess title="You don't have access to the company profile" />;
+  const session = await requireSession("/admin/company");
+
+  const supabase = await createClient();
+  const [{ data: org }, canEdit] = await Promise.all([
+    supabase.from("organizations").select("*").eq("id", session.organizationId).maybeSingle(),
+    can("administration.manage_company_profile"),
+  ]);
+
+  // The nav gates on manage_company_profile; anyone reaching here without it
+  // (deep link) gets a read-only view rather than a 404.
+  if (!org) {
+    return <NoAccess title="Company profile unavailable" />;
   }
 
   return (
-    <PageBody>
-      <ComingSoon
-        icon={Building2}
+    <>
+      <PageHeader
+        eyebrow="Administration"
         title="Company profile"
-        milestone="next up"
-        tagline="Your organisation's identity — the brand candidates see on careers pages, job posts and emails."
-        capabilities={[
-          "Logo, brand colour and company description",
-          "Careers-page details and default locations",
-          "Sender identity for candidate emails",
-          "Defaults that flow into new openings and AI-written posts",
-        ]}
+        description="Your organisation's identity — what candidates see on careers pages, job posts and emails."
       />
-    </PageBody>
+      <PageBody>
+        <CompanyForm org={org as Organization} canEdit={canEdit} action={saveCompanyProfileAction} />
+      </PageBody>
+    </>
   );
 }

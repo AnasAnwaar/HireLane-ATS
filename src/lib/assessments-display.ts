@@ -4,6 +4,7 @@ import type {
   ProctoringSeverity,
   QuestionDifficulty,
   QuestionType,
+  TestAttemptStatus,
   TestStatus,
 } from "@/types/database";
 
@@ -31,6 +32,15 @@ export const TEST_STATUS_META: Record<
   draft: { label: "Draft", variant: "secondary" },
   published: { label: "Published", variant: "success" },
   archived: { label: "Archived", variant: "secondary" },
+};
+
+export const ATTEMPT_STATUS_META: Record<
+  TestAttemptStatus,
+  { label: string; variant: "secondary" | "success" | "warning" | "destructive" }
+> = {
+  in_progress: { label: "In progress", variant: "warning" },
+  submitted: { label: "Submitted", variant: "success" },
+  expired: { label: "Expired", variant: "destructive" },
 };
 
 export const DIFFICULTY_META: Record<
