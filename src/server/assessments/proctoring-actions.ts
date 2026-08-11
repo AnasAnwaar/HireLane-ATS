@@ -134,5 +134,32 @@ export async function submitCheckInAction(
     severity: "low",
     detail: {},
   });
+
+  // Identity-match enrolment (CP-20): the candidate's FIRST check-in becomes the
+  // trusted reference later attempts are compared against.
+  const { data: assignment } = await admin
+    .from("test_assignments")
+    .select("candidate_id")
+    .eq("id", r.attempt.assignment_id)
+    .maybeSingle();
+  if (assignment?.candidate_id) {
+    const { data: candidate } = await admin
+      .from("candidates")
+      .select("reference_photo_path")
+      .eq("id", assignment.candidate_id)
+      .maybeSingle();
+    if (candidate && !candidate.reference_photo_path) {
+      const refPath = `${r.organizationId}/reference/${assignment.candidate_id}.jpg`;
+      const { error: refErr } = await admin.storage
+        .from("candidate-documents")
+        .upload(refPath, bytes, { contentType: m[1], upsert: true });
+      if (!refErr) {
+        await admin
+          .from("candidates")
+          .update({ reference_photo_path: refPath })
+          .eq("id", assignment.candidate_id);
+      }
+    }
+  }
   return { ok: true };
 }

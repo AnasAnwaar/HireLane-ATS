@@ -300,6 +300,7 @@ export type Candidate = Timestamps & {
   github_url: string | null;
   skills: string[];
   created_by: string | null;
+  reference_photo_path: string | null;
 };
 
 export type Application = {
@@ -556,6 +557,10 @@ export type ProctoringFace = {
   face_present: boolean;
   face_count: number;
   note: string;
+  /** Identity match vs the enrolled reference photo (CP-20). Null when unchecked. */
+  identity_checked: boolean;
+  identity_match: boolean | null;
+  identity_confidence: number;
 };
 
 export type ProctoringAnalysis = {

@@ -120,15 +120,30 @@ export function ProctoringAnalysisPanel({
       )}
 
       {analysis.face?.analyzed && (
-        <div className="mt-3 flex items-start gap-2 rounded-md border border-border bg-card p-2.5 text-sm">
-          <ScanFace className="mt-0.5 size-4 shrink-0 text-muted-foreground" />
-          <span>
-            <span className="font-medium">Check-in photo:</span>{" "}
-            {analysis.face.face_present
-              ? `${analysis.face.face_count === 1 ? "One person" : `${analysis.face.face_count} people`} visible`
-              : "No face detected"}
-            {analysis.face.note ? ` — ${analysis.face.note}` : ""}
-          </span>
+        <div className="mt-3 space-y-2">
+          <div className="flex items-start gap-2 rounded-md border border-border bg-card p-2.5 text-sm">
+            <ScanFace className="mt-0.5 size-4 shrink-0 text-muted-foreground" />
+            <span>
+              <span className="font-medium">Check-in photo:</span>{" "}
+              {analysis.face.face_present
+                ? `${analysis.face.face_count === 1 ? "One person" : `${analysis.face.face_count} people`} visible`
+                : "No face detected"}
+              {analysis.face.note ? ` — ${analysis.face.note}` : ""}
+            </span>
+          </div>
+          {analysis.face.identity_checked && (
+            <div className="flex items-center gap-2 rounded-md border border-border bg-card p-2.5 text-sm">
+              <ScanFace className="size-4 shrink-0 text-muted-foreground" />
+              <span className="font-medium">Identity match</span>
+              <span className="text-xs text-muted-foreground">vs enrolled reference</span>
+              <Badge
+                variant={analysis.face.identity_match ? "success" : "destructive"}
+                className="ml-auto"
+              >
+                {analysis.face.identity_match ? "Match" : "Mismatch"} · {pct(analysis.face.identity_confidence)}
+              </Badge>
+            </div>
+          )}
         </div>
       )}
 

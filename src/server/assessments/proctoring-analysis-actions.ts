@@ -60,7 +60,7 @@ export async function analyzeProctoringAction(attemptId: string): Promise<Action
 
   const { data: assignment } = await db
     .from("test_assignments")
-    .select("tests(title)")
+    .select("candidate_id, tests(title)")
     .eq("id", attempt.assignment_id)
     .maybeSingle();
   const testTitle =
@@ -73,6 +73,21 @@ export async function analyzeProctoringAction(attemptId: string): Promise<Action
 
   const photo = await loadCheckInPhoto(attempt.check_in_photo_path);
 
+  // Reference photo for identity match (CP-20) — enrolled from the first check-in.
+  let referencePhoto: InlineImage | null = null;
+  if (photo && assignment?.candidate_id) {
+    const { data: cand } = await db
+      .from("candidates")
+      .select("reference_photo_path")
+      .eq("id", assignment.candidate_id)
+      .maybeSingle();
+    const refPath = cand?.reference_photo_path ?? null;
+    // Skip when the reference IS this attempt's check-in (enrolment attempt).
+    if (refPath && refPath !== attempt.check_in_photo_path) {
+      referencePhoto = await loadCheckInPhoto(refPath);
+    }
+  }
+
   let result;
   try {
     result = await analyzeAttemptIntegrity({
@@ -81,6 +96,7 @@ export async function analyzeProctoringAction(attemptId: string): Promise<Action
       flagged: attempt.flagged,
       durationSeconds,
       photo,
+      referencePhoto,
       testTitle,
     });
   } catch (err) {

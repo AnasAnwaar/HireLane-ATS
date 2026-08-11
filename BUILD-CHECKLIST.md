@@ -765,7 +765,7 @@ watch tuned LinkedIn/Indeed/Rozee/Careers posts appear; edit and regenerate them
 - [x] Advisory only — produces an integrity level (clear/low/medium/high) + plain-language summary; never auto-rejects (R2)
 - [x] `0025_proctoring_analysis.sql` (proctoring_analyses + `integrity_level` enum + RLS); multimodal `generateJson`; AI verdict panel on the results view; `scripts/test-proctoring-analysis.cjs` (11 assertions green)
 - [ ] Audio: additional voices — deferred: needs continuous audio capture (lands with recording in CP-22)
-- [ ] Identity match to a reference photo — deferred: no reference image on file yet
+- [x] Identity match to a reference photo — the candidate's first check-in auto-enrols a reference; later attempts are compared to it by Gemini (match + confidence), surfaced on the results view. `0031_candidate_reference_photo.sql`
 
 ### ✅ CP-21 — Integrity Reports
 - [x] Event timeline aligned to questions — chronological, relative-to-start, best-effort "on Q_n_" correlation from answer save-times (view-answers gated)

@@ -59,6 +59,14 @@ const ANALYSIS_SCHEMA: Schema = {
         face_present: { type: Type.BOOLEAN },
         face_count: { type: Type.INTEGER, description: "Number of distinct faces visible." },
         note: { type: Type.STRING, description: "One short observation about the check-in photo." },
+        identity_match: {
+          type: Type.BOOLEAN,
+          description: "When a reference photo is provided, whether it's the SAME person as the check-in.",
+        },
+        identity_confidence: {
+          type: Type.NUMBER,
+          description: "0.0 to 1.0 confidence in the identity_match judgement.",
+        },
       },
       required: ["face_present", "face_count", "note"],
     },
@@ -71,7 +79,13 @@ type RawAnalysis = {
   confidence: number;
   summary: string;
   findings: Partial<ProctoringFinding>[];
-  face?: { face_present?: boolean; face_count?: number; note?: string };
+  face?: {
+    face_present?: boolean;
+    face_count?: number;
+    note?: string;
+    identity_match?: boolean;
+    identity_confidence?: number;
+  };
 };
 
 export type AttemptIntegrityInput = {
@@ -80,6 +94,7 @@ export type AttemptIntegrityInput = {
   flagged: boolean;
   durationSeconds: number | null;
   photo: InlineImage | null;
+  referencePhoto: InlineImage | null;
   testTitle: string;
 };
 
@@ -141,7 +156,9 @@ function buildPrompt(input: AttemptIntegrityInput): string {
     summariseEvents(input.events, input.durationSeconds),
     ``,
     input.photo
-      ? `A check-in photo is attached. Assess whether exactly one person is present and note anything unusual (no face, multiple faces, screen-of-a-screen).`
+      ? input.referencePhoto
+        ? `Two images are attached. Image 1 is the live check-in photo; Image 2 is a TRUSTED reference photo of the enrolled candidate. Assess whether exactly one person is present in the check-in, note anything unusual (no face, multiple faces, screen-of-a-screen), and set identity_match to whether the check-in is the SAME person as the reference, with identity_confidence.`
+        : `A check-in photo is attached. Assess whether exactly one person is present and note anything unusual (no face, multiple faces, screen-of-a-screen). No reference photo is available, so leave identity_match unset.`
       : `No check-in photo was captured — omit the "face" object.`,
     ``,
     `Return: an overall integrity_level (clear/low/medium/high), an overall confidence (0-1), a short plain-language summary, and a findings array where EVERY finding carries its own confidence (0-1) and one sentence of reasoning. If nothing stands out, return integrity_level "clear" with an empty findings array.`,
@@ -152,9 +169,10 @@ function buildPrompt(input: AttemptIntegrityInput): string {
 export async function analyzeAttemptIntegrity(
   input: AttemptIntegrityInput,
 ): Promise<AttemptIntegrityResult> {
+  const images = [input.photo, input.referencePhoto].filter(Boolean) as InlineImage[];
   const raw = await generateJson<RawAnalysis>(buildPrompt(input), ANALYSIS_SCHEMA, {
     temperature: 0.2,
-    images: input.photo ? [input.photo] : undefined,
+    images: images.length ? images : undefined,
   });
 
   const findings: ProctoringFinding[] = (raw.findings ?? []).map((f) => ({
@@ -165,6 +183,7 @@ export async function analyzeAttemptIntegrity(
     detail: String(f.detail ?? "").slice(0, 500),
   }));
 
+  const identityChecked = Boolean(input.photo && input.referencePhoto && raw.face);
   const face: ProctoringFace | null =
     input.photo && raw.face
       ? {
@@ -172,6 +191,9 @@ export async function analyzeAttemptIntegrity(
           face_present: Boolean(raw.face.face_present),
           face_count: Math.max(0, Math.round(Number(raw.face.face_count ?? 0)) || 0),
           note: String(raw.face.note ?? "").slice(0, 300),
+          identity_checked: identityChecked,
+          identity_match: identityChecked ? Boolean(raw.face.identity_match) : null,
+          identity_confidence: identityChecked ? clamp01(Number(raw.face.identity_confidence)) : 0,
         }
       : null;
 
