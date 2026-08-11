@@ -23,13 +23,9 @@ export function BrandMark({
 
       {showWordmark && (
         <span className="flex flex-col leading-none">
-          <span
-            className={cn(
-              "text-[1.0625rem] font-bold tracking-tight",
-              onDark ? "text-sidebar-foreground" : "text-foreground",
-            )}
-          >
-            Hirelane
+          <span className="text-[1.0625rem] font-bold tracking-tight">
+            <span className={onDark ? "text-white" : "text-foreground"}>Hire</span>
+            <span className="text-primary">Lane</span>
           </span>
           <span
             className={cn(
