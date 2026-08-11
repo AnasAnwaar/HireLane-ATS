@@ -12,8 +12,15 @@ import { formatDate } from "@/lib/utils";
 import { isAiConfigured } from "@/server/ai/gemini";
 import { can } from "@/server/auth/authorize";
 import { requireSession } from "@/server/auth/session";
-import type { ProctoringEvent, QuestionType, TestAnswer, TestAttempt } from "@/types/database";
+import type {
+  ProctoringAnalysis,
+  ProctoringEvent,
+  QuestionType,
+  TestAnswer,
+  TestAttempt,
+} from "@/types/database";
 
+import { ProctoringAnalysisPanel } from "./proctoring-analysis-panel";
 import { ResultsView, type QuestionResult, type ResultsData } from "./results-view";
 
 export const metadata = { title: "Test results" };
@@ -64,14 +71,18 @@ export default async function AttemptResultsPage({
 
   // Integrity capture summary (CP-19). RLS also hides events without the
   // proctoring permissions, so this is empty for a viewer who lacks them.
-  const { data: eventRows } = canViewProctoring
-    ? await supabase
-        .from("proctoring_events")
-        .select("*")
-        .eq("attempt_id", attemptId)
-        .order("occurred_at", { ascending: false })
-    : { data: [] };
+  const [{ data: eventRows }, { data: analysisRow }] = canViewProctoring
+    ? await Promise.all([
+        supabase
+          .from("proctoring_events")
+          .select("*")
+          .eq("attempt_id", attemptId)
+          .order("occurred_at", { ascending: false }),
+        supabase.from("proctoring_analyses").select("*").eq("attempt_id", attemptId).maybeSingle(),
+      ])
+    : [{ data: [] }, { data: null }];
   const events = (eventRows ?? []) as ProctoringEvent[];
+  const analysis = (analysisRow as ProctoringAnalysis | null) ?? null;
 
   const [{ data: candidate }, { data: ver }, { data: answerRows }] = await Promise.all([
     supabase.from("candidates").select("full_name").eq("id", id).maybeSingle(),
@@ -160,16 +171,38 @@ export default async function AttemptResultsPage({
         description={data.testTitle}
       />
       <PageBody className="max-w-3xl">
-        {canViewProctoring && (attempt.breach_count > 0 || events.length > 0) && (
-          <IntegrityCard flagged={attempt.flagged} events={events} />
-        )}
+        {canViewProctoring &&
+          (attempt.breach_count > 0 ||
+            events.length > 0 ||
+            attempt.check_in_photo_path ||
+            analysis) && (
+            <IntegrityCard
+              attemptId={attemptId}
+              flagged={attempt.flagged}
+              events={events}
+              analysis={analysis}
+              aiConfigured={isAiConfigured()}
+            />
+          )}
         <ResultsView data={data} />
       </PageBody>
     </>
   );
 }
 
-function IntegrityCard({ flagged, events }: { flagged: boolean; events: ProctoringEvent[] }) {
+function IntegrityCard({
+  attemptId,
+  flagged,
+  events,
+  analysis,
+  aiConfigured,
+}: {
+  attemptId: string;
+  flagged: boolean;
+  events: ProctoringEvent[];
+  analysis: ProctoringAnalysis | null;
+  aiConfigured: boolean;
+}) {
   // Tally distinct event types, keeping the highest severity + latest time.
   const byType = new Map<string, { count: number; severity: ProctoringEvent["severity"]; last: string }>();
   for (const e of events) {
@@ -225,6 +258,13 @@ function IntegrityCard({ flagged, events }: { flagged: boolean; events: Proctori
             })}
           </ul>
         )}
+
+        <ProctoringAnalysisPanel
+          attemptId={attemptId}
+          analysis={analysis}
+          canAnalyze
+          aiConfigured={aiConfigured}
+        />
       </CardContent>
     </Card>
   );

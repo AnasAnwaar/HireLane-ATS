@@ -9,10 +9,11 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScoreRing } from "@/components/ui/score-ring";
-import { COVERAGE_META, RECOMMENDATION_META } from "@/lib/screening-display";
+import { RECOMMENDATION_META } from "@/lib/screening-display";
 import { cn, formatDate } from "@/lib/utils";
 import type {
   CoverageItem,
+  CoverageStatus,
   CriterionScore,
   ScreeningConcern,
   ScreeningHighlight,
@@ -169,60 +170,57 @@ export function MatchReport({
               </div>
             </div>
 
-            {/* Weighted criteria breakdown */}
+            {/* Weighted criteria breakdown — two columns to keep it compact */}
             {report.criteria.length > 0 && (
               <div className="space-y-2.5">
-                <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                  Score breakdown
-                </p>
-                {report.criteria.map((c) => (
-                  <CriterionRow key={c.key} criterion={c} />
-                ))}
+                <SectionLabel>Score breakdown</SectionLabel>
+                <div className="grid gap-x-6 gap-y-3 sm:grid-cols-2">
+                  {report.criteria.map((c) => (
+                    <CriterionRow key={c.key} criterion={c} />
+                  ))}
+                </div>
               </div>
             )}
 
-            {/* Must-have coverage — the requirements, side by side */}
-            <CoverageBlock title="Must-have requirements" items={report.mustHaves} />
-            {report.niceToHaves.length > 0 && (
-              <CoverageBlock title="Nice-to-have" items={report.niceToHaves} />
-            )}
+            {/* Requirement coverage — matched items collapse to chips; the
+                exceptions (partial/missing) are spelled out with their evidence. */}
+            <CoverageChips title="Must-have requirements" items={report.mustHaves} />
+            <CoverageChips title="Nice-to-have" items={report.niceToHaves} />
 
-            {/* Highlights + concerns */}
-            {report.highlights.length > 0 && (
-              <div>
-                <p className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-success">
-                  Highlights
-                </p>
-                <ul className="space-y-1.5">
-                  {report.highlights.map((h, i) => (
-                    <li key={i} className="text-sm">
-                      <span className="inline-flex items-start gap-1.5">
-                        <Check className="mt-0.5 size-3.5 shrink-0 text-success" />
-                        <span>
-                          {h.text}
-                          {h.evidence && (
-                            <span className="text-muted-foreground"> — {h.evidence}</span>
-                          )}
-                        </span>
-                      </span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-            {report.concerns.length > 0 && (
-              <div>
-                <p className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-warning">
-                  Concerns
-                </p>
-                <ul className="space-y-1.5">
-                  {report.concerns.map((c, i) => (
-                    <li key={i} className="flex items-start gap-1.5 text-sm">
-                      <AlertTriangle className="mt-0.5 size-3.5 shrink-0 text-warning" />
-                      <span>{c.text}</span>
-                    </li>
-                  ))}
-                </ul>
+            {/* Highlights + concerns — side by side on wider screens. Evidence is
+                a hover tooltip so the takeaway line stays scannable. */}
+            {(report.highlights.length > 0 || report.concerns.length > 0) && (
+              <div className="grid gap-x-6 gap-y-4 sm:grid-cols-2">
+                {report.highlights.length > 0 && (
+                  <div>
+                    <SectionLabel className="text-success">Highlights</SectionLabel>
+                    <ul className="mt-1.5 space-y-1.5">
+                      {report.highlights.map((h, i) => (
+                        <li
+                          key={i}
+                          title={h.evidence || undefined}
+                          className="flex items-start gap-1.5 text-sm"
+                        >
+                          <Check className="mt-0.5 size-3.5 shrink-0 text-success" />
+                          <span>{h.text}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+                {report.concerns.length > 0 && (
+                  <div>
+                    <SectionLabel className="text-warning">Concerns</SectionLabel>
+                    <ul className="mt-1.5 space-y-1.5">
+                      {report.concerns.map((c, i) => (
+                        <li key={i} className="flex items-start gap-1.5 text-sm">
+                          <AlertTriangle className="mt-0.5 size-3.5 shrink-0 text-warning" />
+                          <span>{c.text}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
               </div>
             )}
 
@@ -314,50 +312,97 @@ export function MatchReport({
   );
 }
 
+function SectionLabel({
+  children,
+  className,
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) {
+  return (
+    <p className={cn("text-xs font-semibold uppercase tracking-wide text-muted-foreground", className)}>
+      {children}
+    </p>
+  );
+}
+
 function CriterionRow({ criterion }: { criterion: CriterionScore }) {
   const tone =
     criterion.score >= 75 ? "bg-success" : criterion.score >= 50 ? "bg-warning" : "bg-destructive";
   return (
-    <div>
-      <div className="flex items-center justify-between text-sm">
-        <span className="flex items-center gap-2">
+    <div title={criterion.note || undefined}>
+      <div className="flex items-baseline justify-between gap-2 text-sm">
+        <span className="truncate">
           {criterion.label}
           {criterion.weight != null && (
-            <Badge variant="outline" className="text-[0.625rem]">
-              {criterion.weight}% weight
-            </Badge>
+            <span className="ml-1.5 text-xs text-muted-foreground">{criterion.weight}%</span>
           )}
         </span>
         <span className="font-medium tabular-nums">{criterion.score}</span>
       </div>
-      <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-muted">
+      <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-muted">
         <div className={cn("h-full rounded-full", tone)} style={{ width: `${criterion.score}%` }} />
       </div>
-      {criterion.note && <p className="mt-1 text-xs text-muted-foreground">{criterion.note}</p>}
     </div>
   );
 }
 
-function CoverageBlock({ title, items }: { title: string; items: CoverageItem[] }) {
+const CHIP_TONE: Record<CoverageStatus, string> = {
+  matched: "border-success/30 bg-success-soft text-success",
+  partial: "border-warning/30 bg-warning-soft text-warning",
+  missing: "border-destructive/30 bg-destructive-soft text-destructive",
+};
+const DOT_TONE: Record<CoverageStatus, string> = {
+  matched: "bg-success",
+  partial: "bg-warning",
+  missing: "bg-destructive",
+};
+
+/**
+ * Requirement coverage as compact chips. Matched items are just a labelled chip
+ * (evidence on hover); the exceptions that need scrutiny — partial and missing —
+ * are also listed out with their evidence so nothing important hides in a tooltip.
+ */
+function CoverageChips({ title, items }: { title: string; items: CoverageItem[] }) {
   if (!items.length) return null;
+  const matched = items.filter((i) => i.status === "matched").length;
+  const exceptions = items.filter((i) => i.status !== "matched");
   return (
     <div>
-      <p className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-        {title}
-      </p>
-      <ul className="space-y-1.5">
+      <div className="mb-2 flex items-center gap-2">
+        <SectionLabel>{title}</SectionLabel>
+        <span className="text-xs tabular-nums text-muted-foreground">
+          {matched}/{items.length}
+        </span>
+      </div>
+      <div className="flex flex-wrap gap-1.5">
         {items.map((it, i) => (
-          <li key={i} className="flex items-start gap-2 text-sm">
-            <Badge variant={COVERAGE_META[it.status].variant} className="mt-0.5 shrink-0">
-              {COVERAGE_META[it.status].label}
-            </Badge>
-            <span className="min-w-0">
-              <span className="font-medium">{it.requirement}</span>
-              {it.evidence && <span className="text-muted-foreground"> — {it.evidence}</span>}
-            </span>
-          </li>
+          <span
+            key={i}
+            title={it.evidence || undefined}
+            className={cn(
+              "inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs",
+              CHIP_TONE[it.status],
+            )}
+          >
+            <span className={cn("size-1.5 shrink-0 rounded-full", DOT_TONE[it.status])} />
+            {it.requirement}
+          </span>
         ))}
-      </ul>
+      </div>
+      {exceptions.length > 0 && (
+        <ul className="mt-2.5 space-y-1.5">
+          {exceptions.map((it, i) => (
+            <li key={i} className="flex items-start gap-1.5 text-xs">
+              <span className={cn("mt-1.5 size-1.5 shrink-0 rounded-full", DOT_TONE[it.status])} />
+              <span className="text-muted-foreground">
+                <span className="font-medium text-foreground">{it.requirement}</span>
+                {it.evidence && ` — ${it.evidence}`}
+              </span>
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 }

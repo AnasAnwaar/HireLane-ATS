@@ -527,6 +527,40 @@ export type ProctoringEvent = {
   created_at: string;
 };
 
+export type IntegrityLevel = "clear" | "low" | "medium" | "high";
+
+/** One AI-attributed integrity signal, carrying its own confidence (spec R4). */
+export type ProctoringFinding = {
+  signal: string;
+  label: string;
+  severity: ProctoringSeverity;
+  confidence: number; // 0..1
+  detail: string;
+};
+
+/** AI face read of the check-in frame; `analyzed:false` when no photo was captured. */
+export type ProctoringFace = {
+  analyzed: boolean;
+  face_present: boolean;
+  face_count: number;
+  note: string;
+};
+
+export type ProctoringAnalysis = {
+  id: string;
+  organization_id: string;
+  attempt_id: string;
+  integrity_level: IntegrityLevel;
+  confidence: number;
+  summary: string;
+  findings: ProctoringFinding[];
+  face: ProctoringFace | null;
+  model: string;
+  analyzed_by: string | null;
+  analyzed_at: string;
+  created_at: string;
+};
+
 export type AssessmentPolicy = Timestamps & {
   organization_id: string;
   default_proctoring_level: ProctoringLevel;
@@ -780,6 +814,11 @@ export type Database = {
       proctoring_events: Table<
         ProctoringEvent,
         "organization_id" | "attempt_id" | "type",
+        [Rel<"organization_id", "organizations">, Rel<"attempt_id", "test_attempts">]
+      >;
+      proctoring_analyses: Table<
+        ProctoringAnalysis,
+        "organization_id" | "attempt_id" | "integrity_level" | "summary" | "model",
         [Rel<"organization_id", "organizations">, Rel<"attempt_id", "test_attempts">]
       >;
       assessment_policies: Table<

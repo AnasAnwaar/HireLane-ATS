@@ -31,22 +31,31 @@ export function isAiConfigured(): boolean {
 
 export class AiError extends Error {}
 
+/** An inline image part for a multimodal prompt (base64 data + mime type). */
+export type InlineImage = { data: string; mimeType: string };
+
 /**
  * Generate a JSON object matching `schema`. Uses Gemini's structured-output mode
  * (responseSchema) so the model returns valid JSON we can parse without repair.
+ * Pass `images` to send a multimodal prompt (e.g. a check-in photo for CP-20).
  */
 export async function generateJson<T>(
   prompt: string,
   schema: Schema,
-  opts: { temperature?: number } = {},
+  opts: { temperature?: number; images?: InlineImage[] } = {},
 ): Promise<T> {
   const ai = getClient();
+
+  // Text-only stays a plain string; with images we send an ordered parts array.
+  const contents = opts.images?.length
+    ? [...opts.images.map((img) => ({ inlineData: img })), { text: prompt }]
+    : prompt;
 
   let res;
   try {
     res = await ai.models.generateContent({
       model: GEMINI_MODEL,
-      contents: prompt,
+      contents,
       config: {
         responseMimeType: "application/json",
         responseSchema: schema,

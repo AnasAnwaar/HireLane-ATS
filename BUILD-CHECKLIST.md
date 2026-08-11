@@ -30,7 +30,7 @@
 | **P2 — Distribution (channels + AI posts)** | CP-10 … CP-12 | ✅ **COMPLETE** |
 | **P3 — AI Screening** | CP-13 … CP-14 | ✅ **COMPLETE** |
 | **P4 — Assessments** | CP-15 … CP-18 | ✅ **COMPLETE** |
-| **P5 — Proctoring & Interviews** | CP-19 … CP-22 | 🚧 In progress (CP-19 done) |
+| **P5 — Proctoring & Interviews** | CP-19 … CP-22 | 🚧 In progress (CP-19, CP-20 done) |
 | **P6 — Collaboration & Reporting** | CP-23 … CP-25 | ⬜ Not started |
 | **P7 — Plans, Billing & Platform Admin** | CP-26 … CP-28 | ⬜ Not started |
 
@@ -752,11 +752,14 @@ watch tuned LinkedIn/Indeed/Rozee/Careers posts appear; edit and regenerate them
 - [x] HR results view surfaces the integrity summary (flag + event tally), gated on `proctoring.view_summary`
 - [x] `0024_proctoring.sql` (proctoring_events + attempt capture columns + RLS); `scripts/test-proctoring.cjs` (14 assertions green)
 
-### ⬜ CP-20 — AI Proctoring Analysis
-- [ ] Face presence / multiple faces / identity match
-- [ ] Audio: additional voices
-- [ ] Behavioural anomaly detection
-- [ ] Confidence scoring per flag
+### ✅ CP-20 — AI Proctoring Analysis
+- [x] Behavioural anomaly detection — Gemini reasons over the CP-19 event timeline (frequency/clustering), not a raw dump
+- [x] Face presence / multiple faces — vision pass over the check-in photo (present / face count / note)
+- [x] Confidence scoring per flag — every finding + the overall verdict carry a bounded 0–1 confidence (R4)
+- [x] Advisory only — produces an integrity level (clear/low/medium/high) + plain-language summary; never auto-rejects (R2)
+- [x] `0025_proctoring_analysis.sql` (proctoring_analyses + `integrity_level` enum + RLS); multimodal `generateJson`; AI verdict panel on the results view; `scripts/test-proctoring-analysis.cjs` (11 assertions green)
+- [ ] Audio: additional voices — deferred: needs continuous audio capture (lands with recording in CP-22)
+- [ ] Identity match to a reference photo — deferred: no reference image on file yet
 
 ### ⬜ CP-21 — Integrity Reports
 - [ ] Event timeline aligned to questions

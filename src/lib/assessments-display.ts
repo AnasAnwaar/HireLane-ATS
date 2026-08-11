@@ -1,4 +1,5 @@
 import type {
+  IntegrityLevel,
   ProctoringLevel,
   ProctoringSeverity,
   QuestionDifficulty,
@@ -70,6 +71,17 @@ export const PROCTORING_SEVERITY_META: Record<
   low: { label: "Low", variant: "secondary" },
   medium: { label: "Medium", variant: "warning" },
   high: { label: "High", variant: "destructive" },
+};
+
+/** AI integrity verdict (CP-20) — advisory concern level for an attempt. */
+export const INTEGRITY_LEVEL_META: Record<
+  IntegrityLevel,
+  { label: string; variant: "success" | "secondary" | "warning" | "destructive"; blurb: string }
+> = {
+  clear: { label: "Clear", variant: "success", blurb: "No integrity concerns stood out." },
+  low: { label: "Low concern", variant: "secondary", blurb: "Minor signals — likely benign." },
+  medium: { label: "Medium concern", variant: "warning", blurb: "Patterns worth a human review." },
+  high: { label: "High concern", variant: "destructive", blurb: "Strong signals — review before deciding." },
 };
 
 const BROWSER_SIGNALS = [

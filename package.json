@@ -21,6 +21,7 @@
     "db:test:portal": "node scripts/test-portal.cjs",
     "db:test:channels": "node scripts/test-channels.cjs",
     "db:test:proctoring": "node scripts/test-proctoring.cjs",
+    "db:test:proctoring-analysis": "node scripts/test-proctoring-analysis.cjs",
     "db:seed-team": "node scripts/seed-team.cjs",
     "demo-portal-link": "node scripts/demo-portal-link.cjs",
     "seed-assessment": "node scripts/seed-assessment.cjs",
