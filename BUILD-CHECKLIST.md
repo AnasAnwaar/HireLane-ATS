@@ -30,7 +30,7 @@
 | **P2 — Distribution (channels + AI posts)** | CP-10 … CP-12 | ✅ **COMPLETE** |
 | **P3 — AI Screening** | CP-13 … CP-14 | ✅ **COMPLETE** |
 | **P4 — Assessments** | CP-15 … CP-18 | ✅ **COMPLETE** |
-| **P5 — Proctoring & Interviews** | CP-19 … CP-22 | 🚧 In progress (CP-19–21 done) |
+| **P5 — Proctoring & Interviews** | CP-19 … CP-22 | ✅ **COMPLETE** |
 | **P6 — Collaboration & Reporting** | CP-23 … CP-25 | ⬜ Not started |
 | **P7 — Plans, Billing & Platform Admin** | CP-26 … CP-28 | ⬜ Not started |
 
@@ -774,12 +774,14 @@ watch tuned LinkedIn/Indeed/Rozee/Careers posts appear; edit and regenerate them
 - [x] HR decision: accept / invalidate / reject — `recordIntegrityDecisionAction` gated on `proctoring.invalidate`, reason required for invalidate/reject, written with who/when/why to `audit_log`
 - [x] Report at `/candidates/[id]/attempt/[attemptId]/integrity`; decision never moves the application stage (R2); `0027_integrity_reports.sql`; `scripts/test-integrity.cjs` (8 assertions green)
 
-### ⬜ CP-22 — Video Interviews
-- [ ] Scheduling with availability and calendar invites
-- [ ] WebRTC room: screen share, chat, private notes, shared code pad
-- [ ] Consent-gated recording + transcription
-- [ ] Blind scorecards until submitted
-- [ ] Reschedule / no-show / async video interview
+### ✅ CP-22 — Video Interviews
+- [x] Scheduling with calendar invites — schedule dialog (candidate, panel, time, mode, video link); downloadable `.ics` invite at `/interviews/[id]/invite`
+- [x] In-app room: chat, shared notes, shared code pad — real-time via Supabase Realtime (presence + broadcast), screen-share/video via the external call link
+- [x] Blind scorecards until submitted — a panellist sees a peer's scorecard only once their own is submitted (or they hold `view_others_scorecards`); enforced in RLS via a `SECURITY DEFINER` helper (no recursion)
+- [x] Reschedule / no-show — full lifecycle (scheduled → completed / cancelled / no-show, reschedule/reopen)
+- [x] `0028_interviews.sql` + `0029` blind-fix; `scripts/test-interviews.cjs` (12 assertions — scheduling RLS, blind rule, own-only writes, lifecycle) green
+- [ ] Consent-gated recording + transcription — deferred: recording/transcription handled by the external call tool (no media server / TURN in this environment); native capture lands with dedicated infra
+- [ ] Async video interviews — deferred: needs candidate-side media capture + storage (the chosen model is live external + in-app collaboration)
 
 ---
 

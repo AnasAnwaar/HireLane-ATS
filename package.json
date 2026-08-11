@@ -25,6 +25,7 @@
     "db:test:company": "node scripts/test-company.cjs",
     "db:test:library": "node scripts/test-library.cjs",
     "db:test:integrity": "node scripts/test-integrity.cjs",
+    "db:test:interviews": "node scripts/test-interviews.cjs",
     "purge:evidence": "node scripts/purge-proctoring-evidence.cjs",
     "db:seed-team": "node scripts/seed-team.cjs",
     "demo-portal-link": "node scripts/demo-portal-link.cjs",

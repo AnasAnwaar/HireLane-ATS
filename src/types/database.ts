@@ -633,6 +633,52 @@ type Table<Row, Required extends keyof Row, Rels extends readonly unknown[] = []
   Relationships: Rels;
 };
 
+// -- Interviews (CP-22) --------------------------------------------------------
+export type InterviewMode = "video" | "phone" | "onsite";
+export type InterviewStatus = "scheduled" | "completed" | "cancelled" | "no_show";
+export type ScorecardRecommendation = "strong_yes" | "yes" | "no" | "strong_no";
+
+export type Interview = Timestamps & {
+  id: string;
+  organization_id: string;
+  application_id: string;
+  candidate_id: string;
+  job_opening_id: string | null;
+  title: string;
+  round: string | null;
+  mode: InterviewMode;
+  scheduled_at: string;
+  duration_minutes: number;
+  timezone: string;
+  video_link: string | null;
+  location: string | null;
+  status: InterviewStatus;
+  shared_notes: string | null;
+  created_by: string | null;
+};
+
+export type InterviewPanelist = {
+  id: string;
+  organization_id: string;
+  interview_id: string;
+  membership_id: string;
+  created_at: string;
+};
+
+export type InterviewScorecard = Timestamps & {
+  id: string;
+  organization_id: string;
+  interview_id: string;
+  membership_id: string;
+  recommendation: ScorecardRecommendation | null;
+  rating: number | null;
+  strengths: string | null;
+  concerns: string | null;
+  notes: string | null;
+  submitted: boolean;
+  submitted_at: string | null;
+};
+
 export type Database = {
   public: {
     Tables: {
@@ -837,6 +883,26 @@ export type Database = {
         AssessmentPolicy,
         "organization_id",
         [Rel<"organization_id", "organizations">]
+      >;
+      interviews: Table<
+        Interview,
+        "organization_id" | "application_id" | "candidate_id" | "scheduled_at",
+        [
+          Rel<"organization_id", "organizations">,
+          Rel<"application_id", "applications">,
+          Rel<"candidate_id", "candidates">,
+          Rel<"job_opening_id", "job_openings">,
+        ]
+      >;
+      interview_panelists: Table<
+        InterviewPanelist,
+        "organization_id" | "interview_id" | "membership_id",
+        [Rel<"organization_id", "organizations">, Rel<"interview_id", "interviews">]
+      >;
+      interview_scorecards: Table<
+        InterviewScorecard,
+        "organization_id" | "interview_id" | "membership_id",
+        [Rel<"organization_id", "organizations">, Rel<"interview_id", "interviews">]
       >;
     };
     Views: Record<string, never>;
