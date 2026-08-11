@@ -1,5 +1,6 @@
 import type {
   ProctoringLevel,
+  ProctoringSeverity,
   QuestionDifficulty,
   QuestionType,
   TestStatus,
@@ -46,3 +47,52 @@ export const PROCTORING_META: Record<ProctoringLevel, { label: string; hint: str
   standard: { label: "Standard", hint: "Webcam snapshots + activity" },
   strict: { label: "Strict", hint: "Continuous webcam, screen + audio" },
 };
+
+/** Metadata for each captured integrity signal (spec §UC-5.3 monitored signals). */
+export const PROCTORING_EVENT_META: Record<string, { label: string; severity: ProctoringSeverity }> = {
+  tab_switch: { label: "Switched tab or app", severity: "high" },
+  window_blur: { label: "Left the test window", severity: "medium" },
+  fullscreen_exit: { label: "Exited full-screen", severity: "high" },
+  copy: { label: "Copied text", severity: "medium" },
+  paste: { label: "Pasted text", severity: "medium" },
+  right_click: { label: "Opened the context menu", severity: "low" },
+  devtools: { label: "Opened developer tools", severity: "high" },
+  ip_change: { label: "Network / IP changed mid-test", severity: "high" },
+  multi_session: { label: "A second session was detected", severity: "high" },
+  camera_denied: { label: "Camera was unavailable", severity: "medium" },
+  check_in: { label: "Identity check-in captured", severity: "low" },
+};
+
+export const PROCTORING_SEVERITY_META: Record<
+  ProctoringSeverity,
+  { label: string; variant: "secondary" | "warning" | "destructive" }
+> = {
+  low: { label: "Low", variant: "secondary" },
+  medium: { label: "Medium", variant: "warning" },
+  high: { label: "High", variant: "destructive" },
+};
+
+const BROWSER_SIGNALS = [
+  "Switching tabs or leaving the test window",
+  "Exiting full-screen",
+  "Copy, paste and right-click",
+  "Developer-tools activity",
+  "Network/IP changes and duplicate sessions",
+];
+
+/** Exactly what each level records — shown verbatim in the consent copy (R1). */
+export const PROCTORING_SIGNALS: Record<ProctoringLevel, string[]> = {
+  off: [],
+  basic: BROWSER_SIGNALS,
+  standard: [...BROWSER_SIGNALS, "A camera check-in photo at the start"],
+  strict: [
+    ...BROWSER_SIGNALS,
+    "A camera check-in photo at the start",
+    "Microphone audio, to detect background voices",
+    "An identity match against your check-in photo",
+  ],
+};
+
+/** Whether the level needs a camera / mic at system-check time. */
+export const proctoringNeedsCamera = (l: ProctoringLevel) => l === "standard" || l === "strict";
+export const proctoringNeedsMic = (l: ProctoringLevel) => l === "strict";

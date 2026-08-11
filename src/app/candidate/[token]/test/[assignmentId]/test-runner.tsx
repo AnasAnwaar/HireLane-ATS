@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronLeft, ChevronRight, Clock, Loader2, Send } from "lucide-react";
+import { ChevronLeft, ChevronRight, Clock, Eye, Loader2, Maximize, Send, ShieldAlert } from "lucide-react";
 import { useRouter } from "next/navigation";
 import * as React from "react";
 import { toast } from "sonner";
@@ -12,6 +12,8 @@ import { cn } from "@/lib/utils";
 import type { TestAnswerResponse } from "@/types/database";
 import type { RunnerData } from "@/server/assessments/delivery";
 import { saveAnswerAction, submitAttemptAction } from "@/server/assessments/attempt-actions";
+
+import { useProctoring } from "./use-proctoring";
 
 type ActiveRunner = Extract<RunnerData, { state: "active" }>;
 
@@ -42,6 +44,13 @@ export function TestRunner({ token, data }: { token: string; data: ActiveRunner 
   const [submitting, setSubmitting] = React.useState(false);
   const submittedRef = React.useRef(false);
   const debounce = React.useRef<Record<string, ReturnType<typeof setTimeout>>>({});
+
+  // Proctoring capture (CP-19) — no-op when the level is "off".
+  const proctor = useProctoring({ token, attemptId, level: data.proctoringLevel });
+
+  function goFullscreen() {
+    document.documentElement.requestFullscreen?.().catch(() => {});
+  }
 
   const q = questions[idx];
   const answeredCount = questions.filter((x) => isAnswered(answers[x.id])).length;
@@ -137,6 +146,15 @@ export function TestRunner({ token, data }: { token: string; data: ActiveRunner 
 
   return (
     <div className={cn("fixed inset-0 z-50 flex flex-col bg-background", sr && "text-[1.0625rem]")}>
+      {/* In-test integrity warning */}
+      {proctor.warning && (
+        <div className="absolute inset-x-0 top-0 z-[60] flex justify-center px-4 pt-3">
+          <div className="flex items-center gap-2 rounded-lg border border-warning/40 bg-warning-soft px-3 py-2 text-sm font-medium text-warning shadow-lg">
+            <ShieldAlert className="size-4 shrink-0" /> {proctor.warning}
+          </div>
+        </div>
+      )}
+
       {/* Header */}
       <header className="flex items-center gap-3 border-b border-border bg-card px-4 py-3 sm:px-6">
         <p className="truncate text-sm font-semibold">{testTitle}</p>
@@ -145,9 +163,29 @@ export function TestRunner({ token, data }: { token: string; data: ActiveRunner 
             Screen-reader mode
           </span>
         )}
+        {proctor.enabled && (
+          <span
+            className={cn(
+              "inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[0.625rem] font-medium",
+              proctor.flagged ? "bg-destructive/10 text-destructive" : "bg-muted text-muted-foreground",
+            )}
+            title={proctor.flagged ? "Repeated activity flagged for review" : "This assessment is monitored"}
+          >
+            <Eye className="size-3" /> Monitored{proctor.breaches > 0 ? ` · ${proctor.breaches}` : ""}
+          </span>
+        )}
         <span className="ml-auto text-xs text-muted-foreground" aria-live="polite">
           {saving ? "Saving…" : "Saved"}
         </span>
+        {proctor.enabled && (
+          <button
+            type="button"
+            onClick={goFullscreen}
+            className="inline-flex items-center gap-1 rounded-md border border-border px-2 py-1 text-xs text-muted-foreground hover:bg-accent"
+          >
+            <Maximize className="size-3.5" /> Full-screen
+          </button>
+        )}
         <span
           role="timer"
           aria-label={`Time remaining ${fmt(remaining)}`}

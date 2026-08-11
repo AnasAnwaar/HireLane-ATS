@@ -1,14 +1,18 @@
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Eye, ShieldAlert, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { PageBody, PageHeader } from "@/components/layout/app-shell";
 import { NoAccess } from "@/components/permissions/no-access";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
+import { PROCTORING_EVENT_META, PROCTORING_SEVERITY_META } from "@/lib/assessments-display";
 import { createClient } from "@/lib/supabase/server";
+import { formatDate } from "@/lib/utils";
 import { isAiConfigured } from "@/server/ai/gemini";
 import { can } from "@/server/auth/authorize";
 import { requireSession } from "@/server/auth/session";
-import type { QuestionType, TestAnswer, TestAttempt } from "@/types/database";
+import type { ProctoringEvent, QuestionType, TestAnswer, TestAttempt } from "@/types/database";
 
 import { ResultsView, type QuestionResult, type ResultsData } from "./results-view";
 
@@ -46,7 +50,7 @@ export default async function AttemptResultsPage({
   if (!attemptRow) notFound();
   const attempt = attemptRow as TestAttempt;
 
-  const [{ data: assignment }, canViewAnswers, canGrade] = await Promise.all([
+  const [{ data: assignment }, canViewAnswers, canGrade, canViewProctoring] = await Promise.all([
     supabase
       .from("test_assignments")
       .select("candidate_id, tests(title)")
@@ -54,8 +58,20 @@ export default async function AttemptResultsPage({
       .maybeSingle(),
     can("assessments.view_answers"),
     can("assessments.confirm_grades"),
+    can("proctoring.view_summary"),
   ]);
   if (!assignment || assignment.candidate_id !== id) notFound();
+
+  // Integrity capture summary (CP-19). RLS also hides events without the
+  // proctoring permissions, so this is empty for a viewer who lacks them.
+  const { data: eventRows } = canViewProctoring
+    ? await supabase
+        .from("proctoring_events")
+        .select("*")
+        .eq("attempt_id", attemptId)
+        .order("occurred_at", { ascending: false })
+    : { data: [] };
+  const events = (eventRows ?? []) as ProctoringEvent[];
 
   const [{ data: candidate }, { data: ver }, { data: answerRows }] = await Promise.all([
     supabase.from("candidates").select("full_name").eq("id", id).maybeSingle(),
@@ -144,8 +160,72 @@ export default async function AttemptResultsPage({
         description={data.testTitle}
       />
       <PageBody className="max-w-3xl">
+        {canViewProctoring && (attempt.breach_count > 0 || events.length > 0) && (
+          <IntegrityCard flagged={attempt.flagged} events={events} />
+        )}
         <ResultsView data={data} />
       </PageBody>
     </>
+  );
+}
+
+function IntegrityCard({ flagged, events }: { flagged: boolean; events: ProctoringEvent[] }) {
+  // Tally distinct event types, keeping the highest severity + latest time.
+  const byType = new Map<string, { count: number; severity: ProctoringEvent["severity"]; last: string }>();
+  for (const e of events) {
+    const prev = byType.get(e.type);
+    if (prev) {
+      prev.count += 1;
+      if (e.occurred_at > prev.last) prev.last = e.occurred_at;
+    } else {
+      byType.set(e.type, { count: 1, severity: e.severity, last: e.occurred_at });
+    }
+  }
+  const rows = [...byType.entries()].sort(
+    (a, b) => (b[1].last > a[1].last ? 1 : b[1].last < a[1].last ? -1 : 0),
+  );
+
+  return (
+    <Card className={flagged ? "border-destructive/40" : undefined}>
+      <CardContent className="p-5">
+        <div className="flex items-center gap-2">
+          {flagged ? (
+            <ShieldAlert className="size-4 text-destructive" />
+          ) : (
+            <ShieldCheck className="size-4 text-muted-foreground" />
+          )}
+          <h2 className="text-sm font-semibold">Integrity</h2>
+          {flagged ? (
+            <Badge variant="destructive" className="ml-auto">
+              Flagged for review
+            </Badge>
+          ) : (
+            <span className="ml-auto text-xs text-muted-foreground">No escalation</span>
+          )}
+        </div>
+
+        {rows.length === 0 ? (
+          <p className="mt-3 text-sm text-muted-foreground">No integrity events were captured.</p>
+        ) : (
+          <ul className="mt-3 divide-y divide-border">
+            {rows.map(([type, agg]) => {
+              const meta = PROCTORING_EVENT_META[type];
+              const sev = PROCTORING_SEVERITY_META[agg.severity];
+              return (
+                <li key={type} className="flex items-center gap-3 py-2 text-sm">
+                  <Eye className="size-3.5 shrink-0 text-muted-foreground" />
+                  <span className="flex-1">{meta?.label ?? type}</span>
+                  {agg.count > 1 && (
+                    <span className="text-xs text-muted-foreground tabular-nums">×{agg.count}</span>
+                  )}
+                  <span className="text-xs text-muted-foreground">{formatDate(agg.last)}</span>
+                  <Badge variant={sev?.variant ?? "secondary"}>{sev?.label ?? agg.severity}</Badge>
+                </li>
+              );
+            })}
+          </ul>
+        )}
+      </CardContent>
+    </Card>
   );
 }

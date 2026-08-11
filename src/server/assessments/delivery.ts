@@ -3,6 +3,7 @@ import "server-only";
 import { createAdminClient } from "@/lib/supabase/server";
 import { resolvePortalSession } from "@/server/candidates/portal-access";
 import type {
+  ProctoringLevel,
   QuestionOption,
   QuestionType,
   TestAnswer,
@@ -256,6 +257,7 @@ export type RunnerData =
       instructions: string | null;
       allowBacktrack: boolean;
       screenReaderMode: boolean;
+      proctoringLevel: ProctoringLevel;
       expiresAt: string;
       questions: DeliveryQuestion[];
       answers: Record<string, TestAnswerResponse>;
@@ -290,6 +292,12 @@ export async function getRunnerData(rawToken: string, attemptId: string): Promis
     answers[a.question_id] = a.response;
   }
 
+  const { data: test } = await admin
+    .from("tests")
+    .select("proctoring_level")
+    .eq("id", r.attempt.test_id)
+    .maybeSingle();
+
   return {
     state: "active",
     attemptId: r.attempt.id,
@@ -297,6 +305,7 @@ export async function getRunnerData(rawToken: string, attemptId: string): Promis
     instructions: snapshot.test.instructions,
     allowBacktrack: snapshot.test.allow_backtrack,
     screenReaderMode: r.assignment.screenReaderMode,
+    proctoringLevel: (test?.proctoring_level as ProctoringLevel) ?? "standard",
     expiresAt: r.attempt.expires_at,
     questions,
     answers,

@@ -30,7 +30,7 @@
 | **P2 — Distribution (channels + AI posts)** | CP-10 … CP-12 | ✅ **COMPLETE** |
 | **P3 — AI Screening** | CP-13 … CP-14 | ✅ **COMPLETE** |
 | **P4 — Assessments** | CP-15 … CP-18 | ✅ **COMPLETE** |
-| **P5 — Proctoring & Interviews** | CP-19 … CP-22 | ⬜ Not started |
+| **P5 — Proctoring & Interviews** | CP-19 … CP-22 | 🚧 In progress (CP-19 done) |
 | **P6 — Collaboration & Reporting** | CP-23 … CP-25 | ⬜ Not started |
 | **P7 — Plans, Billing & Platform Admin** | CP-26 … CP-28 | ⬜ Not started |
 
@@ -742,12 +742,15 @@ watch tuned LinkedIn/Indeed/Rozee/Careers posts appear; edit and regenerate them
 ## Phase 5 — Proctoring & Interviews
 > *Maps to UC-5.3 and UC-7.*
 
-### ⬜ CP-19 — Proctoring Capture
-- [ ] Consent gate (recorded, non-configurable per spec §9.3)
-- [ ] System check: camera, mic, network, browser
-- [ ] Browser event capture: tab switch, blur, fullscreen exit, copy/paste, devtools
-- [ ] Environment signals: IP change, multi-session, VM indicators
-- [ ] Tiered levels: Off / Basic / Standard / Strict
+### ✅ CP-19 — Proctoring Capture
+- [x] Consent gate — recorded consent + per-level signal disclosure on the intro screen (R1)
+- [x] System check: camera, mic, network, browser + check-in photo capture
+- [x] Browser event capture: tab switch, blur, fullscreen exit, copy/paste, right-click, devtools heuristic
+- [x] Environment signals: IP-change fingerprint (multi-session/VM indicators deferred to CP-20)
+- [x] Tiered levels: Off / Basic / Standard / Strict (capture no-ops when Off)
+- [x] Server-authoritative severity + escalation — FLAGS at threshold, never auto-rejects (R2)
+- [x] HR results view surfaces the integrity summary (flag + event tally), gated on `proctoring.view_summary`
+- [x] `0024_proctoring.sql` (proctoring_events + attempt capture columns + RLS); `scripts/test-proctoring.cjs` (14 assertions green)
 
 ### ⬜ CP-20 — AI Proctoring Analysis
 - [ ] Face presence / multiple faces / identity match

@@ -508,6 +508,23 @@ export type TestAttempt = Timestamps & {
   consent_at: string | null;
   auto_score: number | null;
   max_score: number | null;
+  check_in_photo_path: string | null;
+  last_ip_hash: string | null;
+  breach_count: number;
+  flagged: boolean;
+};
+
+export type ProctoringSeverity = "low" | "medium" | "high";
+
+export type ProctoringEvent = {
+  id: string;
+  organization_id: string;
+  attempt_id: string;
+  type: string;
+  severity: ProctoringSeverity;
+  detail: Record<string, unknown>;
+  occurred_at: string;
+  created_at: string;
 };
 
 export type AssessmentPolicy = Timestamps & {
@@ -758,6 +775,11 @@ export type Database = {
       test_answers: Table<
         TestAnswer,
         "organization_id" | "attempt_id" | "question_id",
+        [Rel<"organization_id", "organizations">, Rel<"attempt_id", "test_attempts">]
+      >;
+      proctoring_events: Table<
+        ProctoringEvent,
+        "organization_id" | "attempt_id" | "type",
         [Rel<"organization_id", "organizations">, Rel<"attempt_id", "test_attempts">]
       >;
       assessment_policies: Table<
