@@ -13,7 +13,12 @@
 const fs = require("fs");
 const path = require("path");
 
+// A DIRECT_URL provided in the shell wins over .env.local, so you can point a
+// single command at a different database (e.g. production):
+//   DIRECT_URL="postgres://…prod…" npm run db:migrate
+const shellDirectUrl = process.env.DIRECT_URL;
 process.loadEnvFile(path.join(__dirname, "..", ".env.local"));
+if (shellDirectUrl) process.env.DIRECT_URL = shellDirectUrl;
 
 const { Client } = require("pg");
 
