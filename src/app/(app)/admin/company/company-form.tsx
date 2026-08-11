@@ -14,6 +14,8 @@ import { Input } from "@/components/ui/input";
 import type { ActionResult } from "@/lib/validation/auth";
 import type { Organization } from "@/types/database";
 
+import { LogoUpload } from "./logo-upload";
+
 const textareaClass =
   "w-full rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm outline-none transition-colors placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring";
 
@@ -97,18 +99,19 @@ export function CompanyForm({
         </Section>
 
         <Section title="Branding" description="Your logo and accent colour.">
-          <Field id="logo_url" label="Logo URL" error={fe.logo_url} className="sm:col-span-2">
-            <Input
-              name="logo_url"
-              defaultValue={org.logo_url ?? ""}
-              onChange={(e) => {
-                setLogoUrl(e.target.value);
+          <div className="sm:col-span-2 space-y-1.5">
+            <label className="text-sm font-medium">Logo</label>
+            <LogoUpload
+              orgId={org.id}
+              value={logoUrl}
+              onChange={(url) => {
+                setLogoUrl(url);
                 setLogoOk(true);
               }}
-              placeholder="https://…/logo.png"
               disabled={!canEdit}
             />
-          </Field>
+            {fe.logo_url && <p className="text-xs font-medium text-destructive">{fe.logo_url}</p>}
+          </div>
           <Field id="brand_color" label="Brand colour" error={fe.brand_color}>
             <div className="flex items-center gap-2">
               <input
