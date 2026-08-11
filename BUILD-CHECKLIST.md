@@ -780,7 +780,7 @@ watch tuned LinkedIn/Indeed/Rozee/Careers posts appear; edit and regenerate them
 - [x] Blind scorecards until submitted — a panellist sees a peer's scorecard only once their own is submitted (or they hold `view_others_scorecards`); enforced in RLS via a `SECURITY DEFINER` helper (no recursion)
 - [x] Reschedule / no-show — full lifecycle (scheduled → completed / cancelled / no-show, reschedule/reopen)
 - [x] `0028_interviews.sql` + `0029` blind-fix; `scripts/test-interviews.cjs` (12 assertions — scheduling RLS, blind rule, own-only writes, lifecycle) green
-- [ ] Consent-gated recording + transcription — deferred: recording/transcription handled by the external call tool (no media server / TURN in this environment); native capture lands with dedicated infra
+- [x] Consent-gated recording + transcription — consent gate on the interview; the recording from the external call tool is uploaded to a private bucket (RLS: `enable_recording` to write, `view_recording` to play/download) and transcribed by Gemini (`view_transcript`). `0032_interview_recording.sql`
 - [ ] Async video interviews — deferred: needs candidate-side media capture + storage (the chosen model is live external + in-app collaboration)
 
 ---

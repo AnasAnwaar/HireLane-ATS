@@ -81,3 +81,40 @@ export async function generateJson<T>(
     throw new AiError("The AI returned an unexpected response. Please try again.");
   }
 }
+
+/**
+ * Generate free-form text (not JSON). Pass `media` for multimodal input — e.g. an
+ * audio/video recording to transcribe (CP-22). Returns the model's text.
+ */
+export async function generateText(
+  prompt: string,
+  opts: { temperature?: number; media?: InlineImage[] } = {},
+): Promise<string> {
+  const ai = getClient();
+  const contents = opts.media?.length
+    ? [...opts.media.map((m) => ({ inlineData: m })), { text: prompt }]
+    : prompt;
+
+  let res;
+  try {
+    res = await ai.models.generateContent({
+      model: GEMINI_MODEL,
+      contents,
+      config: { temperature: opts.temperature ?? 0.2 },
+    });
+  } catch (err) {
+    const message = String((err as Error)?.message ?? err);
+    if (/quota|rate|429/i.test(message)) {
+      throw new AiError("The AI is temporarily rate-limited. Please try again in a moment.");
+    }
+    if (/api key|401|403|permission/i.test(message)) {
+      throw new AiError("The AI isn't configured correctly. Check the Gemini API key.");
+    }
+    if (/unsupported|mime|invalid argument|400/i.test(message)) {
+      throw new AiError("That recording format can't be transcribed. Try an MP3, M4A or MP4 file.");
+    }
+    throw new AiError("The AI couldn't complete that request. Please try again.");
+  }
+
+  return res.text ?? "";
+}

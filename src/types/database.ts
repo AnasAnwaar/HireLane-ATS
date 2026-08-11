@@ -660,6 +660,10 @@ export type Interview = Timestamps & {
   status: InterviewStatus;
   shared_notes: string | null;
   created_by: string | null;
+  recording_consent: boolean;
+  recording_path: string | null;
+  recording_uploaded_at: string | null;
+  transcript: string | null;
 };
 
 export type InterviewPanelist = {

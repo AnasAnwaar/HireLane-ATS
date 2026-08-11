@@ -8,12 +8,13 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { INTERVIEW_MODE_META, INTERVIEW_STATUS_META } from "@/lib/interviews-display";
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient, createClient } from "@/lib/supabase/server";
 import { can } from "@/server/auth/authorize";
 import { getSessionContext } from "@/server/auth/session";
 import type { Interview, InterviewScorecard } from "@/types/database";
 
 import { LifecycleActions } from "./lifecycle-actions";
+import { RecordingPanel } from "./recording-panel";
 import { ScorecardPanel, type ScorecardView } from "./scorecard-panel";
 
 export const metadata = { title: "Interview" };
@@ -36,15 +37,37 @@ export default async function InterviewPage({ params }: { params: Promise<{ id: 
   if (!interviewRow) notFound();
   const interview = interviewRow as Interview;
 
-  const [{ data: candidate }, { data: panelistRows }, { data: scorecardRows }, canSchedule, canScore, canJoin] =
-    await Promise.all([
-      supabase.from("candidates").select("id, full_name").eq("id", interview.candidate_id).maybeSingle(),
-      supabase.from("interview_panelists").select("membership_id").eq("interview_id", id),
-      supabase.from("interview_scorecards").select("*").eq("interview_id", id),
-      can("interviews.schedule"),
-      can("interviews.submit_scorecard"),
-      can("interviews.join"),
-    ]);
+  const [
+    { data: candidate },
+    { data: panelistRows },
+    { data: scorecardRows },
+    canSchedule,
+    canScore,
+    canJoin,
+    canRecord,
+    canViewRecording,
+    canTranscript,
+  ] = await Promise.all([
+    supabase.from("candidates").select("id, full_name").eq("id", interview.candidate_id).maybeSingle(),
+    supabase.from("interview_panelists").select("membership_id").eq("interview_id", id),
+    supabase.from("interview_scorecards").select("*").eq("interview_id", id),
+    can("interviews.schedule"),
+    can("interviews.submit_scorecard"),
+    can("interviews.join"),
+    can("interviews.enable_recording"),
+    can("interviews.view_recording"),
+    can("interviews.view_transcript"),
+  ]);
+
+  // Signed URL for recording playback (gated on view_recording).
+  let recordingUrl: string | null = null;
+  if (canViewRecording && interview.recording_path) {
+    const admin = createAdminClient();
+    const { data: signed } = await admin.storage
+      .from("interview-recordings")
+      .createSignedUrl(interview.recording_path, 3600);
+    recordingUrl = signed?.signedUrl ?? null;
+  }
 
   let openingTitle: string | null = null;
   if (interview.job_opening_id) {
@@ -163,6 +186,21 @@ export default async function InterviewPage({ params }: { params: Promise<{ id: 
             interviewId={id}
             status={interview.status}
             scheduledAtLocal={toLocalInput(interview.scheduled_at)}
+          />
+        )}
+
+        {/* Recording + transcript (consent-gated) */}
+        {(canRecord || interview.recording_path) && (
+          <RecordingPanel
+            interviewId={id}
+            orgId={interview.organization_id}
+            consent={interview.recording_consent}
+            hasRecording={Boolean(interview.recording_path)}
+            transcript={interview.transcript}
+            signedUrl={recordingUrl}
+            canRecord={canRecord}
+            canViewRecording={canViewRecording}
+            canTranscript={canTranscript}
           />
         )}
 

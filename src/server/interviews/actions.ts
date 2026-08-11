@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 
 import { createAdminClient, createClient } from "@/lib/supabase/server";
 import type { ActionResult } from "@/lib/validation/auth";
+import { AiError, generateText, isAiConfigured } from "@/server/ai/gemini";
 import { authorize } from "@/server/auth/authorize";
 import { getSessionContext } from "@/server/auth/session";
 import type {
@@ -11,6 +12,23 @@ import type {
   InterviewStatus,
   ScorecardRecommendation,
 } from "@/types/database";
+
+const RECORDING_BUCKET = "interview-recordings";
+const INLINE_TRANSCRIBE_LIMIT = 18 * 1024 * 1024; // Gemini inline request ceiling
+
+function mimeFromPath(path: string): string {
+  const ext = path.split(".").pop()?.toLowerCase();
+  const map: Record<string, string> = {
+    mp3: "audio/mpeg",
+    m4a: "audio/mp4",
+    aac: "audio/aac",
+    ogg: "audio/ogg",
+    wav: "audio/wav",
+    webm: "audio/webm",
+    mp4: "video/mp4",
+  };
+  return map[ext ?? ""] ?? "audio/mpeg";
+}
 
 const MODES: InterviewMode[] = ["video", "phone", "onsite"];
 const TERMINAL: InterviewStatus[] = ["completed", "cancelled", "no_show"];
@@ -162,6 +180,106 @@ export async function saveSharedNotesAction(
     .eq("organization_id", session.organizationId);
   if (error) return { ok: false, error: error.message };
   return { ok: true };
+}
+
+/** Record the candidate's consent to be recorded (spec §UC-7 — consent-gated). */
+export async function setRecordingConsentAction(
+  interviewId: string,
+  consent: boolean,
+): Promise<ActionResult> {
+  const session = await getSessionContext();
+  if (!session) return { ok: false, error: "Your session has expired." };
+  const auth = await authorize("interviews.enable_recording");
+  if (!auth.ok) return { ok: false, error: auth.error };
+
+  const admin = createAdminClient();
+  const { error } = await admin
+    .from("interviews")
+    .update({ recording_consent: consent })
+    .eq("id", interviewId)
+    .eq("organization_id", session.organizationId);
+  if (error) return { ok: false, error: error.message };
+  revalidatePath(`/interviews/${interviewId}`);
+  return { ok: true, message: consent ? "Consent recorded." : "Consent withdrawn." };
+}
+
+/** Register an uploaded recording (the client uploads to storage first). */
+export async function saveRecordingAction(
+  interviewId: string,
+  storagePath: string,
+): Promise<ActionResult> {
+  const session = await getSessionContext();
+  if (!session) return { ok: false, error: "Your session has expired." };
+  const auth = await authorize("interviews.enable_recording");
+  if (!auth.ok) return { ok: false, error: auth.error };
+
+  const db = await createClient();
+  const { data: iv } = await db
+    .from("interviews")
+    .select("recording_consent")
+    .eq("id", interviewId)
+    .maybeSingle();
+  if (!iv) return { ok: false, error: "Interview not found." };
+  if (!iv.recording_consent) return { ok: false, error: "Record consent before storing a recording." };
+
+  const admin = createAdminClient();
+  const { error } = await admin
+    .from("interviews")
+    .update({ recording_path: storagePath, recording_uploaded_at: new Date().toISOString(), transcript: null })
+    .eq("id", interviewId)
+    .eq("organization_id", session.organizationId);
+  if (error) return { ok: false, error: error.message };
+  revalidatePath(`/interviews/${interviewId}`);
+  return { ok: true, message: "Recording saved." };
+}
+
+/** Transcribe the uploaded recording with Gemini. */
+export async function transcribeRecordingAction(interviewId: string): Promise<ActionResult> {
+  const session = await getSessionContext();
+  if (!session) return { ok: false, error: "Your session has expired." };
+  const auth = await authorize("interviews.view_transcript");
+  if (!auth.ok) return { ok: false, error: auth.error };
+  if (!isAiConfigured()) return { ok: false, error: "AI isn't set up — a Gemini API key is required." };
+
+  const db = await createClient();
+  const { data: iv } = await db
+    .from("interviews")
+    .select("recording_path")
+    .eq("id", interviewId)
+    .maybeSingle();
+  if (!iv?.recording_path) return { ok: false, error: "No recording to transcribe." };
+
+  const admin = createAdminClient();
+  const { data: blob, error: dlErr } = await admin.storage
+    .from(RECORDING_BUCKET)
+    .download(iv.recording_path);
+  if (dlErr || !blob) return { ok: false, error: "Couldn't read the recording." };
+
+  const bytes = Buffer.from(await blob.arrayBuffer());
+  if (bytes.length > INLINE_TRANSCRIBE_LIMIT) {
+    return { ok: false, error: "Recording is too large to transcribe here (~18 MB limit). Upload a shorter clip." };
+  }
+
+  let transcript: string;
+  try {
+    transcript = await generateText(
+      "Transcribe this interview recording verbatim. Where you can tell speakers apart, label lines as Interviewer: or Candidate:. Return plain text only.",
+      { media: [{ data: bytes.toString("base64"), mimeType: mimeFromPath(iv.recording_path) }] },
+    );
+  } catch (err) {
+    if (err instanceof AiError) return { ok: false, error: err.message };
+    return { ok: false, error: "Transcription failed. Please try again." };
+  }
+  if (!transcript.trim()) return { ok: false, error: "The AI returned an empty transcript." };
+
+  const { error } = await admin
+    .from("interviews")
+    .update({ transcript: transcript.slice(0, 100_000) })
+    .eq("id", interviewId)
+    .eq("organization_id", session.organizationId);
+  if (error) return { ok: false, error: error.message };
+  revalidatePath(`/interviews/${interviewId}`);
+  return { ok: true, message: "Transcript ready." };
 }
 
 type ScorecardInput = {
