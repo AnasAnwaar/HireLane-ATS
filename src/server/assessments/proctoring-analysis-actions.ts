@@ -88,6 +88,21 @@ export async function analyzeProctoringAction(attemptId: string): Promise<Action
     }
   }
 
+  // Exam-room audio samples for additional-voice analysis (CP-20).
+  const audioClips: InlineImage[] = [];
+  {
+    const admin = createAdminClient();
+    const dir = `${attempt.organization_id}/proctoring/${attemptId}/audio`;
+    const { data: files } = await admin.storage.from(CANDIDATE_BUCKET).list(dir);
+    for (const f of (files ?? []).slice(0, 3)) {
+      const { data } = await admin.storage.from(CANDIDATE_BUCKET).download(`${dir}/${f.name}`);
+      if (data) {
+        const buf = Buffer.from(await data.arrayBuffer());
+        if (buf.length) audioClips.push({ data: buf.toString("base64"), mimeType: "audio/webm" });
+      }
+    }
+  }
+
   let result;
   try {
     result = await analyzeAttemptIntegrity({
@@ -97,6 +112,7 @@ export async function analyzeProctoringAction(attemptId: string): Promise<Action
       durationSeconds,
       photo,
       referencePhoto,
+      audioClips,
       testTitle,
     });
   } catch (err) {

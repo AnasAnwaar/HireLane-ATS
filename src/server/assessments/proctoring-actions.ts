@@ -93,6 +93,32 @@ export async function recordProctoringEventAction(
 }
 
 /**
+ * Store a short exam-room audio sample (Standard/Strict). Analysed later for
+ * additional voices (spec §UC-5.3, CP-20). Best-effort; a few rotating clips are
+ * kept per attempt. Never blocks the test.
+ */
+export async function submitAudioSampleAction(
+  rawToken: string,
+  attemptId: string,
+  dataUrl: string,
+  index: number,
+): Promise<{ ok: boolean }> {
+  const r = await resolveAttempt(rawToken, attemptId);
+  if (!r || r.attempt.status !== "in_progress") return { ok: false };
+
+  const m = /^data:(audio\/[\w.+-]+);base64,(.+)$/.exec(dataUrl ?? "");
+  if (!m) return { ok: false };
+
+  const admin = createAdminClient();
+  const slot = Math.max(0, Math.min(2, Math.floor(index))); // keep at most 3 clips
+  const path = `${r.organizationId}/proctoring/${attemptId}/audio/${slot}.webm`;
+  const { error } = await admin.storage
+    .from("candidate-documents")
+    .upload(path, Buffer.from(m[2], "base64"), { contentType: m[1], upsert: true });
+  return { ok: !error };
+}
+
+/**
  * Store the check-in photo (Standard/Strict identity capture). Best-effort: a
  * failed upload records a `camera_denied` event but never blocks the test.
  */

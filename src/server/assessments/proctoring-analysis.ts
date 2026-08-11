@@ -52,6 +52,19 @@ const ANALYSIS_SCHEMA: Schema = {
         required: ["signal", "label", "severity", "confidence", "detail"],
       },
     },
+    audio: {
+      type: Type.OBJECT,
+      description: "Only meaningful when exam-room audio samples were provided.",
+      properties: {
+        additional_voices: {
+          type: Type.BOOLEAN,
+          description: "Whether a second distinct human voice is speaking (someone assisting).",
+        },
+        confidence: { type: Type.NUMBER, description: "0.0 to 1.0." },
+        note: { type: Type.STRING, description: "One short observation about the audio." },
+      },
+      required: ["additional_voices", "confidence", "note"],
+    },
     face: {
       type: Type.OBJECT,
       description: "Only meaningful when a check-in photo was provided.",
@@ -86,6 +99,7 @@ type RawAnalysis = {
     identity_match?: boolean;
     identity_confidence?: number;
   };
+  audio?: { additional_voices?: boolean; confidence?: number; note?: string };
 };
 
 export type AttemptIntegrityInput = {
@@ -95,6 +109,7 @@ export type AttemptIntegrityInput = {
   durationSeconds: number | null;
   photo: InlineImage | null;
   referencePhoto: InlineImage | null;
+  audioClips: InlineImage[];
   testTitle: string;
 };
 
@@ -155,6 +170,9 @@ function buildPrompt(input: AttemptIntegrityInput): string {
     `EVENT TIMELINE:`,
     summariseEvents(input.events, input.durationSeconds),
     ``,
+    input.audioClips.length
+      ? `Also attached are short audio samples from the exam room. Assess whether MORE THAN ONE distinct human voice is speaking (e.g. someone coaching the candidate) and set the "audio" object accordingly. A single voice, silence or background noise is NOT a concern.`
+      : `No audio samples were captured — omit the "audio" object.`,
     input.photo
       ? input.referencePhoto
         ? `Two images are attached. Image 1 is the live check-in photo; Image 2 is a TRUSTED reference photo of the enrolled candidate. Assess whether exactly one person is present in the check-in, note anything unusual (no face, multiple faces, screen-of-a-screen), and set identity_match to whether the check-in is the SAME person as the reference, with identity_confidence.`
@@ -169,10 +187,12 @@ function buildPrompt(input: AttemptIntegrityInput): string {
 export async function analyzeAttemptIntegrity(
   input: AttemptIntegrityInput,
 ): Promise<AttemptIntegrityResult> {
-  const images = [input.photo, input.referencePhoto].filter(Boolean) as InlineImage[];
+  const media = [input.photo, input.referencePhoto, ...input.audioClips].filter(
+    Boolean,
+  ) as InlineImage[];
   const raw = await generateJson<RawAnalysis>(buildPrompt(input), ANALYSIS_SCHEMA, {
     temperature: 0.2,
-    images: images.length ? images : undefined,
+    images: media.length ? media : undefined,
   });
 
   const findings: ProctoringFinding[] = (raw.findings ?? []).map((f) => ({
@@ -182,6 +202,17 @@ export async function analyzeAttemptIntegrity(
     confidence: clamp01(Number(f.confidence)),
     detail: String(f.detail ?? "").slice(0, 500),
   }));
+
+  // Surface an additional-voice detection as a high-severity finding.
+  if (input.audioClips.length && raw.audio?.additional_voices) {
+    findings.push({
+      signal: "additional_voices",
+      label: "Additional voice detected",
+      severity: "high",
+      confidence: clamp01(Number(raw.audio.confidence)),
+      detail: String(raw.audio.note ?? "A second voice was heard in the exam audio.").slice(0, 500),
+    });
+  }
 
   const identityChecked = Boolean(input.photo && input.referencePhoto && raw.face);
   const face: ProctoringFace | null =

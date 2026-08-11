@@ -764,7 +764,7 @@ watch tuned LinkedIn/Indeed/Rozee/Careers posts appear; edit and regenerate them
 - [x] Confidence scoring per flag — every finding + the overall verdict carry a bounded 0–1 confidence (R4)
 - [x] Advisory only — produces an integrity level (clear/low/medium/high) + plain-language summary; never auto-rejects (R2)
 - [x] `0025_proctoring_analysis.sql` (proctoring_analyses + `integrity_level` enum + RLS); multimodal `generateJson`; AI verdict panel on the results view; `scripts/test-proctoring-analysis.cjs` (11 assertions green)
-- [ ] Audio: additional voices — deferred: needs continuous audio capture (lands with recording in CP-22)
+- [x] Audio: additional voices — at Strict level (mic consent disclosed, R1) the runner samples short exam-room audio clips; the analysis passes them to Gemini and raises a high-severity "Additional voice detected" finding when a second speaker is heard
 - [x] Identity match to a reference photo — the candidate's first check-in auto-enrols a reference; later attempts are compared to it by Gemini (match + confidence), surfaced on the results view. `0031_candidate_reference_photo.sql`
 
 ### ✅ CP-21 — Integrity Reports
