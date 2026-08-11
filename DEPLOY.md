@@ -39,7 +39,7 @@ machine** to run migrations — it never goes on Vercel.
 1. In the Supabase dashboard → **New project**.
    - **Name:** `hirelane-prod` (so it's obviously not your dev project).
    - **Database password:** generate a strong one and save it — you'll need it for the connection string.
-   - **Region:** pick the one closest to your users, e.g. **Mumbai (ap-south-1)**. Match this to the Vercel region in Part 4.
+   - **Region:** pick the one closest to your users. This project's prod DB is **Sydney (ap-southeast-2)**, matched by the Vercel region in Part 4.
 2. Wait for it to finish provisioning (~2 min).
 3. Collect these from **Project Settings**:
    - **Settings → API**
@@ -115,9 +115,10 @@ Email** and the email templates.
 
    > Do **not** add `DIRECT_URL` to Vercel — the running app never uses it.
 
-4. **Region:** the repo's `vercel.json` pins `bom1` (Mumbai) and registers the
-   daily evidence-purge cron. If your Supabase region is elsewhere, change
-   `regions` in `vercel.json` to the matching Vercel region code and redeploy.
+4. **Region:** the repo's `vercel.json` pins `syd1` (Sydney) — matching the prod
+   Supabase region (`ap-southeast-2`) — and registers the daily evidence-purge
+   cron. If you move the DB, change `regions` in `vercel.json` to the matching
+   Vercel region code and redeploy.
 5. Click **Deploy**. When it finishes, copy the production URL (e.g.
    `https://hirelane.vercel.app`).
 
