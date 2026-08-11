@@ -20,15 +20,19 @@ export async function GET(request: NextRequest) {
   const requested = searchParams.get("next") ?? "/dashboard";
   const next = requested.startsWith("/") && !requested.startsWith("//") ? requested : "/dashboard";
 
+  // Signup confirmation and invites earn the branded "verified" screen; magic
+  // links / password recovery go straight to their destination.
+  const isConfirmation = type === "signup" || type === "invite" || next === "/setup";
+  const onSuccess = isConfirmation
+    ? `${origin}/verified?status=success&next=${encodeURIComponent(next)}`
+    : `${origin}${next}`;
+  const onFailure = `${origin}/verified?status=error`;
+
   const supabase = await createClient();
 
   if (code) {
     const { error } = await supabase.auth.exchangeCodeForSession(code);
-    if (!error) return NextResponse.redirect(`${origin}${next}`);
-
-    return NextResponse.redirect(
-      `${origin}/login?error=${encodeURIComponent("That link has expired or has already been used.")}`,
-    );
+    return NextResponse.redirect(error ? onFailure : onSuccess);
   }
 
   if (tokenHash && type) {
@@ -36,14 +40,8 @@ export async function GET(request: NextRequest) {
       type: type as "signup" | "recovery" | "invite" | "email_change" | "magiclink",
       token_hash: tokenHash,
     });
-    if (!error) return NextResponse.redirect(`${origin}${next}`);
-
-    return NextResponse.redirect(
-      `${origin}/login?error=${encodeURIComponent("That link has expired or has already been used.")}`,
-    );
+    return NextResponse.redirect(error ? onFailure : onSuccess);
   }
 
-  return NextResponse.redirect(
-    `${origin}/login?error=${encodeURIComponent("That link was not valid.")}`,
-  );
+  return NextResponse.redirect(onFailure);
 }

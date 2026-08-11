@@ -27,7 +27,11 @@ export function AppShell({
             aria-label="Close navigation"
             onClick={() => setMobileNavOpen(false)}
           />
-          <AppSidebar className="relative z-10" organization={user.organization} />
+          <AppSidebar
+            className="relative z-10"
+            organization={user.organization}
+            onNavigate={() => setMobileNavOpen(false)}
+          />
         </div>
       )}
 

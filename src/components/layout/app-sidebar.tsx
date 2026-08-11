@@ -30,9 +30,12 @@ function initialsOf(name: string): string {
 export function AppSidebar({
   className,
   organization,
+  onNavigate,
 }: {
   className?: string;
   organization: string;
+  /** Called when a link is followed — the mobile drawer uses it to close. */
+  onNavigate?: () => void;
 }) {
   const pathname = usePathname();
   const perms = usePermissions();
@@ -63,7 +66,7 @@ export function AppSidebar({
       {perms.can("job_openings.create") && (
         <div className="px-4 pb-4 pt-4">
           <Button className="w-full justify-start gap-2" size="sm" asChild>
-            <Link href="/openings/new">
+            <Link href="/openings/new" onClick={onNavigate}>
               <Plus />
               New job opening
             </Link>
@@ -84,6 +87,7 @@ export function AppSidebar({
                   <li key={item.href}>
                     <Link
                       href={item.href}
+                      onClick={onNavigate}
                       aria-current={active ? "page" : undefined}
                       className={cn(
                         "group relative flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors",
@@ -124,6 +128,7 @@ export function AppSidebar({
       <div className="space-y-1 border-t border-sidebar-border p-3">
         <Link
           href="/admin/company"
+          onClick={onNavigate}
           className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors hover:bg-sidebar-accent/50"
         >
           <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-sand text-xs font-bold text-sand-foreground">

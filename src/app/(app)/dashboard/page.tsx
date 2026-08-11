@@ -94,18 +94,20 @@ export default async function DashboardPage() {
         {/* Onboarding is optional, not a gate — nudge rather than block. */}
         {!session.onboardingCompleted && (
           <Card className="border-primary/25 bg-primary-soft/40">
-            <CardContent className="flex flex-wrap items-center gap-4 p-5">
-              <span className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-                <Rocket className="size-5" />
-              </span>
-              <div className="min-w-0 flex-1">
-                <p className="font-medium">Finish setting up {session.organizationName}</p>
-                <p className="mt-0.5 text-sm text-muted-foreground">
-                  Add departments, invite your team and connect your job boards — about two
-                  minutes.
-                </p>
+            <CardContent className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center">
+              <div className="flex min-w-0 flex-1 items-start gap-4">
+                <span className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+                  <Rocket className="size-5" />
+                </span>
+                <div className="min-w-0">
+                  <p className="font-medium">Finish setting up {session.organizationName}</p>
+                  <p className="mt-0.5 text-sm text-muted-foreground">
+                    Add departments, invite your team and connect your job boards — about two
+                    minutes.
+                  </p>
+                </div>
               </div>
-              <Button asChild>
+              <Button asChild className="w-full shrink-0 sm:w-auto">
                 <Link href="/onboarding">
                   Continue setup <ArrowUpRight />
                 </Link>
