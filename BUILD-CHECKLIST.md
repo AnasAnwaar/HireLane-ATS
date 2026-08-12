@@ -31,7 +31,7 @@
 | **P3 — AI Screening** | CP-13 … CP-14 | ✅ **COMPLETE** |
 | **P4 — Assessments** | CP-15 … CP-18 | ✅ **COMPLETE** |
 | **P5 — Proctoring & Interviews** | CP-19 … CP-22 | ✅ **COMPLETE** |
-| **P6 — Collaboration & Reporting** | CP-23 … CP-25 | ⬜ Not started |
+| **P6 — Collaboration & Reporting** | CP-23 … CP-25 | 🚧 In progress (CP-23, CP-24 done) |
 | **P7 — Plans, Billing & Platform Admin** | CP-26 … CP-28 | ⬜ Not started |
 
 **Current checkpoint:** ✅ **Phases 0, 1 & 2 COMPLETE** (CP-1 … CP-12)
@@ -795,11 +795,12 @@ watch tuned LinkedIn/Indeed/Rozee/Careers posts appear; edit and regenerate them
 - [x] Conflict-of-interest declaration — a reviewer declares (with optional reason) / withdraws a COI on a candidate; shown to anyone who can view the profile
 - [x] `0035_collaboration.sql`; `scripts/test-collaboration.cjs`
 
-### ⬜ CP-24 — Reporting
-- [ ] Pipeline funnel, time metrics, source effectiveness
-- [ ] Post performance, assessment analytics, team activity
-- [ ] Aggregate-only diversity reporting
-- [ ] CSV / PDF export
+### ✅ CP-24 — Reporting
+- [x] Pipeline funnel, time metrics, source effectiveness — real `/reports` page (replaces the placeholder): funnel with stage conversion, avg time-to-hire, source→hire conversion table
+- [x] Post performance, assessment analytics, team activity — openings by applicant volume, assessment attempts/submitted/avg-score/pass-rate, and 30-day team activity by actor
+- [x] Aggregate-only diversity reporting — section gated on `reporting.view_diversity`, aggregate-only by design (no protected-characteristic data collected by default)
+- [x] CSV / PDF export — CSV download + print-to-PDF, gated on `reporting.export`
+- [x] Org-wide aggregates via `getReports()` (admin client, org-scoped, after a reporting-permission gate); no migration needed
 
 ### ⬜ CP-25 — Polish & Hardening
 - [ ] Talent pool and cross-opening reuse
