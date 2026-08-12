@@ -3,6 +3,7 @@ import {
   Briefcase,
   Building2,
   ClipboardList,
+  CreditCard,
   LayoutDashboard,
   Plug,
   ScrollText,
@@ -84,6 +85,12 @@ export const NAV_SECTIONS: NavSection[] = [
         href: "/admin/company",
         icon: Building2,
         permission: "administration.manage_company_profile",
+      },
+      {
+        label: "Plans & billing",
+        href: "/admin/billing",
+        icon: CreditCard,
+        permission: "administration.manage_billing",
       },
       {
         label: "Users",

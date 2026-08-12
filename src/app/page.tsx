@@ -17,6 +17,7 @@ import { BrandMark } from "@/components/brand-mark";
 import { HiringFunnel } from "@/components/landing/hiring-funnel";
 import { AppWindow, MatchReportScreen, ScreeningScreen } from "@/components/landing/product-frame";
 import { Reveal } from "@/components/landing/reveal";
+import { ContactForm } from "@/components/landing/contact-form";
 import { Spotlight, SpotlightCard } from "@/components/landing/spotlight";
 import { Avatar } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -113,6 +114,21 @@ const PRICING = [
       { t: "AI screening & match reports", ok: true },
       { t: "AI assessments + grading", ok: true },
       { t: "Proctoring & interview tooling", ok: true },
+    ],
+  },
+  {
+    name: "Custom",
+    price: "Let’s talk",
+    period: "",
+    custom: true,
+    tagline: "For agencies & enterprises with bespoke needs.",
+    cta: "Get in touch",
+    features: [
+      { t: "Unlimited seats & openings", ok: true },
+      { t: "Everything in Premium", ok: true },
+      { t: "SSO, custom roles & audit exports", ok: true },
+      { t: "Dedicated onboarding & support", ok: true },
+      { t: "Custom integrations, SLAs & pricing", ok: true },
     ],
   },
 ];
@@ -461,9 +477,10 @@ export default function LandingPage() {
               </p>
             </div>
 
-            <div className="mx-auto grid max-w-5xl items-start gap-6 lg:grid-cols-3">
+            <div className="mx-auto grid max-w-6xl items-start gap-6 sm:grid-cols-2 lg:grid-cols-4">
               {PRICING.map((plan) => {
                 const popular = "popular" in plan && plan.popular;
+                const custom = "custom" in plan && plan.custom;
                 return (
                   <div key={plan.name} className="relative">
                     {popular && (
@@ -483,8 +500,12 @@ export default function LandingPage() {
                         <h3 className="text-lg font-semibold text-white">{plan.name}</h3>
                         <p className="mt-1 text-sm text-zinc-400">{plan.tagline}</p>
                         <div className="mt-5 flex items-baseline gap-1.5">
-                          <span className={`text-4xl font-bold tracking-tight ${chrome}`}>{plan.price}</span>
-                          <span className="text-sm text-zinc-500">{plan.period}</span>
+                          <span
+                            className={`${custom ? "text-2xl" : "text-4xl"} font-bold tracking-tight ${chrome}`}
+                          >
+                            {plan.price}
+                          </span>
+                          {plan.period && <span className="text-sm text-zinc-500">{plan.period}</span>}
                         </div>
 
                         <ul className="mt-6 space-y-3 text-sm">
@@ -511,7 +532,7 @@ export default function LandingPage() {
                           }
                           asChild
                         >
-                          <Link href="/signup">{plan.cta}</Link>
+                          <Link href={custom ? "#contact" : "/signup"}>{plan.cta}</Link>
                         </Button>
                       </div>
                     </SpotlightCard>
@@ -552,6 +573,39 @@ export default function LandingPage() {
                 </Link>
               </Button>
             </div>
+          </div>
+        </section>
+
+        {/* Contact */}
+        <section id="contact" className="scroll-mt-24 border-t border-white/10 bg-white/[0.02]">
+          <div className="mx-auto grid max-w-6xl gap-10 px-6 py-24 lg:grid-cols-2 lg:gap-16">
+            <div>
+              <p className="mb-2 text-[0.6875rem] font-semibold uppercase tracking-[0.14em] text-primary">
+                Contact
+              </p>
+              <h2 className={`text-3xl font-semibold tracking-tight sm:text-[2.5rem] ${chrome}`}>
+                Questions? Let&rsquo;s talk.
+              </h2>
+              <p className="mt-4 max-w-md text-zinc-400">
+                Curious about a custom plan, a demo of every feature, or how HireLane fits your team?
+                Send a note and we&rsquo;ll get back to you.
+              </p>
+              <ul className="mt-8 space-y-3 text-sm text-zinc-300">
+                <li className="flex items-center gap-3">
+                  <span className="flex size-8 items-center justify-center rounded-lg bg-primary/15 text-primary">✦</span>
+                  Tailored plans for agencies & enterprises
+                </li>
+                <li className="flex items-center gap-3">
+                  <span className="flex size-8 items-center justify-center rounded-lg bg-primary/15 text-primary">◎</span>
+                  A guided walkthrough of the full AI stack
+                </li>
+                <li className="flex items-center gap-3">
+                  <span className="flex size-8 items-center justify-center rounded-lg bg-primary/15 text-primary">◈</span>
+                  Answers on security, roles & integrations
+                </li>
+              </ul>
+            </div>
+            <ContactForm />
           </div>
         </section>
       </main>

@@ -846,6 +846,7 @@ watch tuned LinkedIn/Indeed/Rozee/Careers posts appear; edit and regenerate them
 ### ⬜ CP-28 — Super-Admin Portal (platform)
 - [ ] A separate **cross-tenant** super-admin area for platform staff — hard-gated behind a dedicated super-admin capability (not a normal org role), bypassing org RLS only through an audited service path
 - [ ] Manage **plans & pricing** globally: create/edit tiers, limits, the feature matrix and per-seat pricing — kept in sync with Stripe Products/Prices
+- [ ] **Private / custom plans**: create a bespoke plan (custom limits + full feature access, e.g. an all-features demo) that is **not publicly listed**, and **assign it to specific organisations** from the super-admin portal — only the super-admin can grant it; assigned orgs get the plan's entitlements without it appearing on public pricing or being self-serve
 - [ ] Platform **analytics**: organisations, active subscriptions, plan distribution, MRR, seats sold, AI usage, openings/applicants volume, churn
 - [ ] **API & integrations** management: platform API keys, channel/OAuth app credentials, webhook endpoints, and integration health
 - [ ] Org administration: view / suspend / comp / trial an organisation, adjust its plan, and audited impersonation for support

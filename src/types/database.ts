@@ -668,6 +668,16 @@ export type Interview = Timestamps & {
   async_questions: AsyncQuestion[];
 };
 
+export type ContactMessage = {
+  id: string;
+  name: string;
+  email: string;
+  subject: string | null;
+  message: string;
+  handled: boolean;
+  created_at: string;
+};
+
 export type AsyncQuestion = { prompt: string; max_seconds: number };
 
 export type InterviewAnswer = {
@@ -932,6 +942,7 @@ export type Database = {
         "organization_id" | "interview_id" | "question_index" | "video_path",
         [Rel<"organization_id", "organizations">, Rel<"interview_id", "interviews">]
       >;
+      contact_messages: Table<ContactMessage, "name" | "email" | "message", []>;
     };
     Views: Record<string, never>;
     Functions: {
