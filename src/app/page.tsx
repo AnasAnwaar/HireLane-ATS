@@ -477,7 +477,7 @@ export default function LandingPage() {
               </p>
             </div>
 
-            <div className="mx-auto grid max-w-6xl items-start gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="mx-auto grid max-w-6xl items-stretch gap-6 sm:grid-cols-2 lg:grid-cols-4">
               {PRICING.map((plan) => {
                 const popular = "popular" in plan && plan.popular;
                 const custom = "custom" in plan && plan.custom;
@@ -508,7 +508,7 @@ export default function LandingPage() {
                           {plan.period && <span className="text-sm text-zinc-500">{plan.period}</span>}
                         </div>
 
-                        <ul className="mt-6 space-y-3 text-sm">
+                        <ul className="mt-6 flex-1 space-y-3 text-sm">
                           {plan.features.map((f) => (
                             <li key={f.t} className="flex items-start gap-2.5">
                               {f.ok ? (
