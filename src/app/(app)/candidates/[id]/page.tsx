@@ -21,6 +21,8 @@ import type { ApplicationScreening } from "@/types/database";
 import { AssessmentsCard, type AssignableTest, type AssignmentView } from "./assessments-card";
 import { DocumentsSection } from "./documents-section";
 import { MatchReport, type MatchReportData } from "./match-report";
+import { CandidateScorecard, type ScorecardAggregate } from "./candidate-scorecard";
+import { ConflictSection } from "./conflict-section";
 import { NotesSection } from "./notes-section";
 import { PortalInviteCard } from "./portal-invite-card";
 import { StageControl } from "./stage-control";
@@ -70,9 +72,42 @@ export default async function CandidateProfilePage({
       supabase.from("memberships").select("id, profiles(full_name)").eq("status", "active").limit(100),
     ]);
 
+  const memberName = new Map(
+    (memberRows ?? []).map((m) => [m.id, (m.profiles as { full_name?: string } | null)?.full_name || "Member"]),
+  );
   const teamMembers = (memberRows ?? [])
-    .map((m) => ({ id: m.id, name: (m.profiles as { full_name?: string } | null)?.full_name || "Member" }))
+    .map((m) => ({ id: m.id, name: memberName.get(m.id) ?? "Member" }))
     .filter((m) => m.id !== session.membershipId);
+
+  // Scorecards + conflict declarations (CP-23).
+  const [{ data: scRows }, { data: conflictRows }, canScore] = await Promise.all([
+    supabase.from("candidate_scorecards").select("*").eq("candidate_id", id),
+    supabase.from("conflict_declarations").select("*").eq("candidate_id", id),
+    can("interviews.submit_scorecard"),
+  ]);
+  const scorecards = (scRows ?? []) as import("@/types/database").CandidateScorecard[];
+  const ownScorecardRow = scorecards.find((s) => s.author_membership_id === session.membershipId) ?? null;
+  const submittedCards = scorecards.filter((s) => s.submitted);
+  const compAvgMap = new Map<string, number[]>();
+  for (const s of submittedCards) {
+    for (const c of s.competencies ?? []) {
+      if (c.rating > 0) compAvgMap.set(c.name, [...(compAvgMap.get(c.name) ?? []), c.rating]);
+    }
+  }
+  const overalls = submittedCards.map((s) => s.overall).filter((x): x is number => x != null);
+  const recCounts: Partial<Record<string, number>> = {};
+  for (const s of submittedCards) if (s.recommendation) recCounts[s.recommendation] = (recCounts[s.recommendation] ?? 0) + 1;
+  const scorecardAggregate = {
+    reviewers: submittedCards.length,
+    overallAvg: overalls.length ? overalls.reduce((a, b) => a + b, 0) / overalls.length : null,
+    competencyAvgs: [...compAvgMap].map(([name, arr]) => ({ name, avg: arr.reduce((a, b) => a + b, 0) / arr.length })),
+    recCounts: recCounts as ScorecardAggregate["recCounts"],
+  };
+  const conflicts = (conflictRows ?? []).map((c) => ({
+    name: memberName.get(c.membership_id) ?? "Member",
+    reason: c.reason,
+    isOwn: c.membership_id === session.membershipId,
+  }));
 
   if (!profile) notFound();
   const { candidate, applications, documents, notes, timeline } = profile;
@@ -264,6 +299,27 @@ export default async function CandidateProfilePage({
           )}
 
           {/* Notes */}
+          {conflicts.length > 0 && (
+            <ConflictSection candidateId={candidate.id} conflicts={conflicts} />
+          )}
+
+          <CandidateScorecard
+            candidateId={candidate.id}
+            canScore={canScore}
+            own={
+              ownScorecardRow
+                ? {
+                    competencies: ownScorecardRow.competencies,
+                    overall: ownScorecardRow.overall,
+                    recommendation: ownScorecardRow.recommendation,
+                    comment: ownScorecardRow.comment,
+                    submitted: ownScorecardRow.submitted,
+                  }
+                : null
+            }
+            aggregate={scorecardAggregate}
+          />
+
           <NotesSection
             candidateId={candidate.id}
             notes={notes}
@@ -271,6 +327,9 @@ export default async function CandidateProfilePage({
             canMention={canMention}
             teamMembers={teamMembers}
           />
+          {conflicts.length === 0 && (
+            <ConflictSection candidateId={candidate.id} conflicts={conflicts} />
+          )}
 
           {/* Stubbed sections that arrive with later checkpoints. */}
           <Card className="border-dashed">

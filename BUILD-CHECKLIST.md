@@ -788,11 +788,12 @@ watch tuned LinkedIn/Indeed/Rozee/Careers posts appear; edit and regenerate them
 ## Phase 6 — Collaboration & Insight
 > *Maps to UC-6 and UC-8.*
 
-### ⬜ CP-23 — Notes & Collaboration
-- [ ] Threaded notes with visibility scopes
-- [ ] @mentions and notifications
-- [ ] Structured competency scorecards + aggregate
-- [ ] Conflict-of-interest declaration
+### ✅ CP-23 — Notes & Collaboration
+- [x] Threaded notes with visibility scopes — replies (`parent_id`) inherit the thread's private/team/management scope; enforced in RLS
+- [x] @mentions and notifications — mention active teammates in a note; `notifications` fan-out (mention + reply-to-author) to a functional topbar bell (unread badge, mark read, click-through). RLS scopes notifications to their recipient
+- [x] Structured competency scorecards + aggregate — per-reviewer 1–5 competency ratings + overall + recommendation; blind until submitted, with a panel aggregate (per-competency averages, overall, recommendation spread)
+- [x] Conflict-of-interest declaration — a reviewer declares (with optional reason) / withdraws a COI on a candidate; shown to anyone who can view the profile
+- [x] `0035_collaboration.sql`; `scripts/test-collaboration.cjs`
 
 ### ⬜ CP-24 — Reporting
 - [ ] Pipeline funnel, time metrics, source effectiveness
