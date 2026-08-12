@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { clientEnv } from "@/lib/env";
 import { createClient } from "@/lib/supabase/server";
 import { generateToken, hashToken } from "@/lib/token";
+import { emailLayout, sendEmail } from "@/server/email/send";
 import type { ActionResult } from "@/lib/validation/auth";
 import { authorize } from "@/server/auth/authorize";
 import { getSessionContext } from "@/server/auth/session";
@@ -33,7 +34,7 @@ export async function issuePortalInviteAction(
   // Confirm the candidate is in the caller's org (RLS also enforces this).
   const { data: candidate } = await supabase
     .from("candidates")
-    .select("id")
+    .select("id, full_name, email")
     .eq("id", candidateId)
     .maybeSingle();
   if (!candidate) return { ok: false, error: "Candidate not found." };
@@ -69,12 +70,25 @@ export async function issuePortalInviteAction(
     summary: "Issued a candidate portal link.",
   });
 
+  const url = `${clientEnv.NEXT_PUBLIC_APP_URL}/candidate/${raw}`;
+
+  // Best-effort email of the link to the candidate (no-op without a mail key).
+  if (candidate.email) {
+    await sendEmail({
+      to: candidate.email,
+      subject: `Your ${session.organizationName} application portal`,
+      html: emailLayout({
+        heading: `Hi ${candidate.full_name?.split(" ")[0] || "there"},`,
+        intro: `${session.organizationName} has set up a secure space where you can track your application, complete assessments and record video interviews.`,
+        ctaLabel: "Open your portal",
+        ctaUrl: url,
+        footnote: "This private link is just for you and expires in a few days.",
+      }),
+    });
+  }
+
   revalidatePath(`/candidates/${candidateId}`);
-  return {
-    ok: true,
-    url: `${clientEnv.NEXT_PUBLIC_APP_URL}/candidate/${raw}`,
-    expiresAt,
-  };
+  return { ok: true, url, expiresAt };
 }
 
 /** Revoke the candidate's live portal link. */

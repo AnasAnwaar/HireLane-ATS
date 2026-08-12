@@ -4,6 +4,7 @@ import { z } from "zod";
 
 import { createAdminClient } from "@/lib/supabase/server";
 import { toFieldErrors, type ActionResult } from "@/lib/validation/auth";
+import { emailLayout, sendEmail } from "@/server/email/send";
 
 const DEFAULT_TO = "manasanwaar17@gmail.com";
 
@@ -45,34 +46,18 @@ export async function submitContactAction(
   });
   if (error) return { ok: false, error: "Something went wrong. Please try again." };
 
-  // Best-effort email notification (never blocks the confirmation).
-  const key = process.env.RESEND_API_KEY;
-  if (key) {
-    const to = process.env.CONTACT_EMAIL || DEFAULT_TO;
-    const from = process.env.CONTACT_FROM || "HireLane <onboarding@resend.dev>";
-    try {
-      await fetch("https://api.resend.com/emails", {
-        method: "POST",
-        headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
-        body: JSON.stringify({
-          from,
-          to,
-          reply_to: d.email,
-          subject: `New enquiry from ${d.name}${d.subject ? ` — ${d.subject}` : ""}`,
-          html: `<div style="font-family:system-ui,Arial,sans-serif;font-size:15px;line-height:1.6;color:#18181b">
-            <h2 style="margin:0 0 12px">New HireLane enquiry</h2>
-            <p style="margin:0"><strong>Name:</strong> ${esc(d.name)}</p>
-            <p style="margin:0"><strong>Email:</strong> ${esc(d.email)}</p>
-            ${d.subject ? `<p style="margin:0"><strong>Subject:</strong> ${esc(d.subject)}</p>` : ""}
-            <p style="margin:14px 0 4px"><strong>Message</strong></p>
-            <p style="margin:0;white-space:pre-wrap">${esc(d.message)}</p>
-          </div>`,
-        }),
-      });
-    } catch {
-      // Email failed but the message is safely stored — don't surface an error.
-    }
-  }
+  // Best-effort email notification (never blocks the confirmation; no-op without a key).
+  await sendEmail({
+    to: process.env.CONTACT_EMAIL || DEFAULT_TO,
+    replyTo: d.email,
+    subject: `New enquiry from ${d.name}${d.subject ? ` — ${d.subject}` : ""}`,
+    html: emailLayout({
+      heading: "New enquiry",
+      intro: `From ${d.name} · ${d.email}${d.subject ? ` · ${d.subject}` : ""}`,
+      bodyHtml: `<p style="margin:0 0 6px;font-weight:600;color:#18181b">Message</p><p style="margin:0 0 20px;white-space:pre-wrap;color:#3f3f46">${esc(d.message)}</p>`,
+      footnote: "Reply directly to this email to respond to the sender.",
+    }),
+  });
 
   return { ok: true, message: "Thanks — we'll be in touch shortly." };
 }
