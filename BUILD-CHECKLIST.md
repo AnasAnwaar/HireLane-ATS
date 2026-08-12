@@ -802,11 +802,11 @@ watch tuned LinkedIn/Indeed/Rozee/Careers posts appear; edit and regenerate them
 - [x] CSV / PDF export — CSV download + print-to-PDF, gated on `reporting.export`
 - [x] Org-wide aggregates via `getReports()` (admin client, org-scoped, after a reporting-permission gate); no migration needed
 
-### ⬜ CP-25 — Polish & Hardening
-- [ ] Talent pool and cross-opening reuse
-- [ ] Notification templates (email / SMS / WhatsApp)
-- [ ] Accessibility audit to WCAG 2.1 AA
-- [ ] Localisation: English + Urdu, RTL
+### 🚧 CP-25 — Polish & Hardening (in progress)
+- [x] Talent pool and cross-opening reuse — candidates can be kept in the talent pool + organised with free-form tags; "Consider for another opening" creates a fresh application for an existing candidate (cross-opening reuse). `0036_talent_pool.sql` (candidates `in_talent_pool` + `tags`); gated on `pipeline.add_to_talent_pool` / `applicants.import`
+- [~] Accessibility (WCAG 2.1 AA) — ongoing: skip-to-content link + focusable `main` landmark added; the app already uses focus-visible rings, aria-current nav, labelled controls. A full end-to-end audit remains
+- [ ] Notification templates (email / SMS / WhatsApp) — deferred: needs provider config (SMTP for email — see `supabase/email-templates` history; Twilio/WhatsApp for SMS). The template-authoring UI + delivery pipeline land once a provider is wired
+- [ ] Localisation: English + Urdu, RTL — deferred: needs a full i18n framework (message catalogues, locale routing, RTL layout pass) — a standalone workstream
 - [ ] Performance pass against the spec's NFR targets
 - [ ] Security review + penetration test prep
 

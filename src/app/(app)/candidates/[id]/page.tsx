@@ -22,6 +22,7 @@ import { AssessmentsCard, type AssignableTest, type AssignmentView } from "./ass
 import { DocumentsSection } from "./documents-section";
 import { MatchReport, type MatchReportData } from "./match-report";
 import { CandidateScorecard, type ScorecardAggregate } from "./candidate-scorecard";
+import { TalentPoolSection } from "./talent-pool-section";
 import { ConflictSection } from "./conflict-section";
 import { NotesSection } from "./notes-section";
 import { PortalInviteCard } from "./portal-invite-card";
@@ -72,6 +73,9 @@ export default async function CandidateProfilePage({
       supabase.from("memberships").select("id, profiles(full_name)").eq("status", "active").limit(100),
     ]);
 
+  if (!profile) notFound();
+  const { candidate, applications, documents, notes, timeline } = profile;
+
   const memberName = new Map(
     (memberRows ?? []).map((m) => [m.id, (m.profiles as { full_name?: string } | null)?.full_name || "Member"]),
   );
@@ -109,8 +113,16 @@ export default async function CandidateProfilePage({
     isOwn: c.membership_id === session.membershipId,
   }));
 
-  if (!profile) notFound();
-  const { candidate, applications, documents, notes, timeline } = profile;
+  // Talent pool + cross-opening reuse (CP-25).
+  const [{ data: allOpenings }, canImport, canPool] = await Promise.all([
+    supabase.from("job_openings").select("id, title").neq("status", "closed").order("created_at", { ascending: false }),
+    can("applicants.import"),
+    can("pipeline.add_to_talent_pool"),
+  ]);
+  const appliedOpeningIds = new Set(applications.map((a) => a.jobOpeningId));
+  const reuseOpenings = (allOpenings ?? [])
+    .filter((o) => !appliedOpeningIds.has(o.id))
+    .map((o) => ({ id: o.id, title: o.title }));
 
   const showContact = fields["fields.view_candidate_contact"];
   const exp = experienceLabel(candidate.years_experience, null);
@@ -302,6 +314,16 @@ export default async function CandidateProfilePage({
           {conflicts.length > 0 && (
             <ConflictSection candidateId={candidate.id} conflicts={conflicts} />
           )}
+
+          <TalentPoolSection
+            candidateId={candidate.id}
+            inPool={candidate.in_talent_pool}
+            tags={candidate.tags}
+            openings={reuseOpenings}
+            canPool={canPool}
+            canEditTags={canImport}
+            canAdd={canImport}
+          />
 
           <CandidateScorecard
             candidateId={candidate.id}

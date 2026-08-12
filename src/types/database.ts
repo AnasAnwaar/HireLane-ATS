@@ -301,6 +301,8 @@ export type Candidate = Timestamps & {
   skills: string[];
   created_by: string | null;
   reference_photo_path: string | null;
+  in_talent_pool: boolean;
+  tags: string[];
 };
 
 export type Application = {

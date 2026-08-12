@@ -17,6 +17,12 @@ export function AppShell({
 
   return (
     <div className="flex h-dvh overflow-hidden">
+      <a
+        href="#main-content"
+        className="sr-only focus:absolute focus:left-4 focus:top-3 focus:z-[100] focus:not-sr-only focus:rounded-md focus:bg-primary focus:px-3 focus:py-2 focus:text-sm focus:font-medium focus:text-primary-foreground focus:shadow-lg"
+      >
+        Skip to content
+      </a>
       <AppSidebar className="hidden lg:flex" organization={user.organization} />
 
       {/* Mobile drawer */}
@@ -37,7 +43,9 @@ export function AppShell({
 
       <div className="flex min-w-0 flex-1 flex-col">
         <AppTopbar user={user} onToggleSidebar={() => setMobileNavOpen((open) => !open)} />
-        <main className="flex-1 overflow-y-auto bg-background">{children}</main>
+        <main id="main-content" tabIndex={-1} className="flex-1 overflow-y-auto bg-background">
+          {children}
+        </main>
       </div>
     </div>
   );
