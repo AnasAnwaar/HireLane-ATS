@@ -26,6 +26,8 @@ export type CandidateNoteView = {
   authorName: string;
   authorMembershipId: string | null;
   isOwn: boolean;
+  parentId: string | null;
+  mentions: { membership_id: string; name: string }[];
   editedAt: string | null;
   createdAt: string;
 };
@@ -80,7 +82,7 @@ export const getCandidateProfile = cache(
         .order("created_at", { ascending: false }),
       supabase
         .from("candidate_notes")
-        .select("id, body, visibility, author_membership_id, edited_at, created_at")
+        .select("id, body, visibility, author_membership_id, parent_id, mentions, edited_at, created_at")
         .eq("candidate_id", candidateId)
         .order("created_at", { ascending: false }),
     ]);
@@ -119,6 +121,8 @@ export const getCandidateProfile = cache(
         ? (authorNames.get(n.author_membership_id) ?? "Someone")
         : "System",
       isOwn: n.author_membership_id === currentMembershipId,
+      parentId: n.parent_id ?? null,
+      mentions: Array.isArray(n.mentions) ? (n.mentions as { membership_id: string; name: string }[]) : [],
       editedAt: n.edited_at,
       createdAt: n.created_at,
     }));

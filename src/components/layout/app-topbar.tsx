@@ -1,8 +1,9 @@
 "use client";
 
-import { Bell, Menu, Search, Settings, ShieldCheck, User } from "lucide-react";
+import { Menu, Search, Settings, ShieldCheck, User } from "lucide-react";
 import Link from "next/link";
 
+import { NotificationBell } from "@/components/layout/notification-bell";
 import { SignOutButton } from "@/components/layout/sign-out-button";
 import { Avatar } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -56,10 +57,7 @@ export function AppTopbar({
       <div className="flex-1 md:hidden" />
 
       <div className="ml-auto flex items-center gap-1">
-        <Button variant="ghost" size="icon" aria-label="Notifications" className="relative">
-          <Bell className="size-4" />
-          <span className="absolute right-2 top-2 size-2 rounded-full bg-primary ring-2 ring-card" />
-        </Button>
+        <NotificationBell />
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>

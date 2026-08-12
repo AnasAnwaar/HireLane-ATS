@@ -331,6 +331,8 @@ export type DocumentRow = {
   created_at: string;
 };
 
+export type NoteMention = { membership_id: string; name: string };
+
 export type CandidateNote = Timestamps & {
   id: string;
   organization_id: string;
@@ -339,7 +341,47 @@ export type CandidateNote = Timestamps & {
   author_membership_id: string | null;
   body: string;
   visibility: NoteVisibility;
+  parent_id: string | null;
+  mentions: NoteMention[];
   edited_at: string | null;
+};
+
+export type Notification = {
+  id: string;
+  organization_id: string;
+  recipient_membership_id: string;
+  actor_membership_id: string | null;
+  type: string;
+  candidate_id: string | null;
+  note_id: string | null;
+  body: string | null;
+  read_at: string | null;
+  created_at: string;
+};
+
+export type Competency = { name: string; rating: number };
+
+export type CandidateScorecard = Timestamps & {
+  id: string;
+  organization_id: string;
+  candidate_id: string;
+  application_id: string | null;
+  author_membership_id: string;
+  competencies: Competency[];
+  overall: number | null;
+  recommendation: ScorecardRecommendation | null;
+  comment: string | null;
+  submitted: boolean;
+  submitted_at: string | null;
+};
+
+export type ConflictDeclaration = {
+  id: string;
+  organization_id: string;
+  candidate_id: string;
+  membership_id: string;
+  reason: string | null;
+  created_at: string;
 };
 
 export type CandidatePortalInvite = Timestamps & {
@@ -828,6 +870,25 @@ export type Database = {
           Rel<"candidate_id", "candidates">,
           Rel<"author_membership_id", "memberships">,
         ]
+      >;
+      notifications: Table<
+        Notification,
+        "organization_id" | "recipient_membership_id" | "type",
+        [Rel<"organization_id", "organizations">, Rel<"recipient_membership_id", "memberships">]
+      >;
+      candidate_scorecards: Table<
+        CandidateScorecard,
+        "organization_id" | "candidate_id" | "author_membership_id",
+        [
+          Rel<"organization_id", "organizations">,
+          Rel<"candidate_id", "candidates">,
+          Rel<"author_membership_id", "memberships">,
+        ]
+      >;
+      conflict_declarations: Table<
+        ConflictDeclaration,
+        "organization_id" | "candidate_id" | "membership_id",
+        [Rel<"organization_id", "organizations">, Rel<"candidate_id", "candidates">]
       >;
       candidate_portal_invites: Table<
         CandidatePortalInvite,

@@ -5,8 +5,8 @@ import { z } from "zod";
 
 import { createAdminClient, createClient } from "@/lib/supabase/server";
 import type { ActionResult } from "@/lib/validation/auth";
-import type { NoteVisibility } from "@/types/database";
-import { authorize } from "@/server/auth/authorize";
+import type { NoteMention, NoteVisibility } from "@/types/database";
+import { authorize, can } from "@/server/auth/authorize";
 import { getSessionContext } from "@/server/auth/session";
 
 const noteSchema = z.object({
@@ -14,7 +14,7 @@ const noteSchema = z.object({
   visibility: z.enum(["private", "team", "management"]),
 });
 
-/** Add a note to a candidate (spec §UC-6). */
+/** Add a note to a candidate — optionally a reply, with @mentions (spec §UC-6, CP-23). */
 export async function addNoteAction(
   candidateId: string,
   _prev: ActionResult | null,
@@ -35,18 +35,88 @@ export async function addNoteAction(
   }
 
   const supabase = await createClient();
-  const { error } = await supabase.from("candidate_notes").insert({
-    organization_id: session.organizationId,
-    candidate_id: candidateId,
-    author_membership_id: session.membershipId,
-    body: parsed.data.body,
-    visibility: parsed.data.visibility as NoteVisibility,
-  });
+  let visibility = parsed.data.visibility as NoteVisibility;
 
-  if (error) return { ok: false, error: error.message };
+  // A reply inherits its thread's visibility, and must belong to this candidate.
+  const parentId = (formData.get("parentId") as string) || null;
+  let parentAuthor: string | null = null;
+  if (parentId) {
+    const { data: parent } = await supabase
+      .from("candidate_notes")
+      .select("candidate_id, visibility, author_membership_id, parent_id")
+      .eq("id", parentId)
+      .maybeSingle();
+    if (!parent || parent.candidate_id !== candidateId || parent.parent_id) {
+      return { ok: false, error: "That note can't be replied to." };
+    }
+    visibility = parent.visibility as NoteVisibility;
+    parentAuthor = parent.author_membership_id;
+  }
+
+  // Validate @mentions against real, active members — only if the caller may mention.
+  let mentions: NoteMention[] = [];
+  if (await can("profile.mention_users")) {
+    let requested: { membership_id?: string }[] = [];
+    try {
+      const raw = JSON.parse((formData.get("mentions") as string) || "[]");
+      if (Array.isArray(raw)) requested = raw.slice(0, 20);
+    } catch {
+      /* ignore malformed */
+    }
+    const ids = [...new Set(requested.map((m) => m?.membership_id).filter(Boolean))] as string[];
+    if (ids.length) {
+      const { data: members } = await supabase
+        .from("memberships")
+        .select("id, profiles(full_name)")
+        .in("id", ids)
+        .eq("status", "active");
+      mentions = (members ?? []).map((m) => ({
+        membership_id: m.id,
+        name: (m.profiles as { full_name?: string } | null)?.full_name || "Member",
+      }));
+    }
+  }
+
+  const { data: note, error } = await supabase
+    .from("candidate_notes")
+    .insert({
+      organization_id: session.organizationId,
+      candidate_id: candidateId,
+      author_membership_id: session.membershipId,
+      body: parsed.data.body,
+      visibility,
+      parent_id: parentId,
+      mentions,
+    })
+    .select("id")
+    .single();
+  if (error || !note) return { ok: false, error: error?.message ?? "Couldn't add the note." };
+
+  // Fan-out notifications (service role): mentioned members + the parent author.
+  const recipients = new Map<string, string>();
+  for (const m of mentions) {
+    if (m.membership_id !== session.membershipId) recipients.set(m.membership_id, "mention");
+  }
+  if (parentAuthor && parentAuthor !== session.membershipId && !recipients.has(parentAuthor)) {
+    recipients.set(parentAuthor, "note_reply");
+  }
+  if (recipients.size) {
+    const admin = createAdminClient();
+    await admin.from("notifications").insert(
+      [...recipients].map(([rid, type]) => ({
+        organization_id: session.organizationId,
+        recipient_membership_id: rid,
+        actor_membership_id: session.membershipId,
+        type,
+        candidate_id: candidateId,
+        note_id: note.id,
+        body: parsed.data.body.slice(0, 140),
+      })),
+    );
+  }
 
   revalidatePath(`/candidates/${candidateId}`);
-  return { ok: true, message: "Note added." };
+  return { ok: true, message: parentId ? "Reply added." : "Note added." };
 }
 
 export async function deleteNoteAction(

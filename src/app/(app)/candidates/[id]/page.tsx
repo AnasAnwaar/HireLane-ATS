@@ -46,7 +46,7 @@ export default async function CandidateProfilePage({
   }
 
   const supabase = await createClient();
-  const [profile, fields, canNote, canAdvance, canInvite, canViewReport, canOverride, canRerank, canViewAssessments, canAssign, canGrantRetake, { data: liveInvite }] =
+  const [profile, fields, canNote, canAdvance, canInvite, canViewReport, canOverride, canRerank, canViewAssessments, canAssign, canGrantRetake, canMention, { data: liveInvite }, { data: memberRows }] =
     await Promise.all([
       getCandidateProfile(id, session.membershipId),
       getFieldVisibility(),
@@ -59,6 +59,7 @@ export default async function CandidateProfilePage({
       can("assessments.view"),
       can("assessments.assign"),
       can("assessments.grant_retake"),
+      can("profile.mention_users"),
       supabase
         .from("candidate_portal_invites")
         .select("expires_at")
@@ -66,7 +67,12 @@ export default async function CandidateProfilePage({
         .is("revoked_at", null)
         .gt("expires_at", new Date().toISOString())
         .maybeSingle(),
+      supabase.from("memberships").select("id, profiles(full_name)").eq("status", "active").limit(100),
     ]);
+
+  const teamMembers = (memberRows ?? [])
+    .map((m) => ({ id: m.id, name: (m.profiles as { full_name?: string } | null)?.full_name || "Member" }))
+    .filter((m) => m.id !== session.membershipId);
 
   if (!profile) notFound();
   const { candidate, applications, documents, notes, timeline } = profile;
@@ -258,7 +264,13 @@ export default async function CandidateProfilePage({
           )}
 
           {/* Notes */}
-          <NotesSection candidateId={candidate.id} notes={notes} canAdd={canNote} />
+          <NotesSection
+            candidateId={candidate.id}
+            notes={notes}
+            canAdd={canNote}
+            canMention={canMention}
+            teamMembers={teamMembers}
+          />
 
           {/* Stubbed sections that arrive with later checkpoints. */}
           <Card className="border-dashed">
