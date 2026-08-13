@@ -36,6 +36,7 @@
     "db:check-keys": "node scripts/check-permission-keys.cjs",
     "test:gemini": "node scripts/test-gemini.cjs",
     "db:seed-demo": "node scripts/seed-demo.cjs",
+    "stripe:setup": "node scripts/stripe-setup.cjs",
     "db:pull": "prisma db pull && prisma generate"
   },
   "dependencies": {
@@ -67,6 +68,7 @@
     "react-dom": "19.2.4",
     "react-hook-form": "^7.82.0",
     "sonner": "^2.0.7",
+    "stripe": "^22.5.0",
     "tailwind-merge": "^3.6.0",
     "tailwindcss-animate": "^1.0.7",
     "three": "^0.185.1",

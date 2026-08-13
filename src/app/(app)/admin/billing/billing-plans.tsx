@@ -1,15 +1,20 @@
 "use client";
 
-import { Check, CreditCard, Loader2, Sparkles, X } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { Check, Copy, CreditCard, ExternalLink, Loader2, Sparkles, X } from "lucide-react";
+import { useRouter, useSearchParams } from "next/navigation";
 import * as React from "react";
 import { toast } from "sonner";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import type { ActionResult } from "@/lib/validation/auth";
 import { cn } from "@/lib/utils";
-import { changePlanAction } from "@/server/billing/actions";
+import {
+  changePlanAction,
+  createBillingPortalSessionAction,
+  createCheckoutSessionAction,
+} from "@/server/billing/actions";
 
 type Feature = { t: string; ok: boolean };
 type Plan = {
@@ -89,15 +94,39 @@ export function BillingPlans({
   organization,
   usage,
   features,
+  stripeEnabled,
 }: {
   currentPlan: string;
   organization: string;
   usage: { seatsUsed: number; seatCap: number | null; openingsUsed: number; openingCap: number | null };
   features: Record<"integrations" | "ai_posts" | "ai_screening" | "ai_assessments", boolean>;
+  stripeEnabled: boolean;
 }) {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [busy, setBusy] = React.useState<string | null>(null);
   const current = PLANS.find((p) => p.key === currentPlan);
+
+  // Toast the outcome of a returning Stripe Checkout, then scrub the query.
+  const checkout = searchParams.get("checkout");
+  React.useEffect(() => {
+    if (!checkout) return;
+    if (checkout === "success") toast.success("Payment received — your plan is being activated.");
+    else if (checkout === "cancelled") toast.info("Checkout cancelled — no changes made.");
+    router.replace("/admin/billing");
+  }, [checkout, router]);
+
+  /** Follow a redirect, or toast the result of a direct action. */
+  function resolve(r: ActionResult) {
+    if (r.ok && r.redirectTo) {
+      window.location.assign(r.redirectTo);
+      return;
+    }
+    if (r.ok) {
+      toast.success(r.message ?? "Done.");
+      router.refresh();
+    } else toast.error(r.error);
+  }
 
   async function switchPlan(plan: Plan) {
     if (plan.custom) {
@@ -105,12 +134,23 @@ export function BillingPlans({
       return;
     }
     setBusy(plan.key);
-    const r = await changePlanAction(plan.key);
+    let r: ActionResult;
+    if (!stripeEnabled) {
+      r = await changePlanAction(plan.key); // no payment configured — direct switch
+    } else if (plan.key === "free") {
+      r = await createBillingPortalSessionAction(); // cancel/downgrade in the portal
+    } else {
+      r = await createCheckoutSessionAction(plan.key); // hosted Stripe Checkout
+    }
     setBusy(null);
-    if (r.ok) {
-      toast.success(r.message ?? "Plan updated.");
-      router.refresh();
-    } else toast.error(r.error);
+    resolve(r);
+  }
+
+  async function openPortal() {
+    setBusy("portal");
+    const r = await createBillingPortalSessionAction();
+    setBusy(null);
+    resolve(r);
   }
 
   const cap = (n: number | null) => (n == null ? "∞" : n);
@@ -139,9 +179,17 @@ export function BillingPlans({
               </span>
             </p>
           </div>
-          <Badge variant="success" dot>
-            Active
-          </Badge>
+          <div className="flex items-center gap-3">
+            <Badge variant="success" dot>
+              Active
+            </Badge>
+            {stripeEnabled && (
+              <Button variant="outline" size="sm" onClick={openPortal} disabled={busy !== null}>
+                {busy === "portal" ? <Loader2 className="animate-spin" /> : <ExternalLink />}
+                Manage billing
+              </Button>
+            )}
+          </div>
         </div>
 
         <div className="mt-5 grid gap-4 sm:grid-cols-2">
@@ -238,6 +286,9 @@ export function BillingPlans({
         </div>
       </div>
 
+      {/* Test-card picker (test mode only) */}
+      {stripeEnabled && <TestCards />}
+
       {/* Seats add-on */}
       <Card className="flex flex-wrap items-center gap-4 p-5">
         <div className="min-w-0 flex-1">
@@ -246,16 +297,82 @@ export function BillingPlans({
             Add extra seats to any paid plan for a per-seat monthly fee.
           </p>
         </div>
-        <Button variant="outline" onClick={() => toast.info("Seat management arrives with Stripe billing (CP-27).")}>
-          Add seats
+        <Button
+          variant="outline"
+          disabled={busy !== null}
+          onClick={() =>
+            stripeEnabled
+              ? openPortal()
+              : toast.info("Add your Stripe keys to manage seats and payment.")
+          }
+        >
+          {stripeEnabled ? "Manage in portal" : "Add seats"}
         </Button>
       </Card>
 
       <p className="text-xs text-muted-foreground">
-        Switching plans is live and takes effect immediately (no payment in test mode). Checkout,
-        invoices and seat purchases arrive with Stripe (CP-27).
+        {stripeEnabled
+          ? "Paid plans go through Stripe Checkout (test mode — use card 4242 4242 4242 4242, any future date & CVC). Downgrades, cancellations and invoices live in the billing portal."
+          : "Stripe isn't configured, so switching plans applies immediately without payment. Add your Stripe keys and run npm run stripe:setup to enable real checkout."}
       </p>
     </div>
+  );
+}
+
+/** Stripe test cards. Numbers only — Checkout is hosted, so paste one there. */
+const TEST_CARDS: { number: string; label: string; tone: "ok" | "warn" | "bad" }[] = [
+  { number: "4242 4242 4242 4242", label: "Visa · payment succeeds", tone: "ok" },
+  { number: "5555 5555 5555 4444", label: "Mastercard · succeeds", tone: "ok" },
+  { number: "4000 0025 0000 3155", label: "Requires 3-D Secure auth", tone: "warn" },
+  { number: "4000 0000 0000 9995", label: "Declined · insufficient funds", tone: "bad" },
+  { number: "4000 0000 0000 0002", label: "Declined · generic", tone: "bad" },
+];
+
+function TestCards() {
+  const [copied, setCopied] = React.useState<string | null>(null);
+
+  async function copy(number: string) {
+    try {
+      await navigator.clipboard.writeText(number.replace(/\s/g, ""));
+      setCopied(number);
+      toast.success("Card number copied — paste it into Stripe Checkout.");
+    } catch {
+      toast.error("Couldn't copy — select and copy the number manually.");
+    }
+  }
+
+  return (
+    <Card className="p-5">
+      <div className="flex items-center gap-2">
+        <CreditCard className="size-4 text-primary" />
+        <h2 className="text-sm font-semibold">Test cards</h2>
+        <Badge variant="secondary">Test mode</Badge>
+      </div>
+      <p className="mt-1 text-sm text-muted-foreground">
+        Copy a number, start Checkout, and paste it in. Use any future expiry date, any 3-digit CVC,
+        and any postal code.
+      </p>
+      <ul className="mt-4 divide-y divide-border rounded-lg border border-border">
+        {TEST_CARDS.map((c) => (
+          <li key={c.number} className="flex items-center gap-3 p-3">
+            <span
+              className={cn(
+                "size-2 shrink-0 rounded-full",
+                c.tone === "ok" ? "bg-success" : c.tone === "warn" ? "bg-warning" : "bg-destructive",
+              )}
+            />
+            <div className="min-w-0 flex-1">
+              <p className="font-mono text-sm tabular-nums">{c.number}</p>
+              <p className="text-xs text-muted-foreground">{c.label}</p>
+            </div>
+            <Button variant="ghost" size="sm" onClick={() => copy(c.number)}>
+              {copied === c.number ? <Check className="text-success" /> : <Copy />}
+              {copied === c.number ? "Copied" : "Copy"}
+            </Button>
+          </li>
+        ))}
+      </ul>
+    </Card>
   );
 }
 

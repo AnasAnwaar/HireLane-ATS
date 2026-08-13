@@ -773,6 +773,7 @@ export type Plan = {
   per_seat_cents: number;
   is_public: boolean;
   sort_order: number;
+  stripe_price_id: string | null;
   created_at: string;
 };
 

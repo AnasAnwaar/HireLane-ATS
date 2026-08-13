@@ -32,7 +32,7 @@
 | **P4 — Assessments** | CP-15 … CP-18 | ✅ **COMPLETE** |
 | **P5 — Proctoring & Interviews** | CP-19 … CP-22 | ✅ **COMPLETE** |
 | **P6 — Collaboration & Reporting** | CP-23 … CP-25 | 🚧 In progress (CP-23, CP-24 done) |
-| **P7 — Plans, Billing & Platform Admin** | CP-26 … CP-28 | 🚧 In progress (CP-26 done) |
+| **P7 — Plans, Billing & Platform Admin** | CP-26 … CP-28 | 🚧 In progress (CP-26, CP-27 done) |
 
 **Current checkpoint:** ✅ **Phases 0, 1 & 2 COMPLETE** (CP-1 … CP-12)
 **Environment:** 🟢 Full loop live: setup → openings → apply → screen → profile → candidate portal → channels → AI posts → **publish/schedule** · build clean — **zero blockers**
@@ -838,16 +838,21 @@ watch tuned LinkedIn/Indeed/Rozee/Careers posts appear; edit and regenerate them
 - [x] `scripts/test-entitlements.cjs` (11 assertions — matrix, backfill, read-own RLS, no self-upgrade) green
 - Note: `plan_prices` as a separate table + Stripe price IDs land with CP-27 (prices live on `plans` for now)
 
-### ⬜ CP-27 — Stripe Billing (test mode)
-- [ ] Stripe integration in **test mode** (test keys + test cards); Products/Prices mirror the plan matrix
-- [ ] Upgrade / downgrade across Free / Basic / Premium via Stripe Checkout, with entitlements updated on success
-- [ ] Additional-seat purchase as a quantity-based subscription item (per-seat Price)
-- [ ] Subscription lifecycle via **signature-verified, idempotent webhooks** (`checkout.session.completed`, `customer.subscription.updated/deleted`, `invoice.paid/payment_failed`) → sync `org_subscriptions` + entitlements
-- [ ] Stripe **Customer Portal** for payment method, invoices and cancellation
-- [ ] Org billing admin page: current plan, seat usage, upgrade, buy seats, manage billing
-- [ ] Test-mode banner; go-live items (live keys, production webhook endpoint, tax/receipts) tracked under the go-live list
+### ✅ CP-27 — Stripe Billing (test mode) — DONE (stagging)
+- [x] Stripe integration in **test mode** (`sk_test_`/`pk_test_`); `npm run stripe:setup` creates Products/Prices (Basic $49, Premium $149) and writes `plans.stripe_price_id` (migration 0038). Test-key guard refuses live keys
+- [x] Upgrade across Free / Basic / Premium via **Stripe Checkout** (`createCheckoutSessionAction`); entitlements update when the webhook confirms payment
+- [x] Subscription lifecycle via **signature-verified, idempotent webhook** (`/api/stripe/webhook`: `checkout.session.completed`, `customer.subscription.created/updated/deleted`, `invoice.payment_failed`) → syncs `org_subscriptions` (plan, status, period end, customer/subscription ids) + entitlements
+- [x] Stripe **Customer Portal** (`createBillingPortalSessionAction`) for payment method, invoices, downgrade and cancellation
+- [x] Org billing admin page: current plan, seat/opening usage, feature chips, upgrade, **manage billing**, and a **test-card picker** widget (copy 4242…/3-DS/declines) for testing Checkout
+- [x] **Graceful degradation**: no Stripe keys → buttons fall back to the direct plan switch (`changePlanAction`); the whole layer no-ops without keys (same posture as email)
+- [ ] Additional-seat purchase as a quantity-based subscription item (per-seat Price) — deferred; managed via portal for now
+- [ ] Go-live items (live keys, production webhook endpoint, tax/receipts) tracked under the go-live list — Pakistan can't take live Stripe payments; revisit with a Merchant-of-Record when going live
+- **Webhook secret**: dev = `stripe listen --forward-to localhost:3000/api/stripe/webhook`; prod = dashboard → Developers → Webhooks → add `https://<domain>/api/stripe/webhook`, copy the signing secret into `STRIPE_WEBHOOK_SECRET`
 
 ### ⬜ CP-28 — Super-Admin Portal (platform)
+- [ ] Served at a dedicated host **`admin.hirelane-pearl.vercel.app`** (super-admin subdomain), separate from the tenant app; routed/gated so tenant users never reach it
+- [ ] **2FA required** — TOTP via **Google Authenticator** (enrol with QR + secret, verify 6-digit code); super-admin access is hard-gated behind passing 2FA so only the platform owner can enter
+
 - [ ] A separate **cross-tenant** super-admin area for platform staff — hard-gated behind a dedicated super-admin capability (not a normal org role), bypassing org RLS only through an audited service path
 - [ ] Manage **plans & pricing** globally: create/edit tiers, limits, the feature matrix and per-seat pricing — kept in sync with Stripe Products/Prices
 - [ ] **Private / custom plans**: create a bespoke plan (custom limits + full feature access, e.g. an all-features demo) that is **not publicly listed**, and **assign it to specific organisations** from the super-admin portal — only the super-admin can grant it; assigned orgs get the plan's entitlements without it appearing on public pricing or being self-serve

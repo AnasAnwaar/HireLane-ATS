@@ -3,6 +3,7 @@ import { NoAccess } from "@/components/permissions/no-access";
 import { can } from "@/server/auth/authorize";
 import { requireSession } from "@/server/auth/session";
 import { getEntitlements, getUsage } from "@/server/billing/entitlements";
+import { isStripeConfigured } from "@/server/billing/stripe";
 
 import { BillingPlans } from "./billing-plans";
 
@@ -37,6 +38,7 @@ export default async function BillingPage() {
             openingCap: ent.openingCap,
           }}
           features={ent.features}
+          stripeEnabled={isStripeConfigured()}
         />
       </PageBody>
     </>
