@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, Copy, CreditCard, ExternalLink, Loader2, Sparkles, X } from "lucide-react";
+import { Check, Copy, CreditCard, ExternalLink, Loader2, Minus, Plus, Sparkles, X } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import * as React from "react";
 import { toast } from "sonner";
@@ -14,6 +14,7 @@ import {
   changePlanAction,
   createBillingPortalSessionAction,
   createCheckoutSessionAction,
+  updateSeatsAction,
 } from "@/server/billing/actions";
 
 type Feature = { t: string; ok: boolean };
@@ -95,12 +96,18 @@ export function BillingPlans({
   usage,
   features,
   stripeEnabled,
+  testMode,
+  addonSeats,
+  seatsSupported,
 }: {
   currentPlan: string;
   organization: string;
   usage: { seatsUsed: number; seatCap: number | null; openingsUsed: number; openingCap: number | null };
   features: Record<"integrations" | "ai_posts" | "ai_screening" | "ai_assessments", boolean>;
   stripeEnabled: boolean;
+  testMode: boolean;
+  addonSeats: number;
+  seatsSupported: boolean;
 }) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -164,6 +171,16 @@ export function BillingPlans({
 
   return (
     <div className="space-y-8">
+      {stripeEnabled && testMode && (
+        <div className="flex items-center gap-2 rounded-lg border border-warning/30 bg-warning-soft px-4 py-2.5 text-sm text-warning-foreground">
+          <CreditCard className="size-4 shrink-0" />
+          <span>
+            <strong>Test mode.</strong> Payments use Stripe test cards — no real money moves. Going
+            live needs production keys (and, from Pakistan, a Merchant-of-Record).
+          </span>
+        </div>
+      )}
+
       {/* Current plan + usage */}
       <Card className="p-5">
         <div className="flex flex-wrap items-center gap-4">
@@ -290,25 +307,7 @@ export function BillingPlans({
       {stripeEnabled && <TestCards />}
 
       {/* Seats add-on */}
-      <Card className="flex flex-wrap items-center gap-4 p-5">
-        <div className="min-w-0 flex-1">
-          <p className="font-medium">Need more seats?</p>
-          <p className="text-sm text-muted-foreground">
-            Add extra seats to any paid plan for a per-seat monthly fee.
-          </p>
-        </div>
-        <Button
-          variant="outline"
-          disabled={busy !== null}
-          onClick={() =>
-            stripeEnabled
-              ? openPortal()
-              : toast.info("Add your Stripe keys to manage seats and payment.")
-          }
-        >
-          {stripeEnabled ? "Manage in portal" : "Add seats"}
-        </Button>
-      </Card>
+      <SeatControl initial={addonSeats} supported={seatsSupported} stripeEnabled={stripeEnabled} />
 
       <p className="text-xs text-muted-foreground">
         {stripeEnabled
@@ -316,6 +315,81 @@ export function BillingPlans({
           : "Stripe isn't configured, so switching plans applies immediately without payment. Add your Stripe keys and run npm run stripe:setup to enable real checkout."}
       </p>
     </div>
+  );
+}
+
+/** Extra-seat purchase — a quantity-based Stripe subscription item. */
+function SeatControl({
+  initial,
+  supported,
+  stripeEnabled,
+}: {
+  initial: number;
+  supported: boolean;
+  stripeEnabled: boolean;
+}) {
+  const router = useRouter();
+  const [qty, setQty] = React.useState(initial);
+  const [saved, setSaved] = React.useState(initial);
+  const [busy, setBusy] = React.useState(false);
+  const dirty = qty !== saved;
+
+  async function save() {
+    setBusy(true);
+    const r = await updateSeatsAction(qty);
+    setBusy(false);
+    if (r.ok) {
+      setSaved(qty);
+      toast.success(r.message ?? "Seats updated.");
+      router.refresh();
+    } else toast.error(r.error);
+  }
+
+  return (
+    <Card className="flex flex-wrap items-center gap-4 p-5">
+      <div className="min-w-0 flex-1">
+        <p className="font-medium">Extra seats</p>
+        <p className="text-sm text-muted-foreground">
+          {supported
+            ? "Add seats beyond your plan's included limit — billed per seat, prorated."
+            : stripeEnabled
+              ? "Extra seats are available once you're on a paid plan."
+              : "Add your Stripe keys to buy extra seats."}
+        </p>
+      </div>
+
+      <div className="flex items-center gap-2">
+        <div className="flex items-center rounded-lg border border-border">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="rounded-r-none"
+            disabled={!supported || busy || qty <= 0}
+            onClick={() => setQty((n) => Math.max(0, n - 1))}
+            aria-label="Fewer seats"
+          >
+            <Minus />
+          </Button>
+          <span className="w-10 text-center text-sm font-medium tabular-nums" aria-live="polite">
+            {qty}
+          </span>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="rounded-l-none"
+            disabled={!supported || busy || qty >= 50}
+            onClick={() => setQty((n) => Math.min(50, n + 1))}
+            aria-label="More seats"
+          >
+            <Plus />
+          </Button>
+        </div>
+        <Button disabled={!supported || busy || !dirty} onClick={save}>
+          {busy && <Loader2 className="animate-spin" />}
+          {dirty ? "Update seats" : "Saved"}
+        </Button>
+      </div>
+    </Card>
   );
 }
 

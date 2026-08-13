@@ -845,9 +845,11 @@ watch tuned LinkedIn/Indeed/Rozee/Careers posts appear; edit and regenerate them
 - [x] Stripe **Customer Portal** (`createBillingPortalSessionAction`) for payment method, invoices, downgrade and cancellation
 - [x] Org billing admin page: current plan, seat/opening usage, feature chips, upgrade, **manage billing**, and a **test-card picker** widget (copy 4242…/3-DS/declines) for testing Checkout
 - [x] **Graceful degradation**: no Stripe keys → buttons fall back to the direct plan switch (`changePlanAction`); the whole layer no-ops without keys (same posture as email)
-- [ ] Additional-seat purchase as a quantity-based subscription item (per-seat Price) — deferred; managed via portal for now
-- [ ] Go-live items (live keys, production webhook endpoint, tax/receipts) tracked under the go-live list — Pakistan can't take live Stripe payments; revisit with a Merchant-of-Record when going live
-- **Webhook secret**: dev = `stripe listen --forward-to localhost:3000/api/stripe/webhook`; prod = dashboard → Developers → Webhooks → add `https://<domain>/api/stripe/webhook`, copy the signing secret into `STRIPE_WEBHOOK_SECRET`
+- [x] **Additional-seat purchase** as a quantity-based subscription item: per-seat Price (migration 0039 `plans.stripe_seat_price_id`, created by `stripe:setup`), `updateSeatsAction` adds/updates/removes the seat line item with prorated billing, and a **seat stepper** on the billing page. Webhook reads the seat item quantity → `org_subscriptions.addon_seats` → entitlement `seatCap`
+- [x] **Test-mode banner** on the billing page (shown for `sk_test_` keys), making the sandbox state unmistakable
+- [ ] Go-live items — **blocked, tracked** (not a coding gap): live keys, tax and receipts require live mode, which Pakistan can't use without a Merchant-of-Record. The production webhook endpoint is already created. Revisit at go-live via a MoR (LemonSqueezy/Paddle) or a US/Atlas entity
+- **Webhook secret**: dev = `stripe listen --forward-to localhost:3000/api/stripe/webhook`; prod = dashboard → **Developers → Workbench → Webhooks** → add `https://<domain>/api/stripe/webhook`, copy the signing secret into `STRIPE_WEBHOOK_SECRET`
+- **Prod migrations pending**: apply `0037`, `0038`, `0039` to the prod DB (single-file form) + run `stripe:setup` against prod — see prod-deploy note
 
 ### ⬜ CP-28 — Super-Admin Portal (platform)
 - [ ] Served at a dedicated host **`admin.hirelane-pearl.vercel.app`** (super-admin subdomain), separate from the tenant app; routed/gated so tenant users never reach it

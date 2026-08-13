@@ -143,3 +143,66 @@ export async function createBillingPortalSessionAction(): Promise<ActionResult> 
   });
   return { ok: true, redirectTo: portal.url };
 }
+
+/**
+ * Set the number of extra seats (CP-27). Adds/updates/removes a quantity-based
+ * seat line item on the org's Stripe subscription with prorated billing; the
+ * webhook syncs `addon_seats` authoritatively. Requires an active paid plan.
+ */
+export async function updateSeatsAction(quantity: number): Promise<ActionResult> {
+  const session = await getSessionContext();
+  if (!session) return { ok: false, error: "Your session has expired." };
+  const auth = await authorize("administration.manage_billing");
+  if (!auth.ok) return { ok: false, error: auth.error };
+  if (!isStripeConfigured()) return { ok: false, error: "Online billing isn't configured yet." };
+
+  const qty = Math.max(0, Math.min(50, Math.floor(Number.isFinite(quantity) ? quantity : 0)));
+
+  const admin = createAdminClient();
+  const { data: sub } = await admin
+    .from("org_subscriptions")
+    .select("plan_key, stripe_subscription_id")
+    .eq("organization_id", session.organizationId)
+    .maybeSingle();
+  if (!sub?.stripe_subscription_id) {
+    return { ok: false, error: "Start a paid plan before adding seats." };
+  }
+
+  const { data: plan } = await admin
+    .from("plans")
+    .select("stripe_seat_price_id")
+    .eq("key", sub.plan_key)
+    .maybeSingle();
+  if (!plan?.stripe_seat_price_id) {
+    return { ok: false, error: "This plan doesn't offer extra seats." };
+  }
+
+  const stripe = getStripe();
+  const subscription = await stripe.subscriptions.retrieve(sub.stripe_subscription_id);
+  const seatItem = subscription.items.data.find((i) => i.price?.id === plan.stripe_seat_price_id);
+
+  if (!seatItem && qty === 0) return { ok: true, message: "No extra seats to change." };
+
+  const item = seatItem
+    ? qty === 0
+      ? { id: seatItem.id, deleted: true as const }
+      : { id: seatItem.id, quantity: qty }
+    : { price: plan.stripe_seat_price_id, quantity: qty };
+
+  await stripe.subscriptions.update(sub.stripe_subscription_id, {
+    items: [item],
+    proration_behavior: "create_prorations",
+  });
+
+  // Optimistic local reflect; the customer.subscription.updated webhook confirms.
+  await admin
+    .from("org_subscriptions")
+    .update({ addon_seats: qty })
+    .eq("organization_id", session.organizationId);
+
+  revalidatePath("/admin/billing");
+  return {
+    ok: true,
+    message: qty === 0 ? "Extra seats removed." : `You now have ${qty} extra seat${qty === 1 ? "" : "s"}.`,
+  };
+}

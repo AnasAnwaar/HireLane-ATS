@@ -774,6 +774,7 @@ export type Plan = {
   is_public: boolean;
   sort_order: number;
   stripe_price_id: string | null;
+  stripe_seat_price_id: string | null;
   created_at: string;
 };
 
