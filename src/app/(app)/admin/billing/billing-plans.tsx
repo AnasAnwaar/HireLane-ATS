@@ -1,12 +1,15 @@
 "use client";
 
-import { Check, CreditCard, Sparkles, X } from "lucide-react";
+import { Check, CreditCard, Loader2, Sparkles, X } from "lucide-react";
+import { useRouter } from "next/navigation";
+import * as React from "react";
 import { toast } from "sonner";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
+import { changePlanAction } from "@/server/billing/actions";
 
 type Feature = { t: string; ok: boolean };
 type Plan = {
@@ -84,39 +87,88 @@ const PLANS: Plan[] = [
 export function BillingPlans({
   currentPlan,
   organization,
+  usage,
+  features,
 }: {
   currentPlan: string;
   organization: string;
+  usage: { seatsUsed: number; seatCap: number | null; openingsUsed: number; openingCap: number | null };
+  features: Record<"integrations" | "ai_posts" | "ai_screening" | "ai_assessments", boolean>;
 }) {
+  const router = useRouter();
+  const [busy, setBusy] = React.useState<string | null>(null);
   const current = PLANS.find((p) => p.key === currentPlan);
 
-  function preview(plan: Plan) {
+  async function switchPlan(plan: Plan) {
     if (plan.custom) {
       toast.info("Custom plans are arranged with our team — get in touch to set one up.");
       return;
     }
-    toast.info(`Billing isn't live yet — “${plan.name}” checkout arrives with Stripe (CP-27).`);
+    setBusy(plan.key);
+    const r = await changePlanAction(plan.key);
+    setBusy(null);
+    if (r.ok) {
+      toast.success(r.message ?? "Plan updated.");
+      router.refresh();
+    } else toast.error(r.error);
   }
+
+  const cap = (n: number | null) => (n == null ? "∞" : n);
+  type Feat = "integrations" | "ai_posts" | "ai_screening" | "ai_assessments";
+  const FEATURE_ROWS: { key: Feat; label: string }[] = [
+    { key: "integrations", label: "Channel integrations" },
+    { key: "ai_posts", label: "AI job-post generation" },
+    { key: "ai_screening", label: "AI screening & match reports" },
+    { key: "ai_assessments", label: "AI assessments & grading" },
+  ];
 
   return (
     <div className="space-y-8">
-      {/* Current plan */}
-      <Card className="flex flex-wrap items-center gap-4 p-5">
-        <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-primary-soft text-primary">
-          <CreditCard className="size-5" />
-        </span>
-        <div className="min-w-0 flex-1">
-          <p className="text-sm text-muted-foreground">Current plan · {organization}</p>
-          <p className="text-lg font-semibold">
-            {current?.name ?? "Free"} plan
-            <span className="ml-2 text-sm font-normal text-muted-foreground">
-              {current?.price} {current?.period}
-            </span>
-          </p>
+      {/* Current plan + usage */}
+      <Card className="p-5">
+        <div className="flex flex-wrap items-center gap-4">
+          <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-primary-soft text-primary">
+            <CreditCard className="size-5" />
+          </span>
+          <div className="min-w-0 flex-1">
+            <p className="text-sm text-muted-foreground">Current plan · {organization}</p>
+            <p className="text-lg font-semibold">
+              {current?.name ?? currentPlan} plan
+              <span className="ml-2 text-sm font-normal text-muted-foreground">
+                {current?.price} {current?.period}
+              </span>
+            </p>
+          </div>
+          <Badge variant="success" dot>
+            Active
+          </Badge>
         </div>
-        <Badge variant="success" dot>
-          Active
-        </Badge>
+
+        <div className="mt-5 grid gap-4 sm:grid-cols-2">
+          <Meter label="Seats" used={usage.seatsUsed} total={usage.seatCap} />
+          <Meter label="Job openings" used={usage.openingsUsed} total={usage.openingCap} />
+        </div>
+
+        <div className="mt-5 flex flex-wrap gap-2">
+          {FEATURE_ROWS.map((f) => (
+            <span
+              key={f.key}
+              className={cn(
+                "inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs",
+                features[f.key]
+                  ? "border-success/30 bg-success-soft text-success"
+                  : "border-border bg-muted/40 text-muted-foreground",
+              )}
+            >
+              {features[f.key] ? <Check className="size-3" /> : <X className="size-3" />}
+              {f.label}
+            </span>
+          ))}
+        </div>
+        <p className="mt-3 text-xs text-muted-foreground">
+          Locked features and limits are enforced server-side — not just hidden. Current caps:{" "}
+          {cap(usage.seatCap)} seats · {cap(usage.openingCap)} openings.
+        </p>
       </Card>
 
       {/* Plan grid */}
@@ -166,9 +218,10 @@ export function BillingPlans({
                 <Button
                   className="mt-5 w-full"
                   variant={isCurrent ? "outline" : plan.popular ? "default" : "outline"}
-                  disabled={isCurrent}
-                  onClick={() => preview(plan)}
+                  disabled={isCurrent || busy !== null}
+                  onClick={() => switchPlan(plan)}
                 >
+                  {busy === plan.key && <Loader2 className="animate-spin" />}
                   {isCurrent ? (
                     "Current plan"
                   ) : plan.custom ? (
@@ -176,7 +229,7 @@ export function BillingPlans({
                       <Sparkles /> Contact us
                     </>
                   ) : (
-                    `Upgrade to ${plan.name}`
+                    `Switch to ${plan.name}`
                   )}
                 </Button>
               </Card>
@@ -199,9 +252,30 @@ export function BillingPlans({
       </Card>
 
       <p className="text-xs text-muted-foreground">
-        This is a preview of the billing experience. Live checkout, invoices and seat management land
-        with Stripe (CP-27).
+        Switching plans is live and takes effect immediately (no payment in test mode). Checkout,
+        invoices and seat purchases arrive with Stripe (CP-27).
       </p>
+    </div>
+  );
+}
+
+function Meter({ label, used, total }: { label: string; used: number; total: number | null }) {
+  const pct = total ? Math.min(100, (used / total) * 100) : Math.min(100, used > 0 ? 30 : 0);
+  const over = total != null && used >= total;
+  return (
+    <div className="rounded-lg border border-border p-3">
+      <div className="flex items-center justify-between text-sm">
+        <span className="text-muted-foreground">{label}</span>
+        <span className="font-medium tabular-nums">
+          {used} / {total == null ? "∞" : total}
+        </span>
+      </div>
+      <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-muted">
+        <div
+          className={cn("h-full rounded-full", over ? "bg-destructive" : "bg-primary")}
+          style={{ width: `${pct}%` }}
+        />
+      </div>
     </div>
   );
 }

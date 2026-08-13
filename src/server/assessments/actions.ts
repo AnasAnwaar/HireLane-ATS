@@ -7,6 +7,7 @@ import { createClient } from "@/lib/supabase/server";
 import type { ActionResult } from "@/lib/validation/auth";
 import { can } from "@/server/auth/authorize";
 import { getSessionContext } from "@/server/auth/session";
+import { requireFeature } from "@/server/billing/entitlements";
 import { isAiConfigured } from "@/server/ai/gemini";
 import type {
   ProctoringLevel,
@@ -114,6 +115,8 @@ export async function createAiTestAction(
   if (!isAiConfigured()) {
     return { ok: false, error: "AI generation isn't set up yet — a Gemini API key is required." };
   }
+  const feat = await requireFeature(s.organizationId, "ai_assessments");
+  if (!feat.ok) return feat;
 
   const db = await createClient();
   const ctx = await loadOpeningContext(db, openingId);

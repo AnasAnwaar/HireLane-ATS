@@ -8,6 +8,7 @@ import { createAdminClient, createClient } from "@/lib/supabase/server";
 import { toFieldErrors, type ActionResult } from "@/lib/validation/auth";
 import { can } from "@/server/auth/authorize";
 import { getSessionContext } from "@/server/auth/session";
+import { requireSeatAvailable } from "@/server/billing/entitlements";
 
 const inviteSchema = z.object({
   email: z.email("Enter a valid email address").max(255),
@@ -38,6 +39,10 @@ export async function inviteTeamMemberAction(
   if (!(await can("administration.manage_users"))) {
     return { ok: false, error: "You don't have permission to invite team members." };
   }
+
+  // Plan limit: block inviting past the seat cap (CP-26).
+  const seat = await requireSeatAvailable(session.organizationId);
+  if (!seat.ok) return seat;
 
   const parsed = inviteSchema.safeParse(Object.fromEntries(formData.entries()));
   if (!parsed.success) {

@@ -8,6 +8,7 @@ import { linesToItems, openingSchema } from "@/lib/validation/openings";
 import { toFieldErrors, type ActionResult } from "@/lib/validation/auth";
 import { authorize } from "@/server/auth/authorize";
 import { getSessionContext } from "@/server/auth/session";
+import { requireOpeningAvailable } from "@/server/billing/entitlements";
 import type { JobOpening, OpeningStatus, RequirementKind } from "@/types/database";
 
 /**
@@ -50,6 +51,10 @@ export async function createOpeningAction(
 
   const auth = await authorize("job_openings.create");
   if (!auth.ok) return auth;
+
+  // Plan limit: Free caps active openings (CP-26).
+  const cap = await requireOpeningAvailable(session.organizationId);
+  if (!cap.ok) return cap;
 
   const parsed = openingSchema.safeParse(formToObject(formData));
   if (!parsed.success) {

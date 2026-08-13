@@ -32,7 +32,7 @@
 | **P4 — Assessments** | CP-15 … CP-18 | ✅ **COMPLETE** |
 | **P5 — Proctoring & Interviews** | CP-19 … CP-22 | ✅ **COMPLETE** |
 | **P6 — Collaboration & Reporting** | CP-23 … CP-25 | 🚧 In progress (CP-23, CP-24 done) |
-| **P7 — Plans, Billing & Platform Admin** | CP-26 … CP-28 | ⬜ Not started |
+| **P7 — Plans, Billing & Platform Admin** | CP-26 … CP-28 | 🚧 In progress (CP-26 done) |
 
 **Current checkpoint:** ✅ **Phases 0, 1 & 2 COMPLETE** (CP-1 … CP-12)
 **Environment:** 🟢 Full loop live: setup → openings → apply → screen → profile → candidate portal → channels → AI posts → **publish/schedule** · build clean — **zero blockers**
@@ -829,12 +829,14 @@ watch tuned LinkedIn/Indeed/Rozee/Careers posts appear; edit and regenerate them
 
 *“All AI features” = Premium. Basic unlocks integrations + AI **post creation only**. Extra seats are a metered per-seat add-on billed on top of the plan.*
 
-### ⬜ CP-26 — Plans & Entitlements
-- [ ] Schema: `plans` (free/basic/premium — seat cap, opening cap, feature flags), `plan_prices`, `org_subscriptions` (plan, status, base seats, purchased add-on seats, current period)
-- [ ] Entitlement engine — one source of truth resolving an org's **limits** (seats, openings) and **feature flags** (`integrations`, `ai_posts`, `ai_screening`, `ai_assessments`) from its plan + add-ons
-- [ ] Server-side enforcement: block inviting a user past the seat limit; block creating a job opening past the cap (Free = 5); gate the AI actions (CP-11/13–17) and channel connections on the org's feature flags — layered on top of the existing permission + `isAiConfigured` checks, not UI-only
-- [ ] Usage surfacing: an org **billing/plan** page showing current plan, seats used/available, openings used vs. cap, and which features are locked (with an upgrade nudge)
-- [ ] Graceful downgrade: over-cap resources become read-only rather than deleted (e.g., openings beyond the new limit can't be reopened until upgrade)
+### ✅ CP-26 — Plans & Entitlements
+- [x] Schema: `plans` (free/basic/premium — seat cap, opening cap, feature flags, price cents) + `org_subscriptions` (plan, status, base + add-on seats, Stripe placeholders) — `0037_plans_entitlements.sql`, seeded matrix, every org backfilled to Free; RLS (read-own subscription, public plans, no direct writes)
+- [x] Entitlement engine — `src/server/billing/entitlements.ts`: one resolver for limits (seats, openings) + feature flags (`integrations`, `ai_posts`, `ai_screening`, `ai_assessments`) from plan + add-on seats (defaults to Free)
+- [x] Server-side enforcement — seat cap on invite, opening cap on create, `ai_posts`/`ai_screening`/`ai_assessments`/`integrations` gates on the AI + channel actions, layered on the existing permission + `isAiConfigured` checks (not UI-only)
+- [x] Usage surfacing — `/admin/billing` shows current plan, seats used/cap, openings used/cap, and which features are locked; plan switch works server-side (no payment in test mode)
+- [x] Graceful downgrade — over-cap resources aren't deleted; the caps are enforced only on *new* creation/reopen, so existing openings/seats stay read-only until upgrade
+- [x] `scripts/test-entitlements.cjs` (11 assertions — matrix, backfill, read-own RLS, no self-upgrade) green
+- Note: `plan_prices` as a separate table + Stripe price IDs land with CP-27 (prices live on `plans` for now)
 
 ### ⬜ CP-27 — Stripe Billing (test mode)
 - [ ] Stripe integration in **test mode** (test keys + test cards); Products/Prices mirror the plan matrix

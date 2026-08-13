@@ -9,6 +9,7 @@ import type { ActionResult } from "@/lib/validation/auth";
 import type { CriterionScore, ScoringWeights, ScreeningRecommendation } from "@/types/database";
 import { authorize } from "@/server/auth/authorize";
 import { getSessionContext } from "@/server/auth/session";
+import { requireFeature } from "@/server/billing/entitlements";
 import { isAiConfigured } from "@/server/ai/gemini";
 
 import { screenApplication } from "./screen";
@@ -28,6 +29,8 @@ async function guard() {
 export async function screenApplicationAction(applicationId: string): Promise<ActionResult> {
   const g = await guard();
   if (!g.ok) return g;
+  const feat = await requireFeature(g.organizationId, "ai_screening");
+  if (!feat.ok) return feat;
 
   const db = await createClient();
   const result = await screenApplication(db, g.organizationId, applicationId, g.membershipId);
@@ -50,6 +53,8 @@ export async function screenApplicationAction(applicationId: string): Promise<Ac
 export async function rerankOpeningAction(openingId: string): Promise<ActionResult> {
   const g = await guard();
   if (!g.ok) return g;
+  const feat = await requireFeature(g.organizationId, "ai_screening");
+  if (!feat.ok) return feat;
 
   const db = await createClient();
   const { data: apps } = await db.from("applications").select("id").eq("job_opening_id", openingId);
