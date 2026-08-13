@@ -756,6 +756,38 @@ export type InterviewScorecard = Timestamps & {
   submitted_at: string | null;
 };
 
+// -- Plans & subscriptions (CP-26) --------------------------------------------
+export type SubscriptionStatus = "active" | "trialing" | "past_due" | "canceled";
+
+export type Plan = {
+  key: string;
+  name: string;
+  seat_cap: number | null;
+  opening_cap: number | null;
+  feat_integrations: boolean;
+  feat_ai_posts: boolean;
+  feat_ai_screening: boolean;
+  feat_ai_assessments: boolean;
+  allow_addon_seats: boolean;
+  monthly_cents: number;
+  per_seat_cents: number;
+  is_public: boolean;
+  sort_order: number;
+  stripe_price_id: string | null;
+  created_at: string;
+};
+
+export type OrgSubscription = Timestamps & {
+  organization_id: string;
+  plan_key: string;
+  status: SubscriptionStatus;
+  base_seats: number;
+  addon_seats: number;
+  current_period_end: string | null;
+  stripe_customer_id: string | null;
+  stripe_subscription_id: string | null;
+};
+
 export type Database = {
   public: {
     Tables: {
@@ -1006,6 +1038,12 @@ export type Database = {
         [Rel<"organization_id", "organizations">, Rel<"interview_id", "interviews">]
       >;
       contact_messages: Table<ContactMessage, "name" | "email" | "message", []>;
+      plans: Table<Plan, "key" | "name", []>;
+      org_subscriptions: Table<
+        OrgSubscription,
+        "organization_id",
+        [Rel<"organization_id", "organizations">, Rel<"plan_key", "plans">]
+      >;
     };
     Views: Record<string, never>;
     Functions: {

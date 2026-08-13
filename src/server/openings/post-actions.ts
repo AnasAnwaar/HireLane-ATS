@@ -8,6 +8,7 @@ import type { ActionResult } from "@/lib/validation/auth";
 import { authorize } from "@/server/auth/authorize";
 import { AiError, generateJson, isAiConfigured } from "@/server/ai/gemini";
 import { getSessionContext } from "@/server/auth/session";
+import { requireFeature } from "@/server/billing/entitlements";
 
 /**
  * AI job-post generation (spec §UC-2).
@@ -141,6 +142,8 @@ export async function generatePostAction(
 ): Promise<ActionResult> {
   const g = await guard();
   if (!g.ok) return g;
+  const feat = await requireFeature(g.organizationId, "ai_posts");
+  if (!feat.ok) return feat;
 
   const supabase = await createClient();
 
@@ -211,6 +214,8 @@ export async function generatePostAction(
 export async function generateAllPostsAction(openingId: string): Promise<ActionResult> {
   const g = await guard();
   if (!g.ok) return g;
+  const feat = await requireFeature(g.organizationId, "ai_posts");
+  if (!feat.ok) return feat;
 
   const supabase = await createClient();
   const [{ data: connections }, { data: existing }] = await Promise.all([

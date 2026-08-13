@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/server";
 import type { ActionResult } from "@/lib/validation/auth";
 import { authorize } from "@/server/auth/authorize";
 import { getSessionContext } from "@/server/auth/session";
+import { requireFeature } from "@/server/billing/entitlements";
 
 /**
  * Channel connections (spec §UC-1).
@@ -33,6 +34,8 @@ export async function connectChannelAction(
 ): Promise<ActionResult> {
   const g = await guard("integrations.connect");
   if (!g.ok) return g;
+  const feat = await requireFeature(g.organizationId, "integrations");
+  if (!feat.ok) return feat;
 
   const supabase = await createClient();
 
