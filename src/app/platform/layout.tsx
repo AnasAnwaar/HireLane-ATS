@@ -1,6 +1,6 @@
-import { ShieldCheck } from "lucide-react";
 import type { ReactNode } from "react";
 
+import { BrandMark } from "@/components/brand-mark";
 import { Badge } from "@/components/ui/badge";
 import { SignOutButton } from "@/components/layout/sign-out-button";
 import { requirePlatformAccess } from "@/server/platform/auth";
@@ -26,11 +26,8 @@ export default async function PlatformLayout({ children }: { children: ReactNode
     <div className="min-h-dvh bg-muted/30">
       <header className="sticky top-0 z-20 border-b border-border bg-background/95 backdrop-blur">
         <div className="mx-auto flex h-14 max-w-[84rem] items-center gap-4 px-4 sm:px-6">
-          <div className="flex items-center gap-2">
-            <span className="flex size-7 items-center justify-center rounded-md bg-primary text-primary-foreground">
-              <ShieldCheck className="size-4" />
-            </span>
-            <span className="text-sm font-semibold">HireLane</span>
+          <div className="flex items-center gap-2.5">
+            <BrandMark />
             <Badge variant="secondary">Platform</Badge>
           </div>
           <div className="hidden sm:block">
