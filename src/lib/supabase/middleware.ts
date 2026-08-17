@@ -52,9 +52,16 @@ export async function updateSession(request: NextRequest) {
     // Auth flows must stay reachable on the platform host so an admin can sign
     // in; everything else (including "/") maps to the portal. Note isPublic("/")
     // is true, so we can't reuse it here — the landing page must NOT pass through.
-    const isAuthPath = ["/login", "/signup", "/forgot-password", "/reset-password", "/set-password", "/mfa", "/auth"].some(
-      (a) => p === a || p.startsWith(`${a}/`),
-    );
+    const isAuthPath = [
+      "/login",
+      "/signup",
+      "/forgot-password",
+      "/reset-password",
+      "/set-password",
+      "/mfa",
+      "/auth",
+      "/settings/security", // reachable so an admin can enrol 2FA without looping
+    ].some((a) => p === a || p.startsWith(`${a}/`));
     if (onPlatformHost && !p.startsWith("/platform") && !p.startsWith("/_next") && !p.startsWith("/api") && !isAuthPath) {
       // The platform host serves only the portal. Map any non-portal path to the
       // portal home (so post-login redirects like /dashboard land on /platform,
