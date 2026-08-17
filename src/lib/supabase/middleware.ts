@@ -40,6 +40,41 @@ function isPublic(pathname: string) {
  * lives in RLS and the server-side permission checks (CP-4).
  */
 export async function updateSession(request: NextRequest) {
+  // Optional dedicated host for the super-admin portal (CP-28). When PLATFORM_HOST
+  // is configured (e.g. admin.yourdomain.com once a custom domain exists), that
+  // host serves ONLY the portal, and /platform is hidden everywhere else. Dormant
+  // — a no-op — until the env var is set, so the vercel.app domain is unaffected.
+  const platformHost = process.env.PLATFORM_HOST?.toLowerCase();
+  if (platformHost) {
+    const host = (request.headers.get("host") ?? "").toLowerCase();
+    const onPlatformHost = host === platformHost;
+    const p = request.nextUrl.pathname;
+    // Auth flows must stay reachable on the platform host so an admin can sign
+    // in; everything else (including "/") maps to the portal. Note isPublic("/")
+    // is true, so we can't reuse it here — the landing page must NOT pass through.
+    const isAuthPath = [
+      "/login",
+      "/signup",
+      "/forgot-password",
+      "/reset-password",
+      "/set-password",
+      "/mfa",
+      "/auth",
+      "/settings/security", // reachable so an admin can enrol 2FA without looping
+    ].some((a) => p === a || p.startsWith(`${a}/`));
+    if (onPlatformHost && !p.startsWith("/platform") && !p.startsWith("/_next") && !p.startsWith("/api") && !isAuthPath) {
+      // The platform host serves only the portal. Map any non-portal path to the
+      // portal home (so post-login redirects like /dashboard land on /platform,
+      // not a 404). The portal's own links already use /platform/* hrefs.
+      const url = request.nextUrl.clone();
+      url.pathname = "/platform";
+      return NextResponse.rewrite(url);
+    }
+    if (!onPlatformHost && p.startsWith("/platform")) {
+      return new NextResponse("Not found", { status: 404 });
+    }
+  }
+
   let response = NextResponse.next({ request });
 
   const supabase = createServerClient<Database>(

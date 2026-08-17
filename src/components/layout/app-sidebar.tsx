@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronRight, Plus } from "lucide-react";
+import { ChevronRight, Plus, Settings2 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -43,12 +43,21 @@ export function AppSidebar({
   // Show a nav item only if the viewer holds its permission. Items with a null
   // permission (e.g. Dashboard) are always visible. A section with no visible
   // items disappears entirely, so a limited role sees a tidy menu, not greyed rows.
-  const sections = NAV_SECTIONS.map((section) => ({
-    ...section,
-    items: section.items.filter(
+  const sections = NAV_SECTIONS.map((section) => {
+    const items = section.items.filter(
       (item) => item.permission === null || perms.can(item.permission as PermissionKey),
-    ),
-  })).filter((section) => section.items.length > 0);
+    );
+    // The Administration pages have their own in-page tab bar now, so collapse
+    // the section to a single "Administration" entry that opens the first page
+    // the viewer can access (headerless — the item itself names the section).
+    if (section.label === "Administration" && items.length > 0) {
+      return {
+        label: "",
+        items: [{ label: "Administration", href: items[0]!.href, icon: Settings2, permission: null as string | null }],
+      };
+    }
+    return { ...section, items };
+  }).filter((section) => section.items.length > 0);
 
   return (
     <aside
@@ -76,13 +85,18 @@ export function AppSidebar({
 
       <nav className="flex-1 overflow-y-auto px-3 pb-3" aria-label="Main">
         {sections.map((section) => (
-          <div key={section.label} className="mb-6 last:mb-0">
-            <p className="px-3 pb-2 text-[0.6875rem] font-semibold uppercase tracking-[0.08em] text-sidebar-muted">
-              {section.label}
-            </p>
+          <div key={section.label || "administration"} className="mb-6 last:mb-0">
+            {section.label && (
+              <p className="px-3 pb-2 text-[0.6875rem] font-semibold uppercase tracking-[0.08em] text-sidebar-muted">
+                {section.label}
+              </p>
+            )}
             <ul className="space-y-0.5">
               {section.items.map((item) => {
-                const active = isActive(pathname, item.href);
+                // The collapsed Administration entry highlights for any /admin/* route.
+                const active = item.href.startsWith("/admin")
+                  ? pathname.startsWith("/admin")
+                  : isActive(pathname, item.href);
                 return (
                   <li key={item.href}>
                     <Link

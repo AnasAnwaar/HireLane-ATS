@@ -851,14 +851,20 @@ watch tuned LinkedIn/Indeed/Rozee/Careers posts appear; edit and regenerate them
 - **Webhook secret**: dev = `stripe listen --forward-to localhost:3000/api/stripe/webhook`; prod = dashboard → **Developers → Workbench → Webhooks** → add `https://<domain>/api/stripe/webhook`, copy the signing secret into `STRIPE_WEBHOOK_SECRET`
 - [x] **Prod migrated**: `0037`, `0038`, `0039` applied to `hirelane-prod` + `stripe:setup` run against prod (plan + seat price IDs populated). Prod webhook endpoint live. ⚠️ Rotate the prod DB password — it's been pasted into chat
 
-### ⬜ CP-28 — Super-Admin Portal (platform)
-- [ ] Served at a dedicated host **`admin.hirelane-pearl.vercel.app`** (super-admin subdomain), separate from the tenant app; routed/gated so tenant users never reach it
-- [ ] **2FA required** — TOTP via **Google Authenticator** (enrol with QR + secret, verify 6-digit code); super-admin access is hard-gated behind passing 2FA so only the platform owner can enter
-
-- [ ] A separate **cross-tenant** super-admin area for platform staff — hard-gated behind a dedicated super-admin capability (not a normal org role), bypassing org RLS only through an audited service path
+### 🚧 CP-28 — Super-Admin Portal (platform) — Phase 1 done (stagging)
+- [x] **Cross-tenant identity** (Phase 1): `profiles.is_platform_admin` flag (NOT an org role — RBAC is org-scoped) + SECURITY DEFINER `is_platform_admin()` + append-only `platform_audit_log` (migration 0040). `requirePlatformAccess()` gate in `src/server/platform/auth.ts`; grant via `node scripts/grant-platform-admin.cjs <email>`
+- [x] **2FA required** (Phase 1): reuses Supabase native MFA (TOTP / Google Authenticator) — portal gate enforces **AAL2**; a platform admin without a verified factor is sent to enrol, aal1 sessions are challenged. Only aal2 + platform-admin passes; everyone else gets a 404 (portal existence hidden)
+- [x] **Portal shell + overview** (Phase 1): `/platform` route with its own chrome (distinct from tenant AppShell) + live overview (orgs, active subs, paying orgs, est. MRR, plan distribution)
+- [~] Served at a dedicated **super-admin subdomain**: built **host-aware** — set `PLATFORM_HOST` (e.g. `admin.yourdomain.com`) and the proxy serves the portal there and 404s `/platform` elsewhere. NOTE: `admin.hirelane-pearl.vercel.app` is **not creatable** (Vercel doesn't assign sub-subdomains of `*.vercel.app`); needs a real custom domain. Until then the portal lives at `/platform` on the main domain, locked to platform-admin + 2FA
+- [ ] A separate **cross-tenant** super-admin area for platform staff — hard-gated behind a dedicated super-admin capability (not a normal org role), bypassing org RLS only through an audited service path — **foundation done (Phase 1)**; cross-tenant admin actions land in Phases 2–5
 - [ ] Manage **plans & pricing** globally: create/edit tiers, limits, the feature matrix and per-seat pricing — kept in sync with Stripe Products/Prices
 - [ ] **Private / custom plans**: create a bespoke plan (custom limits + full feature access, e.g. an all-features demo) that is **not publicly listed**, and **assign it to specific organisations** from the super-admin portal — only the super-admin can grant it; assigned orgs get the plan's entitlements without it appearing on public pricing or being self-serve
-- [ ] Platform **analytics**: organisations, active subscriptions, plan distribution, MRR, seats sold, AI usage, openings/applicants volume, churn
+- [x] Global **plans & pricing** management (Phase 2): `/platform/plans` editor — name, limits, feature matrix, per-seat pricing, visibility, sort; create private plans; "Sync price to Stripe" mints new Prices. Audited
+- [x] **Private / custom plans** + assign to orgs (Phase 3): create `is_public=false` plans; `/platform/orgs` assigns ANY plan (incl. private) to a specific org — comp/custom grant, no payment. Audited
+- [x] Platform **analytics** (Phase 4): `/platform` overview — orgs, active subs, paying orgs, est. MRR, seats in use, add-on seats sold, openings, churn, applicants/candidates/interviews, AI posts & tests generated, plan distribution
+- [x] **Org administration** (Phase 5): `/platform/orgs` suspend/reactivate (enforced in the app shell via `organizations.suspended_at`); `/platform/audit` shows the full `platform_audit_log`. Plan adjust/comp = the assign flow above
+- [ ] **Impersonation** (audited support login-as) — deferred: minting another user's session safely (scoped, bannered, one-click exit) is security-sensitive; do it deliberately, not rushed
+- [ ] **API & integrations management** (platform API keys, OAuth app creds, webhook endpoints, integration health) — deferred to a later pass
 - [ ] **API & integrations** management: platform API keys, channel/OAuth app credentials, webhook endpoints, and integration health
 - [ ] Org administration: view / suspend / comp / trial an organisation, adjust its plan, and audited impersonation for support
 
