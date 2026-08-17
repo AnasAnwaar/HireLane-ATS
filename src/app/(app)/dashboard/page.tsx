@@ -1,5 +1,6 @@
 import { ArrowUpRight, Briefcase, CalendarClock, ClipboardCheck, Rocket, Users } from "lucide-react";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 
 import { PageBody, PageHeader } from "@/components/layout/app-shell";
 import { Avatar } from "@/components/ui/avatar";
@@ -9,6 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { createClient } from "@/lib/supabase/server";
 import { cn } from "@/lib/utils";
 import { requireSession } from "@/server/auth/session";
+import { getPlatformAdmin } from "@/server/platform/auth";
 
 export const metadata = { title: "Dashboard" };
 export const dynamic = "force-dynamic";
@@ -62,6 +64,11 @@ function whenLabel(iso: string): string {
 
 export default async function DashboardPage() {
   const session = await requireSession("/dashboard");
+
+  // Role-based landing: a platform super-admin gets the cross-tenant portal as
+  // their dashboard — same sign-in, no special route or subdomain to remember.
+  if (await getPlatformAdmin()) redirect("/platform");
+
   const firstName = session.fullName.split(" ")[0] || "there";
   const supabase = await createClient();
   const nowIso = new Date().toISOString();
