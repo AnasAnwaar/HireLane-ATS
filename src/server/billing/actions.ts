@@ -161,6 +161,68 @@ export async function createBillingPortalSessionAction(): Promise<ActionResult> 
 }
 
 /**
+ * Start an EMBEDDED Stripe Checkout for a first subscription (CP-27) — the card
+ * form renders inside our app (ui_mode: embedded) instead of redirecting to
+ * checkout.stripe.com. Returns the session client_secret for the client to
+ * mount. On completion Stripe navigates the page to return_url (our domain).
+ */
+export async function createEmbeddedCheckoutSessionAction(
+  planKey: string,
+): Promise<{ ok: true; clientSecret: string } | { ok: false; error: string }> {
+  const session = await getSessionContext();
+  if (!session) return { ok: false, error: "Your session has expired." };
+  const auth = await authorize("administration.manage_billing");
+  if (!auth.ok) return { ok: false, error: auth.error };
+  if (!isStripeConfigured()) return { ok: false, error: "Online billing isn't configured yet." };
+
+  const admin = createAdminClient();
+  const { data: plan } = await admin
+    .from("plans")
+    .select("key, name, stripe_price_id")
+    .eq("key", planKey)
+    .maybeSingle();
+  if (!plan) return { ok: false, error: "Unknown plan." };
+  if (!plan.stripe_price_id) return { ok: false, error: `The ${plan.name} plan isn't wired to Stripe yet.` };
+
+  const { data: sub } = await admin
+    .from("org_subscriptions")
+    .select("stripe_customer_id")
+    .eq("organization_id", session.organizationId)
+    .maybeSingle();
+
+  const stripe = getStripe();
+  let customerId = sub?.stripe_customer_id ?? null;
+  if (!customerId) {
+    const customer = await stripe.customers.create({
+      email: session.email || undefined,
+      name: session.organizationName,
+      metadata: { organization_id: session.organizationId },
+    });
+    customerId = customer.id;
+    await admin
+      .from("org_subscriptions")
+      .upsert({ organization_id: session.organizationId, stripe_customer_id: customerId }, { onConflict: "organization_id" });
+  }
+
+  const base = await appUrl();
+  const checkout = await stripe.checkout.sessions.create({
+    ui_mode: "embedded",
+    mode: "subscription",
+    customer: customerId,
+    line_items: [{ price: plan.stripe_price_id, quantity: 1 }],
+    return_url: `${base}/admin/billing?checkout=complete`,
+    allow_promotion_codes: true,
+    metadata: { organization_id: session.organizationId, plan_key: plan.key },
+    subscription_data: {
+      metadata: { organization_id: session.organizationId, plan_key: plan.key },
+    },
+  });
+
+  if (!checkout.client_secret) return { ok: false, error: "Stripe did not return a checkout secret." };
+  return { ok: true, clientSecret: checkout.client_secret };
+}
+
+/**
  * Cancel the subscription IN-APP (no Stripe redirect). Cancels the Stripe
  * subscription immediately, drops the org to Free, and returns the caller to the
  * dashboard. The webhook confirms, but we apply it synchronously for instant
