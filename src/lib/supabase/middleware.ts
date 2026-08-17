@@ -40,6 +40,25 @@ function isPublic(pathname: string) {
  * lives in RLS and the server-side permission checks (CP-4).
  */
 export async function updateSession(request: NextRequest) {
+  // Optional dedicated host for the super-admin portal (CP-28). When PLATFORM_HOST
+  // is configured (e.g. admin.yourdomain.com once a custom domain exists), that
+  // host serves ONLY the portal, and /platform is hidden everywhere else. Dormant
+  // — a no-op — until the env var is set, so the vercel.app domain is unaffected.
+  const platformHost = process.env.PLATFORM_HOST?.toLowerCase();
+  if (platformHost) {
+    const host = (request.headers.get("host") ?? "").toLowerCase();
+    const onPlatformHost = host === platformHost;
+    const p = request.nextUrl.pathname;
+    if (onPlatformHost && !p.startsWith("/platform") && !p.startsWith("/_next") && !p.startsWith("/api") && !isPublic(p)) {
+      const url = request.nextUrl.clone();
+      url.pathname = `/platform${p === "/" ? "" : p}`;
+      return NextResponse.rewrite(url);
+    }
+    if (!onPlatformHost && p.startsWith("/platform")) {
+      return new NextResponse("Not found", { status: 404 });
+    }
+  }
+
   let response = NextResponse.next({ request });
 
   const supabase = createServerClient<Database>(

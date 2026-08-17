@@ -121,6 +121,7 @@ export type Profile = Timestamps & {
   full_name: string;
   avatar_url: string | null;
   phone: string | null;
+  is_platform_admin: boolean;
 };
 
 export type Department = Timestamps & {
