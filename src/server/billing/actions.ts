@@ -206,7 +206,9 @@ export async function createEmbeddedCheckoutSessionAction(
 
   const base = await appUrl();
   const checkout = await stripe.checkout.sessions.create({
-    ui_mode: "embedded",
+    // The account's API version renamed the embedded value: "embedded" ->
+    // "embedded_page". Cast because the SDK's TS union predates it.
+    ui_mode: "embedded_page" as unknown as "embedded",
     mode: "subscription",
     customer: customerId,
     line_items: [{ price: plan.stripe_price_id, quantity: 1 }],
