@@ -67,25 +67,43 @@ async function syncSubscription(admin: Admin, sub: Stripe.Subscription, opts?: {
     return;
   }
 
+  const items = sub.items?.data ?? [];
+  const priceIds = items.map((i) => i.price?.id).filter((id): id is string => Boolean(id));
+
   let planKey = sub.metadata?.plan_key ?? null;
-  const priceId = sub.items?.data?.[0]?.price?.id ?? null;
-  if (!opts?.forceFree && priceId) {
-    const { data: plan } = await admin.from("plans").select("key").eq("stripe_price_id", priceId).maybeSingle();
-    if (plan) planKey = plan.key;
+  let baseSeats: number | null = null;
+  let addonSeats = 0;
+  if (!opts?.forceFree && priceIds.length) {
+    // Resolve the plan from whichever item matches a plan's monthly price, then
+    // read the extra-seat quantity from the seat-price line item.
+    const { data: plan } = await admin
+      .from("plans")
+      .select("key, seat_cap, stripe_seat_price_id")
+      .in("stripe_price_id", priceIds)
+      .maybeSingle();
+    if (plan) {
+      planKey = plan.key;
+      baseSeats = plan.seat_cap;
+      if (plan.stripe_seat_price_id) {
+        const seatItem = items.find((i) => i.price?.id === plan.stripe_seat_price_id);
+        addonSeats = seatItem?.quantity ?? 0;
+      }
+    }
   }
 
   const cid = customerId(sub.customer);
-  const { error } = await admin.from("org_subscriptions").upsert(
-    {
-      organization_id: orgId,
-      plan_key: opts?.forceFree ? "free" : planKey ?? "free",
-      status: opts?.forceFree ? "canceled" : mapStatus(sub.status),
-      stripe_customer_id: cid,
-      stripe_subscription_id: opts?.forceFree ? null : sub.id,
-      current_period_end: periodEndIso(sub),
-    },
-    { onConflict: "organization_id" },
-  );
+  const row: Record<string, unknown> = {
+    organization_id: orgId,
+    plan_key: opts?.forceFree ? "free" : planKey ?? "free",
+    status: opts?.forceFree ? "canceled" : mapStatus(sub.status),
+    stripe_customer_id: cid,
+    stripe_subscription_id: opts?.forceFree ? null : sub.id,
+    current_period_end: periodEndIso(sub),
+    addon_seats: opts?.forceFree ? 0 : addonSeats,
+  };
+  if (baseSeats != null) row.base_seats = baseSeats;
+
+  const { error } = await admin.from("org_subscriptions").upsert(row, { onConflict: "organization_id" });
   if (error) throw new Error(error.message);
 }
 

@@ -19,6 +19,7 @@ export type Entitlements = {
   seatCap: number | null; // null = unlimited
   openingCap: number | null;
   addonSeats: number;
+  allowAddonSeats: boolean;
   features: Record<Feature, boolean>;
 };
 
@@ -29,6 +30,7 @@ const FREE_FALLBACK: Entitlements = {
   seatCap: 1,
   openingCap: 5,
   addonSeats: 0,
+  allowAddonSeats: false,
   features: { integrations: false, ai_posts: false, ai_screening: false, ai_assessments: false },
 };
 
@@ -60,6 +62,7 @@ export async function getEntitlements(organizationId: string): Promise<Entitleme
     seatCap: plan.seat_cap == null ? null : plan.seat_cap + addon,
     openingCap: plan.opening_cap,
     addonSeats: addon,
+    allowAddonSeats: plan.allow_addon_seats,
     features: {
       integrations: plan.feat_integrations,
       ai_posts: plan.feat_ai_posts,

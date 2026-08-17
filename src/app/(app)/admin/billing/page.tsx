@@ -39,6 +39,9 @@ export default async function BillingPage() {
           }}
           features={ent.features}
           stripeEnabled={isStripeConfigured()}
+          testMode={(process.env.STRIPE_SECRET_KEY ?? "").startsWith("sk_test_")}
+          addonSeats={ent.addonSeats}
+          seatsSupported={isStripeConfigured() && ent.allowAddonSeats}
         />
       </PageBody>
     </>
