@@ -849,7 +849,7 @@ watch tuned LinkedIn/Indeed/Rozee/Careers posts appear; edit and regenerate them
 - [x] **Test-mode banner** on the billing page (shown for `sk_test_` keys), making the sandbox state unmistakable
 - [ ] Go-live items — **blocked, tracked** (not a coding gap): live keys, tax and receipts require live mode, which Pakistan can't use without a Merchant-of-Record. The production webhook endpoint is already created. Revisit at go-live via a MoR (LemonSqueezy/Paddle) or a US/Atlas entity
 - **Webhook secret**: dev = `stripe listen --forward-to localhost:3000/api/stripe/webhook`; prod = dashboard → **Developers → Workbench → Webhooks** → add `https://<domain>/api/stripe/webhook`, copy the signing secret into `STRIPE_WEBHOOK_SECRET`
-- **Prod migrations pending**: apply `0037`, `0038`, `0039` to the prod DB (single-file form) + run `stripe:setup` against prod — see prod-deploy note
+- [x] **Prod migrated**: `0037`, `0038`, `0039` applied to `hirelane-prod` + `stripe:setup` run against prod (plan + seat price IDs populated). Prod webhook endpoint live. ⚠️ Rotate the prod DB password — it's been pasted into chat
 
 ### ⬜ CP-28 — Super-Admin Portal (platform)
 - [ ] Served at a dedicated host **`admin.hirelane-pearl.vercel.app`** (super-admin subdomain), separate from the tenant app; routed/gated so tenant users never reach it
