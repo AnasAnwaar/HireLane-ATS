@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
-import { clientEnv } from "@/lib/env";
+import { requestBaseUrl } from "@/lib/request-url";
 import { createAdminClient, createClient } from "@/lib/supabase/server";
 import {
   forgotPasswordSchema,
@@ -75,12 +75,13 @@ export async function signUpAction(
 
   const { companyName, fullName, email, password, preset } = parsed.data;
   const supabase = await createClient();
+  const baseUrl = await requestBaseUrl();
 
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
     options: {
-      emailRedirectTo: `${clientEnv.NEXT_PUBLIC_APP_URL}/auth/callback?next=/setup`,
+      emailRedirectTo: `${baseUrl}/auth/callback?next=/setup`,
       // Carried on the user record so provisioning can complete after the
       // email-confirmation round trip, when the original form is long gone.
       data: {
@@ -183,7 +184,7 @@ export async function forgotPasswordAction(
 
   const supabase = await createClient();
   await supabase.auth.resetPasswordForEmail(parsed.data.email, {
-    redirectTo: `${clientEnv.NEXT_PUBLIC_APP_URL}/auth/callback?next=/reset-password`,
+    redirectTo: `${await requestBaseUrl()}/auth/callback?next=/reset-password`,
   });
 
   // Deliberately identical whether or not the address exists — otherwise this
