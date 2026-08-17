@@ -3,7 +3,7 @@ import "server-only";
 import { notFound, redirect } from "next/navigation";
 import { cache } from "react";
 
-import { createAdminClient, createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/server";
 import { getCurrentUser } from "@/server/auth/session";
 
 export type PlatformAdmin = {
@@ -34,10 +34,10 @@ export const getPlatformAdmin = cache(async (): Promise<PlatformAdmin | null> =>
 });
 
 /**
- * Full gate for the super-admin portal: must be signed in, a platform admin, and
- * stepped up to AAL2 (a verified TOTP factor — Google Authenticator). Non-admins
- * get a 404 so the portal's existence isn't revealed. Callers that pass this may
- * act cross-tenant via the admin client.
+ * Full gate for the super-admin portal: must be signed in and a platform admin.
+ * Non-admins get a 404 so the portal's existence isn't revealed. Callers that
+ * pass this may act cross-tenant via the admin client. (Role-based only; a 2FA
+ * step-up can be layered back on later if desired.)
  */
 export async function requirePlatformAccess(): Promise<PlatformAdmin> {
   const user = await getCurrentUser();
@@ -45,34 +45,18 @@ export async function requirePlatformAccess(): Promise<PlatformAdmin> {
 
   const admin = await getPlatformAdmin();
   if (!admin) notFound();
-
-  // 2FA is mandatory for the portal. Reuse Supabase's AAL model.
-  const supabase = await createClient();
-  const { data: aal } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
-  if (aal?.currentLevel !== "aal2") {
-    // A factor exists → challenge it; otherwise the admin must enrol one first.
-    if (aal?.nextLevel === "aal2") redirect("/mfa");
-    redirect("/settings/security?reason=platform-2fa");
-  }
-
   return admin;
 }
 
 /**
- * Guard for platform server actions — same requirements as requirePlatformAccess
- * (platform-admin + AAL2) but returns a result instead of redirecting, so
- * actions can surface a clean error. Actions must call this: the layout gate
- * protects the page, not a direct action invocation.
+ * Guard for platform server actions — platform-admin required. Returns a result
+ * instead of redirecting so actions can surface a clean error. Actions must call
+ * this: the layout gate protects the page, not a direct action invocation.
  */
 export async function requirePlatformActor(): Promise<
   { ok: true; actor: PlatformAdmin } | { ok: false; error: string }
 > {
   const actor = await getPlatformAdmin();
   if (!actor) return { ok: false, error: "You are not authorized for the platform portal." };
-
-  const supabase = await createClient();
-  const { data: aal } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
-  if (aal?.currentLevel !== "aal2") return { ok: false, error: "Two-factor step-up is required." };
-
   return { ok: true, actor };
 }
