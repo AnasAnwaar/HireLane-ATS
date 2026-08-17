@@ -50,8 +50,11 @@ export async function updateSession(request: NextRequest) {
     const onPlatformHost = host === platformHost;
     const p = request.nextUrl.pathname;
     if (onPlatformHost && !p.startsWith("/platform") && !p.startsWith("/_next") && !p.startsWith("/api") && !isPublic(p)) {
+      // The platform host serves only the portal. Map any non-portal path to the
+      // portal home (so post-login redirects like /dashboard land on /platform,
+      // not a 404). The portal's own links already use /platform/* hrefs.
       const url = request.nextUrl.clone();
-      url.pathname = `/platform${p === "/" ? "" : p}`;
+      url.pathname = "/platform";
       return NextResponse.rewrite(url);
     }
     if (!onPlatformHost && p.startsWith("/platform")) {
