@@ -12,7 +12,11 @@ export const metadata = { title: "HireLane Platform" };
 // The portal is cross-tenant and privileged — never cache or statically render it.
 export const dynamic = "force-dynamic";
 
-const NAV = [{ href: "/platform", label: "Overview" }];
+const NAV = [
+  { href: "/platform", label: "Overview" },
+  { href: "/platform/plans", label: "Plans" },
+  { href: "/platform/orgs", label: "Organizations" },
+];
 
 export default async function PlatformLayout({ children }: { children: ReactNode }) {
   const admin = await requirePlatformAccess();

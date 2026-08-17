@@ -57,3 +57,22 @@ export async function requirePlatformAccess(): Promise<PlatformAdmin> {
 
   return admin;
 }
+
+/**
+ * Guard for platform server actions — same requirements as requirePlatformAccess
+ * (platform-admin + AAL2) but returns a result instead of redirecting, so
+ * actions can surface a clean error. Actions must call this: the layout gate
+ * protects the page, not a direct action invocation.
+ */
+export async function requirePlatformActor(): Promise<
+  { ok: true; actor: PlatformAdmin } | { ok: false; error: string }
+> {
+  const actor = await getPlatformAdmin();
+  if (!actor) return { ok: false, error: "You are not authorized for the platform portal." };
+
+  const supabase = await createClient();
+  const { data: aal } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+  if (aal?.currentLevel !== "aal2") return { ok: false, error: "Two-factor step-up is required." };
+
+  return { ok: true, actor };
+}

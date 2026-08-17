@@ -790,6 +790,17 @@ export type OrgSubscription = Timestamps & {
   stripe_subscription_id: string | null;
 };
 
+export type PlatformAuditLog = {
+  id: string;
+  actor_user_id: string | null;
+  actor_email: string | null;
+  action: string;
+  target_type: string | null;
+  target_id: string | null;
+  detail: Record<string, unknown>;
+  created_at: string;
+};
+
 export type Database = {
   public: {
     Tables: {
@@ -1046,6 +1057,7 @@ export type Database = {
         "organization_id",
         [Rel<"organization_id", "organizations">, Rel<"plan_key", "plans">]
       >;
+      platform_audit_log: Table<PlatformAuditLog, "action", []>;
     };
     Views: Record<string, never>;
     Functions: {

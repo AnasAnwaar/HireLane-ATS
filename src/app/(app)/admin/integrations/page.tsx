@@ -1,12 +1,14 @@
 import { Plug } from "lucide-react";
 
 import { PageBody, PageHeader } from "@/components/layout/app-shell";
+import { FeatureGate } from "@/components/billing/feature-gate";
 import { NoAccess } from "@/components/permissions/no-access";
 import { Alert } from "@/components/ui/alert";
 import { createClient } from "@/lib/supabase/server";
 import { CATEGORY_LABELS } from "@/lib/channels-display";
 import { can } from "@/server/auth/authorize";
 import { requireSession } from "@/server/auth/session";
+import { getEntitlements } from "@/server/billing/entitlements";
 import type { Channel, ChannelConnection } from "@/types/database";
 
 import { ChannelCard, type ChannelView } from "./channel-card";
@@ -14,7 +16,7 @@ import { ChannelCard, type ChannelView } from "./channel-card";
 export const metadata = { title: "Integrations" };
 
 export default async function IntegrationsPage() {
-  await requireSession("/admin/integrations");
+  const session = await requireSession("/admin/integrations");
 
   if (!(await can("integrations.view"))) {
     return (
@@ -22,6 +24,24 @@ export default async function IntegrationsPage() {
         title="You don't have access to integrations"
         message="Connecting job boards requires the Integrations permission."
       />
+    );
+  }
+
+  const ent = await getEntitlements(session.organizationId);
+  if (!ent.features.integrations) {
+    return (
+      <>
+        <PageHeader
+          eyebrow="Administration"
+          title="Integrations"
+          description="Connect the job boards and social platforms you post openings to."
+        />
+        <PageBody>
+          <FeatureGate locked feature="integrations">
+            {null}
+          </FeatureGate>
+        </PageBody>
+      </>
     );
   }
 

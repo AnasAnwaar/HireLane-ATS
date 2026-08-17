@@ -3,12 +3,14 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { PageBody, PageHeader } from "@/components/layout/app-shell";
+import { FeatureGate } from "@/components/billing/feature-gate";
 import { NoAccess } from "@/components/permissions/no-access";
 import { Alert } from "@/components/ui/alert";
 import { createClient } from "@/lib/supabase/server";
 import { can } from "@/server/auth/authorize";
 import { isAiConfigured } from "@/server/ai/gemini";
 import { requireSession } from "@/server/auth/session";
+import { getEntitlements } from "@/server/billing/entitlements";
 import type { Channel, ChannelConnection, JobPosting } from "@/types/database";
 
 import { PostsClient, type ChannelPost } from "./posts-client";
@@ -16,11 +18,29 @@ import { PostsClient, type ChannelPost } from "./posts-client";
 export const metadata = { title: "AI job posts" };
 
 export default async function PostsPage({ params }: { params: Promise<{ id: string }> }) {
-  await requireSession();
+  const session = await requireSession();
   const { id } = await params;
 
   if (!(await can("post_generation.generate"))) {
     return <NoAccess title="You don't have access to post generation" />;
+  }
+
+  const ent = await getEntitlements(session.organizationId);
+  if (!ent.features.ai_posts) {
+    return (
+      <>
+        <PageHeader
+          eyebrow="Openings"
+          title="Posts & publishing"
+          description="A platform-tuned post for each channel. Review, edit, schedule and publish."
+        />
+        <PageBody>
+          <FeatureGate locked feature="ai_posts">
+            {null}
+          </FeatureGate>
+        </PageBody>
+      </>
+    );
   }
 
   const supabase = await createClient();
