@@ -19,6 +19,11 @@ const PUBLIC_ROUTES = [
   "/invite",
   "/apply",
   "/candidate",
+  // Self-authenticating endpoints — they verify their own caller (Stripe
+  // webhook signature, cron Bearer secret) and must NOT be bounced to /login,
+  // which would 307 the request and swallow the event.
+  "/api/stripe",
+  "/api/cron",
 ];
 
 function isPublic(pathname: string) {
