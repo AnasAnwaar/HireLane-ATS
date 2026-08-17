@@ -3,7 +3,7 @@ import type { ReactNode } from "react";
 import { BrandMark } from "@/components/brand-mark";
 import { Badge } from "@/components/ui/badge";
 import { SignOutButton } from "@/components/layout/sign-out-button";
-import { requirePlatformAccess } from "@/server/platform/auth";
+import { requirePlatformAdmin } from "@/server/platform/auth";
 
 import { PlatformNav } from "./platform-nav";
 
@@ -20,7 +20,7 @@ const NAV = [
 ];
 
 export default async function PlatformLayout({ children }: { children: ReactNode }) {
-  const admin = await requirePlatformAccess();
+  const admin = await requirePlatformAdmin();
 
   return (
     <div className="min-h-dvh bg-muted/30">
