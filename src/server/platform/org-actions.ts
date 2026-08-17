@@ -48,6 +48,51 @@ export async function assignPlanToOrgAction(organizationId: string, planKey: str
   return { ok: true, message: `${org.name} is now on ${plan.name}.` };
 }
 
+/**
+ * Provision a DEMO account (CP-28) — super-admin only. Creates a confirmed user
+ * whose workspace, on first sign-in, provisions onto the all-access `demo` plan
+ * (see the `pending_demo` handling in ensureOrganization). No user can create
+ * this themselves: the flag is stamped only here, behind requirePlatformActor.
+ */
+export async function createDemoAccountAction(input: {
+  email: string;
+  password: string;
+  companyName: string;
+  fullName?: string;
+}): Promise<ActionResult> {
+  const gate = await requirePlatformActor();
+  if (!gate.ok) return { ok: false, error: gate.error };
+
+  const email = input.email?.trim().toLowerCase();
+  if (!email || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return { ok: false, error: "Enter a valid email." };
+  if (!input.password || input.password.length < 8) return { ok: false, error: "Password must be at least 8 characters." };
+  if (!input.companyName?.trim()) return { ok: false, error: "Enter a workspace name." };
+
+  const admin = createAdminClient();
+  const { data, error } = await admin.auth.admin.createUser({
+    email,
+    password: input.password,
+    email_confirm: true,
+    user_metadata: {
+      full_name: input.fullName?.trim() || "Demo User",
+      pending_company_name: input.companyName.trim(),
+      pending_preset: "standard",
+      pending_demo: true,
+    },
+  });
+  if (error) return { ok: false, error: error.message };
+
+  await logPlatformAction(gate.actor, "demo.create_account", {
+    type: "user",
+    id: data.user.id,
+    detail: { email, company: input.companyName.trim() },
+  });
+  return {
+    ok: true,
+    message: `Demo account created for ${email}. They get full access on first sign-in.`,
+  };
+}
+
 /** Suspend or reactivate an organization (CP-28). Suspended orgs are blocked at
  * the app shell. Platform-gated + audited. */
 export async function setOrgSuspendedAction(organizationId: string, suspend: boolean): Promise<ActionResult> {

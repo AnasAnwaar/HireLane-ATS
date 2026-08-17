@@ -1,5 +1,6 @@
 import { PageBody, PageHeader } from "@/components/layout/app-shell";
 import { NoAccess } from "@/components/permissions/no-access";
+import { createAdminClient } from "@/lib/supabase/server";
 import { can } from "@/server/auth/authorize";
 import { requireSession } from "@/server/auth/session";
 import { getEntitlements, getUsage } from "@/server/billing/entitlements";
@@ -15,10 +16,16 @@ export default async function BillingPage() {
     return <NoAccess title="You don't have access to billing" />;
   }
 
-  const [ent, usage] = await Promise.all([
+  const [ent, usage, { data: sub }] = await Promise.all([
     getEntitlements(session.organizationId),
     getUsage(session.organizationId),
+    createAdminClient()
+      .from("org_subscriptions")
+      .select("stripe_subscription_id")
+      .eq("organization_id", session.organizationId)
+      .maybeSingle(),
   ]);
+  const hasSubscription = Boolean(sub?.stripe_subscription_id);
 
   return (
     <>
@@ -42,6 +49,8 @@ export default async function BillingPage() {
           testMode={(process.env.STRIPE_SECRET_KEY ?? "").startsWith("sk_test_")}
           addonSeats={ent.addonSeats}
           seatsSupported={isStripeConfigured() && ent.allowAddonSeats}
+          hasSubscription={hasSubscription}
+          status={ent.status}
         />
       </PageBody>
     </>

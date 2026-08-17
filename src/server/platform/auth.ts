@@ -3,7 +3,7 @@ import "server-only";
 import { notFound, redirect } from "next/navigation";
 import { cache } from "react";
 
-import { createAdminClient } from "@/lib/supabase/server";
+import { createAdminClient, createClient } from "@/lib/supabase/server";
 import { getCurrentUser } from "@/server/auth/session";
 
 export type PlatformAdmin = {
@@ -33,13 +33,19 @@ export const getPlatformAdmin = cache(async (): Promise<PlatformAdmin | null> =>
   return { userId: user.id, email: data.email ?? user.email ?? "", fullName: data.full_name ?? "" };
 });
 
+/** Whether the current session has stepped up to a verified second factor. */
+async function isAal2(): Promise<boolean> {
+  const supabase = await createClient();
+  const { data } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+  return data?.currentLevel === "aal2";
+}
+
 /**
- * Full gate for the super-admin portal: must be signed in and a platform admin.
- * Non-admins get a 404 so the portal's existence isn't revealed. Callers that
- * pass this may act cross-tenant via the admin client. (Role-based only; a 2FA
- * step-up can be layered back on later if desired.)
+ * Platform-admin gate WITHOUT the 2FA step-up. Used by the portal layout and the
+ * /platform/security page (which is where 2FA gets set up, so it can't itself
+ * require 2FA). Non-admins get a 404 so the portal stays hidden.
  */
-export async function requirePlatformAccess(): Promise<PlatformAdmin> {
+export async function requirePlatformAdmin(): Promise<PlatformAdmin> {
   const user = await getCurrentUser();
   if (!user) redirect(`/login?next=${encodeURIComponent("/platform")}`);
 
@@ -49,14 +55,25 @@ export async function requirePlatformAccess(): Promise<PlatformAdmin> {
 }
 
 /**
- * Guard for platform server actions — platform-admin required. Returns a result
- * instead of redirecting so actions can surface a clean error. Actions must call
- * this: the layout gate protects the page, not a direct action invocation.
+ * Full gate for super-admin content: platform-admin + mandatory 2FA (a verified
+ * TOTP factor via Google Authenticator). Admins who haven't enrolled/stepped up
+ * are sent to /platform/security to do so.
+ */
+export async function requirePlatformAccess(): Promise<PlatformAdmin> {
+  const admin = await requirePlatformAdmin();
+  if (!(await isAal2())) redirect("/platform/security");
+  return admin;
+}
+
+/**
+ * Guard for platform server actions — platform-admin + 2FA. Returns a result
+ * instead of redirecting so actions can surface a clean error.
  */
 export async function requirePlatformActor(): Promise<
   { ok: true; actor: PlatformAdmin } | { ok: false; error: string }
 > {
   const actor = await getPlatformAdmin();
   if (!actor) return { ok: false, error: "You are not authorized for the platform portal." };
+  if (!(await isAal2())) return { ok: false, error: "Two-factor step-up is required." };
   return { ok: true, actor };
 }

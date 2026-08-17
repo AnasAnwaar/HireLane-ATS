@@ -3,8 +3,8 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
-import { clientEnv } from "@/lib/env";
-import { createClient } from "@/lib/supabase/server";
+import { requestBaseUrl } from "@/lib/request-url";
+import { createAdminClient, createClient } from "@/lib/supabase/server";
 import {
   forgotPasswordSchema,
   resetPasswordSchema,
@@ -75,12 +75,13 @@ export async function signUpAction(
 
   const { companyName, fullName, email, password, preset } = parsed.data;
   const supabase = await createClient();
+  const baseUrl = await requestBaseUrl();
 
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
     options: {
-      emailRedirectTo: `${clientEnv.NEXT_PUBLIC_APP_URL}/auth/callback?next=/setup`,
+      emailRedirectTo: `${baseUrl}/auth/callback?next=/setup`,
       // Carried on the user record so provisioning can complete after the
       // email-confirmation round trip, when the original form is long gone.
       data: {
@@ -183,7 +184,7 @@ export async function forgotPasswordAction(
 
   const supabase = await createClient();
   await supabase.auth.resetPasswordForEmail(parsed.data.email, {
-    redirectTo: `${clientEnv.NEXT_PUBLIC_APP_URL}/auth/callback?next=/reset-password`,
+    redirectTo: `${await requestBaseUrl()}/auth/callback?next=/reset-password`,
   });
 
   // Deliberately identical whether or not the address exists — otherwise this
@@ -279,9 +280,19 @@ export async function ensureOrganization(): Promise<ActionResult> {
     };
   }
 
+  // Demo accounts (provisioned by a super-admin) start on the all-access `demo`
+  // plan. The pending_demo flag is only ever set by createDemoAccountAction.
+  if (meta.pending_demo === true && orgId) {
+    const admin = createAdminClient();
+    await admin.from("org_subscriptions").upsert(
+      { organization_id: String(orgId), plan_key: "demo", status: "active" },
+      { onConflict: "organization_id" },
+    );
+  }
+
   // Clear the pending markers so a later sign-in cannot create a second workspace.
   await supabase.auth.updateUser({
-    data: { pending_company_name: null, pending_preset: null },
+    data: { pending_company_name: null, pending_preset: null, pending_demo: null },
   });
 
   revalidatePath("/", "layout");

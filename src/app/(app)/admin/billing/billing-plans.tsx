@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, Copy, CreditCard, ExternalLink, Loader2, Minus, Plus, Sparkles, X } from "lucide-react";
+import { Check, Copy, CreditCard, Loader2, Minus, Plus, Sparkles, X } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import * as React from "react";
 import { toast } from "sonner";
@@ -11,11 +11,14 @@ import { Card } from "@/components/ui/card";
 import type { ActionResult } from "@/lib/validation/auth";
 import { cn } from "@/lib/utils";
 import {
+  cancelSubscriptionAction,
   changePlanAction,
-  createBillingPortalSessionAction,
-  createCheckoutSessionAction,
+  reconcileSubscriptionAction,
+  switchPlanStripeAction,
   updateSeatsAction,
 } from "@/server/billing/actions";
+
+import { EmbeddedCheckoutModal } from "./embedded-checkout";
 
 type Feature = { t: string; ok: boolean };
 type Plan = {
@@ -99,6 +102,8 @@ export function BillingPlans({
   testMode,
   addonSeats,
   seatsSupported,
+  hasSubscription,
+  status,
 }: {
   currentPlan: string;
   organization: string;
@@ -108,19 +113,40 @@ export function BillingPlans({
   testMode: boolean;
   addonSeats: number;
   seatsSupported: boolean;
+  hasSubscription: boolean;
+  status: string;
 }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [busy, setBusy] = React.useState<string | null>(null);
+  const [checkoutPlan, setCheckoutPlan] = React.useState<string | null>(null);
   const current = PLANS.find((p) => p.key === currentPlan);
 
-  // Toast the outcome of a returning Stripe Checkout, then scrub the query.
+  // Over-limit state: more members/openings than the plan allows (e.g. after a
+  // downgrade). Existing data keeps working, but new invites/openings are blocked
+  // server-side — surface it with a path forward instead of a bare red bar.
+  const overSeats = usage.seatCap != null && usage.seatsUsed > usage.seatCap;
+  const overOpenings = usage.openingCap != null && usage.openingsUsed > usage.openingCap;
+  const overLimit = overSeats || overOpenings;
+
+  // On a returning (embedded) Checkout, reconcile the plan from Stripe directly
+  // so it flips immediately — without depending on webhook delivery (which can't
+  // reach localhost). Then scrub the query.
   const checkout = searchParams.get("checkout");
   React.useEffect(() => {
     if (!checkout) return;
-    if (checkout === "success") toast.success("Payment received — your plan is being activated.");
-    else if (checkout === "cancelled") toast.info("Checkout cancelled — no changes made.");
-    router.replace("/admin/billing");
+    if (checkout === "complete" || checkout === "success") {
+      void (async () => {
+        const r = await reconcileSubscriptionAction();
+        if (r.ok) toast.success("Payment received — your plan is now active.");
+        else toast.error(r.error);
+        router.replace("/admin/billing");
+        router.refresh();
+      })();
+    } else if (checkout === "cancelled") {
+      toast.info("Checkout cancelled — no changes made.");
+      router.replace("/admin/billing");
+    }
   }, [checkout, router]);
 
   /** Follow a redirect, or toast the result of a direct action. */
@@ -140,22 +166,30 @@ export function BillingPlans({
       toast.info("Custom plans are arranged with our team — get in touch to set one up.");
       return;
     }
+    // First subscription needs card entry → open embedded Checkout in a modal
+    // (stays on our domain, no redirect).
+    if (stripeEnabled && plan.key !== "free" && !hasSubscription) {
+      setCheckoutPlan(plan.key);
+      return;
+    }
+
     setBusy(plan.key);
     let r: ActionResult;
     if (!stripeEnabled) {
       r = await changePlanAction(plan.key); // no payment configured — direct switch
     } else if (plan.key === "free") {
-      r = await createBillingPortalSessionAction(); // cancel/downgrade in the portal
+      r = await cancelSubscriptionAction(); // in-app cancel → dashboard, no Stripe redirect
     } else {
-      r = await createCheckoutSessionAction(plan.key); // hosted Stripe Checkout
+      r = await switchPlanStripeAction(plan.key); // in-app plan swap on the card on file
     }
     setBusy(null);
     resolve(r);
   }
 
-  async function openPortal() {
-    setBusy("portal");
-    const r = await createBillingPortalSessionAction();
+  async function cancelSub() {
+    if (!confirm("Cancel your subscription? You'll move to the Free plan and lose paid features.")) return;
+    setBusy("cancel");
+    const r = await cancelSubscriptionAction();
     setBusy(null);
     resolve(r);
   }
@@ -171,6 +205,71 @@ export function BillingPlans({
 
   return (
     <div className="space-y-8">
+      {checkoutPlan && (
+        <EmbeddedCheckoutModal planKey={checkoutPlan} onClose={() => setCheckoutPlan(null)} />
+      )}
+
+      {status === "past_due" && (
+        <div className="rounded-lg border border-destructive/40 bg-destructive-soft p-4">
+          <div className="flex items-start gap-3">
+            <span className="mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full bg-destructive/15 text-destructive">
+              <CreditCard className="size-3.5" />
+            </span>
+            <div className="min-w-0 flex-1">
+              <p className="text-sm font-medium text-destructive">Your last payment failed</p>
+              <p className="mt-0.5 text-sm text-muted-foreground">
+                We couldn&apos;t charge your card, so your subscription is past due. Update your
+                payment method to keep your plan active — otherwise it may be cancelled.
+              </p>
+              {stripeEnabled && current && !current.custom && current.key !== "free" && (
+                <Button size="sm" className="mt-3" onClick={() => setCheckoutPlan(current.key)}>
+                  <CreditCard /> Update payment
+                </Button>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {overLimit && (
+        <div className="rounded-lg border border-destructive/30 bg-destructive-soft/50 p-4">
+          <div className="flex items-start gap-3">
+            <span className="mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full bg-destructive/15 text-destructive">
+              <X className="size-3.5" />
+            </span>
+            <div className="min-w-0 flex-1">
+              <p className="text-sm font-medium text-destructive">
+                You&apos;re over your {current?.name ?? currentPlan} plan limits
+              </p>
+              <p className="mt-0.5 text-sm text-muted-foreground">
+                {overSeats && (
+                  <>
+                    You have <strong>{usage.seatsUsed}</strong> members but this plan includes{" "}
+                    <strong>{usage.seatCap}</strong> seat{usage.seatCap === 1 ? "" : "s"}.{" "}
+                  </>
+                )}
+                {overOpenings && (
+                  <>
+                    You have <strong>{usage.openingsUsed}</strong> active openings but this plan
+                    allows <strong>{usage.openingCap}</strong>.{" "}
+                  </>
+                )}
+                Everyone keeps working, but you can&apos;t add more until you upgrade
+                {overSeats ? " or remove members" : " or close some openings"}.
+              </p>
+              <div className="mt-3">
+                <Button
+                  size="sm"
+                  onClick={() => document.getElementById("change-plan")?.scrollIntoView({ behavior: "smooth" })}
+                >
+                  <Sparkles /> Upgrade plan
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {stripeEnabled && testMode && (
         <div className="flex items-center gap-2 rounded-lg border border-warning/30 bg-warning-soft px-4 py-2.5 text-sm text-warning-foreground">
           <CreditCard className="size-4 shrink-0" />
@@ -200,10 +299,16 @@ export function BillingPlans({
             <Badge variant="success" dot>
               Active
             </Badge>
-            {stripeEnabled && (
-              <Button variant="outline" size="sm" onClick={openPortal} disabled={busy !== null}>
-                {busy === "portal" ? <Loader2 className="animate-spin" /> : <ExternalLink />}
-                Manage billing
+            {stripeEnabled && hasSubscription && (
+              <Button
+                variant="outline"
+                size="sm"
+                className="text-destructive hover:text-destructive"
+                onClick={cancelSub}
+                disabled={busy !== null}
+              >
+                {busy === "cancel" ? <Loader2 className="animate-spin" /> : <X />}
+                Cancel subscription
               </Button>
             )}
           </div>
@@ -237,7 +342,7 @@ export function BillingPlans({
       </Card>
 
       {/* Plan grid */}
-      <div>
+      <div id="change-plan">
         <h2 className="text-sm font-semibold">Change plan</h2>
         <p className="mt-0.5 text-sm text-muted-foreground">
           Upgrade any time. Prorated, no lock-in — billing secured by Stripe.
@@ -311,7 +416,7 @@ export function BillingPlans({
 
       <p className="text-xs text-muted-foreground">
         {stripeEnabled
-          ? "Paid plans go through Stripe Checkout (test mode — use card 4242 4242 4242 4242, any future date & CVC). Downgrades, cancellations and invoices live in the billing portal."
+          ? "Your first subscription uses Stripe Checkout for card entry (test mode — card 4242 4242 4242 4242, any future date & CVC). Plan switches and cancellation then happen right here, no redirect."
           : "Stripe isn't configured, so switching plans applies immediately without payment. Add your Stripe keys and run npm run stripe:setup to enable real checkout."}
       </p>
     </div>

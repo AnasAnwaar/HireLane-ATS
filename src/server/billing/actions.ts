@@ -161,6 +161,233 @@ export async function createBillingPortalSessionAction(): Promise<ActionResult> 
 }
 
 /**
+ * Start an EMBEDDED Stripe Checkout for a first subscription (CP-27) — the card
+ * form renders inside our app (ui_mode: embedded) instead of redirecting to
+ * checkout.stripe.com. Returns the session client_secret for the client to
+ * mount. On completion Stripe navigates the page to return_url (our domain).
+ */
+export async function createEmbeddedCheckoutSessionAction(
+  planKey: string,
+): Promise<{ ok: true; clientSecret: string } | { ok: false; error: string }> {
+  const session = await getSessionContext();
+  if (!session) return { ok: false, error: "Your session has expired." };
+  const auth = await authorize("administration.manage_billing");
+  if (!auth.ok) return { ok: false, error: auth.error };
+  if (!isStripeConfigured()) return { ok: false, error: "Online billing isn't configured yet." };
+
+  const admin = createAdminClient();
+  const { data: plan } = await admin
+    .from("plans")
+    .select("key, name, stripe_price_id")
+    .eq("key", planKey)
+    .maybeSingle();
+  if (!plan) return { ok: false, error: "Unknown plan." };
+  if (!plan.stripe_price_id) return { ok: false, error: `The ${plan.name} plan isn't wired to Stripe yet.` };
+
+  const { data: sub } = await admin
+    .from("org_subscriptions")
+    .select("stripe_customer_id")
+    .eq("organization_id", session.organizationId)
+    .maybeSingle();
+
+  const stripe = getStripe();
+  let customerId = sub?.stripe_customer_id ?? null;
+  if (!customerId) {
+    const customer = await stripe.customers.create({
+      email: session.email || undefined,
+      name: session.organizationName,
+      metadata: { organization_id: session.organizationId },
+    });
+    customerId = customer.id;
+    await admin
+      .from("org_subscriptions")
+      .upsert({ organization_id: session.organizationId, stripe_customer_id: customerId }, { onConflict: "organization_id" });
+  }
+
+  const base = await appUrl();
+  const checkout = await stripe.checkout.sessions.create({
+    // The account's API version renamed the embedded value: "embedded" ->
+    // "embedded_page". Cast because the SDK's TS union predates it.
+    ui_mode: "embedded_page" as unknown as "embedded",
+    mode: "subscription",
+    customer: customerId,
+    line_items: [{ price: plan.stripe_price_id, quantity: 1 }],
+    return_url: `${base}/admin/billing?checkout=complete`,
+    allow_promotion_codes: true,
+    metadata: { organization_id: session.organizationId, plan_key: plan.key },
+    subscription_data: {
+      metadata: { organization_id: session.organizationId, plan_key: plan.key },
+    },
+  });
+
+  if (!checkout.client_secret) return { ok: false, error: "Stripe did not return a checkout secret." };
+  return { ok: true, clientSecret: checkout.client_secret };
+}
+
+/**
+ * Reconcile the org's plan from Stripe directly (CP-27). Called when Checkout
+ * returns, so the plan flips immediately without waiting on — or depending on —
+ * webhook delivery (which can't reach localhost). Reads the customer's active
+ * subscription and mirrors it into org_subscriptions.
+ */
+export async function reconcileSubscriptionAction(): Promise<ActionResult> {
+  const session = await getSessionContext();
+  if (!session) return { ok: false, error: "Your session has expired." };
+  const auth = await authorize("administration.manage_billing");
+  if (!auth.ok) return { ok: false, error: auth.error };
+  if (!isStripeConfigured()) return { ok: true };
+
+  const admin = createAdminClient();
+  const { data: sub } = await admin
+    .from("org_subscriptions")
+    .select("stripe_customer_id")
+    .eq("organization_id", session.organizationId)
+    .maybeSingle();
+  if (!sub?.stripe_customer_id) return { ok: true };
+
+  const list = await getStripe().subscriptions.list({
+    customer: sub.stripe_customer_id,
+    status: "all",
+    limit: 10,
+  });
+  const active = list.data.find((s) => s.status === "active" || s.status === "trialing");
+  if (!active) return { ok: true };
+
+  const priceIds = active.items.data.map((i) => i.price?.id).filter((id): id is string => Boolean(id));
+  const { data: plan } = await admin
+    .from("plans")
+    .select("key, seat_cap, stripe_seat_price_id")
+    .in("stripe_price_id", priceIds)
+    .maybeSingle();
+  const planKey = plan?.key ?? (active.metadata?.plan_key || "free");
+
+  let addonSeats = 0;
+  if (plan?.stripe_seat_price_id) {
+    const seatItem = active.items.data.find((i) => i.price?.id === plan.stripe_seat_price_id);
+    addonSeats = seatItem?.quantity ?? 0;
+  }
+
+  const item = active.items.data[0] as { current_period_end?: number } | undefined;
+  const secs = item?.current_period_end ?? (active as unknown as { current_period_end?: number }).current_period_end;
+  const periodEnd = typeof secs === "number" ? new Date(secs * 1000).toISOString() : null;
+
+  const { error } = await admin.from("org_subscriptions").upsert(
+    {
+      organization_id: session.organizationId,
+      plan_key: planKey,
+      status: active.status === "trialing" ? "trialing" : "active",
+      stripe_customer_id: sub.stripe_customer_id,
+      stripe_subscription_id: active.id,
+      current_period_end: periodEnd,
+      addon_seats: addonSeats,
+      base_seats: plan?.seat_cap ?? 1,
+    },
+    { onConflict: "organization_id" },
+  );
+  if (error) return { ok: false, error: error.message };
+
+  revalidatePath("/admin/billing");
+  return { ok: true, message: "Your plan is now active." };
+}
+
+/**
+ * Cancel the subscription IN-APP (no Stripe redirect). Cancels the Stripe
+ * subscription immediately, drops the org to Free, and returns the caller to the
+ * dashboard. The webhook confirms, but we apply it synchronously for instant
+ * feedback.
+ */
+export async function cancelSubscriptionAction(): Promise<ActionResult> {
+  const session = await getSessionContext();
+  if (!session) return { ok: false, error: "Your session has expired." };
+  const auth = await authorize("administration.manage_billing");
+  if (!auth.ok) return { ok: false, error: auth.error };
+
+  const admin = createAdminClient();
+  const { data: sub } = await admin
+    .from("org_subscriptions")
+    .select("stripe_subscription_id")
+    .eq("organization_id", session.organizationId)
+    .maybeSingle();
+
+  if (isStripeConfigured() && sub?.stripe_subscription_id) {
+    try {
+      await getStripe().subscriptions.cancel(sub.stripe_subscription_id);
+    } catch {
+      // Already canceled/absent in Stripe — proceed to reflect Free locally.
+    }
+  }
+
+  const { error } = await admin.from("org_subscriptions").upsert(
+    {
+      organization_id: session.organizationId,
+      plan_key: "free",
+      status: "canceled",
+      stripe_subscription_id: null,
+      addon_seats: 0,
+    },
+    { onConflict: "organization_id" },
+  );
+  if (error) return { ok: false, error: error.message };
+
+  revalidatePath("/admin/billing");
+  revalidatePath("/dashboard");
+  return { ok: true, redirectTo: "/dashboard", message: "Your subscription has been cancelled." };
+}
+
+/**
+ * Switch between paid plans IN-APP (no Stripe redirect) when an active Stripe
+ * subscription already exists — swaps the plan line item's price with prorated
+ * billing against the card on file. Falls back to the direct switch when Stripe
+ * isn't configured. (Starting a subscription from Free still needs Checkout for
+ * card entry — the UI routes there when there's no subscription yet.)
+ */
+export async function switchPlanStripeAction(planKey: string): Promise<ActionResult> {
+  const session = await getSessionContext();
+  if (!session) return { ok: false, error: "Your session has expired." };
+  const auth = await authorize("administration.manage_billing");
+  if (!auth.ok) return { ok: false, error: auth.error };
+  if (!isStripeConfigured()) return changePlanAction(planKey);
+
+  const admin = createAdminClient();
+  const { data: sub } = await admin
+    .from("org_subscriptions")
+    .select("stripe_subscription_id, plan_key")
+    .eq("organization_id", session.organizationId)
+    .maybeSingle();
+  if (!sub?.stripe_subscription_id) {
+    return { ok: false, error: "No active subscription to change — start one first." };
+  }
+
+  const [{ data: plan }, { data: currentPlan }] = await Promise.all([
+    admin.from("plans").select("name, stripe_price_id, seat_cap").eq("key", planKey).maybeSingle(),
+    admin.from("plans").select("stripe_seat_price_id").eq("key", sub.plan_key).maybeSingle(),
+  ]);
+  if (!plan) return { ok: false, error: "Unknown plan." };
+  if (!plan.stripe_price_id) return { ok: false, error: `The ${plan.name} plan isn't wired to Stripe yet.` };
+
+  const stripe = getStripe();
+  const subscription = await stripe.subscriptions.retrieve(sub.stripe_subscription_id);
+  const seatPriceId = currentPlan?.stripe_seat_price_id ?? null;
+  // The plan line item is the one that isn't the per-seat item.
+  const planItem = subscription.items.data.find((i) => i.price?.id !== seatPriceId);
+  if (!planItem) return { ok: false, error: "Couldn't locate the plan line item." };
+
+  await stripe.subscriptions.update(sub.stripe_subscription_id, {
+    items: [{ id: planItem.id, price: plan.stripe_price_id }],
+    proration_behavior: "create_prorations",
+    metadata: { organization_id: session.organizationId, plan_key: planKey },
+  });
+
+  await admin
+    .from("org_subscriptions")
+    .update({ plan_key: planKey, base_seats: plan.seat_cap ?? 1 })
+    .eq("organization_id", session.organizationId);
+
+  revalidatePath("/admin/billing");
+  return { ok: true, message: `You're now on the ${plan.name} plan.` };
+}
+
+/**
  * Set the number of extra seats (CP-27). Adds/updates/removes a quantity-based
  * seat line item on the org's Stripe subscription with prorated billing; the
  * webhook syncs `addon_seats` authoritatively. Requires an active paid plan.
