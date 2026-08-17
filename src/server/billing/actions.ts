@@ -161,6 +161,103 @@ export async function createBillingPortalSessionAction(): Promise<ActionResult> 
 }
 
 /**
+ * Cancel the subscription IN-APP (no Stripe redirect). Cancels the Stripe
+ * subscription immediately, drops the org to Free, and returns the caller to the
+ * dashboard. The webhook confirms, but we apply it synchronously for instant
+ * feedback.
+ */
+export async function cancelSubscriptionAction(): Promise<ActionResult> {
+  const session = await getSessionContext();
+  if (!session) return { ok: false, error: "Your session has expired." };
+  const auth = await authorize("administration.manage_billing");
+  if (!auth.ok) return { ok: false, error: auth.error };
+
+  const admin = createAdminClient();
+  const { data: sub } = await admin
+    .from("org_subscriptions")
+    .select("stripe_subscription_id")
+    .eq("organization_id", session.organizationId)
+    .maybeSingle();
+
+  if (isStripeConfigured() && sub?.stripe_subscription_id) {
+    try {
+      await getStripe().subscriptions.cancel(sub.stripe_subscription_id);
+    } catch {
+      // Already canceled/absent in Stripe — proceed to reflect Free locally.
+    }
+  }
+
+  const { error } = await admin.from("org_subscriptions").upsert(
+    {
+      organization_id: session.organizationId,
+      plan_key: "free",
+      status: "canceled",
+      stripe_subscription_id: null,
+      addon_seats: 0,
+    },
+    { onConflict: "organization_id" },
+  );
+  if (error) return { ok: false, error: error.message };
+
+  revalidatePath("/admin/billing");
+  revalidatePath("/dashboard");
+  return { ok: true, redirectTo: "/dashboard", message: "Your subscription has been cancelled." };
+}
+
+/**
+ * Switch between paid plans IN-APP (no Stripe redirect) when an active Stripe
+ * subscription already exists — swaps the plan line item's price with prorated
+ * billing against the card on file. Falls back to the direct switch when Stripe
+ * isn't configured. (Starting a subscription from Free still needs Checkout for
+ * card entry — the UI routes there when there's no subscription yet.)
+ */
+export async function switchPlanStripeAction(planKey: string): Promise<ActionResult> {
+  const session = await getSessionContext();
+  if (!session) return { ok: false, error: "Your session has expired." };
+  const auth = await authorize("administration.manage_billing");
+  if (!auth.ok) return { ok: false, error: auth.error };
+  if (!isStripeConfigured()) return changePlanAction(planKey);
+
+  const admin = createAdminClient();
+  const { data: sub } = await admin
+    .from("org_subscriptions")
+    .select("stripe_subscription_id, plan_key")
+    .eq("organization_id", session.organizationId)
+    .maybeSingle();
+  if (!sub?.stripe_subscription_id) {
+    return { ok: false, error: "No active subscription to change — start one first." };
+  }
+
+  const [{ data: plan }, { data: currentPlan }] = await Promise.all([
+    admin.from("plans").select("name, stripe_price_id, seat_cap").eq("key", planKey).maybeSingle(),
+    admin.from("plans").select("stripe_seat_price_id").eq("key", sub.plan_key).maybeSingle(),
+  ]);
+  if (!plan) return { ok: false, error: "Unknown plan." };
+  if (!plan.stripe_price_id) return { ok: false, error: `The ${plan.name} plan isn't wired to Stripe yet.` };
+
+  const stripe = getStripe();
+  const subscription = await stripe.subscriptions.retrieve(sub.stripe_subscription_id);
+  const seatPriceId = currentPlan?.stripe_seat_price_id ?? null;
+  // The plan line item is the one that isn't the per-seat item.
+  const planItem = subscription.items.data.find((i) => i.price?.id !== seatPriceId);
+  if (!planItem) return { ok: false, error: "Couldn't locate the plan line item." };
+
+  await stripe.subscriptions.update(sub.stripe_subscription_id, {
+    items: [{ id: planItem.id, price: plan.stripe_price_id }],
+    proration_behavior: "create_prorations",
+    metadata: { organization_id: session.organizationId, plan_key: planKey },
+  });
+
+  await admin
+    .from("org_subscriptions")
+    .update({ plan_key: planKey, base_seats: plan.seat_cap ?? 1 })
+    .eq("organization_id", session.organizationId);
+
+  revalidatePath("/admin/billing");
+  return { ok: true, message: `You're now on the ${plan.name} plan.` };
+}
+
+/**
  * Set the number of extra seats (CP-27). Adds/updates/removes a quantity-based
  * seat line item on the org's Stripe subscription with prorated billing; the
  * webhook syncs `addon_seats` authoritatively. Requires an active paid plan.

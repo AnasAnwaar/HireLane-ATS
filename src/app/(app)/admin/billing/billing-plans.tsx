@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, Copy, CreditCard, ExternalLink, Loader2, Minus, Plus, Sparkles, X } from "lucide-react";
+import { Check, Copy, CreditCard, Loader2, Minus, Plus, Sparkles, X } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import * as React from "react";
 import { toast } from "sonner";
@@ -11,9 +11,10 @@ import { Card } from "@/components/ui/card";
 import type { ActionResult } from "@/lib/validation/auth";
 import { cn } from "@/lib/utils";
 import {
+  cancelSubscriptionAction,
   changePlanAction,
-  createBillingPortalSessionAction,
   createCheckoutSessionAction,
+  switchPlanStripeAction,
   updateSeatsAction,
 } from "@/server/billing/actions";
 
@@ -99,6 +100,7 @@ export function BillingPlans({
   testMode,
   addonSeats,
   seatsSupported,
+  hasSubscription,
 }: {
   currentPlan: string;
   organization: string;
@@ -108,6 +110,7 @@ export function BillingPlans({
   testMode: boolean;
   addonSeats: number;
   seatsSupported: boolean;
+  hasSubscription: boolean;
 }) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -145,17 +148,20 @@ export function BillingPlans({
     if (!stripeEnabled) {
       r = await changePlanAction(plan.key); // no payment configured — direct switch
     } else if (plan.key === "free") {
-      r = await createBillingPortalSessionAction(); // cancel/downgrade in the portal
+      r = await cancelSubscriptionAction(); // in-app cancel → dashboard, no Stripe redirect
+    } else if (hasSubscription) {
+      r = await switchPlanStripeAction(plan.key); // in-app plan swap on the card on file
     } else {
-      r = await createCheckoutSessionAction(plan.key); // hosted Stripe Checkout
+      r = await createCheckoutSessionAction(plan.key); // first subscription — card entry
     }
     setBusy(null);
     resolve(r);
   }
 
-  async function openPortal() {
-    setBusy("portal");
-    const r = await createBillingPortalSessionAction();
+  async function cancelSub() {
+    if (!confirm("Cancel your subscription? You'll move to the Free plan and lose paid features.")) return;
+    setBusy("cancel");
+    const r = await cancelSubscriptionAction();
     setBusy(null);
     resolve(r);
   }
@@ -200,10 +206,16 @@ export function BillingPlans({
             <Badge variant="success" dot>
               Active
             </Badge>
-            {stripeEnabled && (
-              <Button variant="outline" size="sm" onClick={openPortal} disabled={busy !== null}>
-                {busy === "portal" ? <Loader2 className="animate-spin" /> : <ExternalLink />}
-                Manage billing
+            {stripeEnabled && hasSubscription && (
+              <Button
+                variant="outline"
+                size="sm"
+                className="text-destructive hover:text-destructive"
+                onClick={cancelSub}
+                disabled={busy !== null}
+              >
+                {busy === "cancel" ? <Loader2 className="animate-spin" /> : <X />}
+                Cancel subscription
               </Button>
             )}
           </div>
@@ -311,7 +323,7 @@ export function BillingPlans({
 
       <p className="text-xs text-muted-foreground">
         {stripeEnabled
-          ? "Paid plans go through Stripe Checkout (test mode — use card 4242 4242 4242 4242, any future date & CVC). Downgrades, cancellations and invoices live in the billing portal."
+          ? "Your first subscription uses Stripe Checkout for card entry (test mode — card 4242 4242 4242 4242, any future date & CVC). Plan switches and cancellation then happen right here, no redirect."
           : "Stripe isn't configured, so switching plans applies immediately without payment. Add your Stripe keys and run npm run stripe:setup to enable real checkout."}
       </p>
     </div>
