@@ -1,15 +1,4 @@
-import {
-  ArrowUpRight,
-  Briefcase,
-  CalendarClock,
-  ClipboardCheck,
-  Flag,
-  Rocket,
-  Sparkles,
-  TrendingDown,
-  TrendingUp,
-  Users,
-} from "lucide-react";
+import { ArrowUpRight, Briefcase, CalendarClock, ClipboardCheck, Rocket, Users } from "lucide-react";
 import Link from "next/link";
 
 import { PageBody, PageHeader } from "@/components/layout/app-shell";
@@ -17,60 +6,124 @@ import { Avatar } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ScoreRing } from "@/components/ui/score-ring";
+import { createClient } from "@/lib/supabase/server";
 import { cn } from "@/lib/utils";
 import { requireSession } from "@/server/auth/session";
 
 export const metadata = { title: "Dashboard" };
+export const dynamic = "force-dynamic";
 
-/* ---------------------------------------------------------------------------
-   Sample data — replaced by real queries from CP-6 onward. Kept here (not in a
-   shared fixtures file) so it's obvious at a glance that this page is not yet
-   wired to the database.
-   --------------------------------------------------------------------------- */
-
-const STATS = [
-  { label: "Open positions", value: "12", delta: "+3", trend: "up", sub: "vs last month", icon: Briefcase },
-  { label: "Active candidates", value: "348", delta: "+62", trend: "up", sub: "vs last month", icon: Users },
-  { label: "Awaiting review", value: "27", delta: "+9", trend: "up", sub: "tests + profiles", icon: ClipboardCheck },
-  { label: "Avg. time to hire", value: "21d", delta: "−4d", trend: "down", sub: "vs last quarter", icon: CalendarClock },
-] as const;
-
-const FUNNEL = [
-  { stage: "Applied", count: 348, tone: "bg-chart-1" },
-  { stage: "Screened", count: 194, tone: "bg-chart-2" },
-  { stage: "Shortlisted", count: 86, tone: "bg-chart-3" },
-  { stage: "Assessed", count: 41, tone: "bg-chart-4" },
-  { stage: "Interviewed", count: 18, tone: "bg-chart-5" },
-  { stage: "Offer", count: 5, tone: "bg-success" },
+const FUNNEL_STAGES: { label: string; keys: string[]; tone: string }[] = [
+  { label: "Applied", keys: ["applied"], tone: "bg-chart-1" },
+  { label: "Screened", keys: ["screened"], tone: "bg-chart-2" },
+  { label: "Shortlisted", keys: ["shortlisted"], tone: "bg-chart-3" },
+  { label: "Assessed", keys: ["test_assigned", "test_completed"], tone: "bg-chart-4" },
+  { label: "Interviewed", keys: ["interview_scheduled", "interviewed"], tone: "bg-chart-5" },
+  { label: "Offer", keys: ["offer"], tone: "bg-warning" },
+  { label: "Hired", keys: ["hired"], tone: "bg-success" },
 ];
 
-const CANDIDATES = [
-  { name: "Ayesha Khan", role: "Senior React Developer", score: 94, status: "Interview", variant: "success", flagged: false },
-  { name: "Bilal Ahmed", role: "Senior React Developer", score: 88, status: "Test passed", variant: "default", flagged: false },
-  { name: "Hina Raza", role: "Product Designer", score: 81, status: "Test flagged", variant: "warning", flagged: true },
-  { name: "Usman Tariq", role: "DevOps Engineer", score: 67, status: "Screened", variant: "secondary", flagged: false },
-  { name: "Sara Malik", role: "Product Designer", score: 52, status: "Applied", variant: "secondary", flagged: false },
-] as const;
+const STAGE_LABEL: Record<string, string> = {
+  applied: "Applied",
+  screened: "Screened",
+  shortlisted: "Shortlisted",
+  test_assigned: "Test assigned",
+  test_completed: "Test completed",
+  interview_scheduled: "Interview",
+  interviewed: "Interviewed",
+  offer: "Offer",
+  hired: "Hired",
+  rejected: "Rejected",
+  on_hold: "On hold",
+  withdrawn: "Withdrawn",
+};
 
-const ACTIVITY = [
-  { icon: Sparkles, text: "AI ranked 42 new applicants for Senior React Developer", time: "12m ago", tone: "text-primary" },
-  { icon: CalendarClock, text: "Interview scheduled with Ayesha Khan — technical round 2", time: "40m ago", tone: "text-sand-foreground" },
-  { icon: Flag, text: "Hina Raza flagged for tab switching during assessment", time: "1h ago", tone: "text-warning" },
-  { icon: ClipboardCheck, text: "Bilal Ahmed completed React Fundamentals (88%)", time: "3h ago", tone: "text-success" },
-  { icon: Briefcase, text: "DevOps Engineer published to LinkedIn, Indeed, Rozee.pk", time: "Yesterday", tone: "text-muted-foreground" },
-];
+function ago(iso: string): string {
+  const diff = Date.now() - new Date(iso).getTime();
+  const m = Math.round(diff / 60000);
+  if (m < 1) return "just now";
+  if (m < 60) return `${m}m ago`;
+  const h = Math.round(m / 60);
+  if (h < 24) return `${h}h ago`;
+  const d = Math.round(h / 24);
+  return d === 1 ? "yesterday" : `${d}d ago`;
+}
 
-const INTERVIEWS = [
-  { name: "Ayesha Khan", round: "Technical round 2", when: "Today, 3:00 PM" },
-  { name: "Bilal Ahmed", round: "Culture fit", when: "Tomorrow, 11:30 AM" },
-  { name: "Zoya Iqbal", round: "Screening call", when: "Thu, 10:00 AM" },
-];
+function whenLabel(iso: string): string {
+  const date = new Date(iso);
+  const time = date.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
+  const day = date.toDateString();
+  const today = new Date().toDateString();
+  const tomorrow = new Date(Date.now() + 86_400_000).toDateString();
+  if (day === today) return `Today, ${time}`;
+  if (day === tomorrow) return `Tomorrow, ${time}`;
+  return `${date.toLocaleDateString("en-US", { weekday: "short" })}, ${time}`;
+}
 
 export default async function DashboardPage() {
   const session = await requireSession("/dashboard");
-  const funnelMax = FUNNEL[0].count;
   const firstName = session.fullName.split(" ")[0] || "there";
+  const supabase = await createClient();
+  const nowIso = new Date().toISOString();
+
+  const [
+    { count: openPositions },
+    { count: activeCandidates },
+    { count: awaitingReview },
+    { data: stageRows },
+    { data: hiredRows },
+    { data: interviews },
+    { data: recentApps },
+  ] = await Promise.all([
+    supabase.from("job_openings").select("id", { count: "exact", head: true }).eq("status", "open"),
+    supabase.from("applications").select("id", { count: "exact", head: true }).not("stage", "in", "(hired,rejected,withdrawn)"),
+    supabase.from("applications").select("id", { count: "exact", head: true }).in("stage", ["applied", "test_completed"]),
+    supabase.from("applications").select("stage"),
+    supabase.from("applications").select("applied_at, updated_at").eq("stage", "hired"),
+    supabase.from("interviews").select("id, title, scheduled_at, candidate_id").gte("scheduled_at", nowIso).order("scheduled_at").limit(5),
+    supabase.from("applications").select("applied_at, stage, candidate_id, job_opening_id").order("applied_at", { ascending: false }).limit(6),
+  ]);
+
+  // Resolve candidate names / opening titles for the interview + activity lists.
+  const candidateIds = [
+    ...new Set([...(interviews ?? []), ...(recentApps ?? [])].map((r) => r.candidate_id).filter(Boolean)),
+  ];
+  const openingIds = [...new Set((recentApps ?? []).map((r) => r.job_opening_id).filter(Boolean))];
+  const [{ data: cands }, { data: opens }] = await Promise.all([
+    candidateIds.length
+      ? supabase.from("candidates").select("id, full_name").in("id", candidateIds as string[])
+      : Promise.resolve({ data: [] as { id: string; full_name: string }[] }),
+    openingIds.length
+      ? supabase.from("job_openings").select("id, title").in("id", openingIds as string[])
+      : Promise.resolve({ data: [] as { id: string; title: string }[] }),
+  ]);
+  const nameOf = new Map((cands ?? []).map((c) => [c.id, c.full_name]));
+  const titleOf = new Map((opens ?? []).map((o) => [o.id, o.title]));
+
+  // Funnel counts from current stages.
+  const stageCount = new Map<string, number>();
+  for (const r of stageRows ?? []) stageCount.set(r.stage, (stageCount.get(r.stage) ?? 0) + 1);
+  const funnel = FUNNEL_STAGES.map((s) => ({
+    label: s.label,
+    tone: s.tone,
+    count: s.keys.reduce((n, k) => n + (stageCount.get(k) ?? 0), 0),
+  }));
+  const funnelMax = Math.max(1, ...funnel.map((f) => f.count));
+
+  // Avg time to hire (applied → hired, approximated by updated_at).
+  const durations = (hiredRows ?? [])
+    .map((r) => new Date(r.updated_at).getTime() - new Date(r.applied_at).getTime())
+    .filter((ms) => ms > 0);
+  const avgHire = durations.length
+    ? `${Math.round(durations.reduce((a, b) => a + b, 0) / durations.length / 86_400_000)}d`
+    : "—";
+
+  const stats = [
+    { label: "Open positions", value: openPositions ?? 0, sub: "currently open", icon: Briefcase },
+    { label: "Active candidates", value: activeCandidates ?? 0, sub: "in the pipeline", icon: Users },
+    { label: "Awaiting review", value: awaitingReview ?? 0, sub: "new profiles + tests", icon: ClipboardCheck },
+    { label: "Avg. time to hire", value: avgHire, sub: "applied → hired", icon: CalendarClock },
+  ];
 
   return (
     <>
@@ -91,7 +144,6 @@ export default async function DashboardPage() {
       />
 
       <PageBody className="space-y-6">
-        {/* Onboarding is optional, not a gate — nudge rather than block. */}
         {!session.onboardingCompleted && (
           <Card className="border-primary/25 bg-primary-soft/40">
             <CardContent className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center">
@@ -102,8 +154,7 @@ export default async function DashboardPage() {
                 <div className="min-w-0">
                   <p className="font-medium">Finish setting up {session.organizationName}</p>
                   <p className="mt-0.5 text-sm text-muted-foreground">
-                    Add departments, invite your team and connect your job boards — about two
-                    minutes.
+                    Add departments, invite your team and connect your job boards — about two minutes.
                   </p>
                 </div>
               </div>
@@ -118,12 +169,8 @@ export default async function DashboardPage() {
 
         {/* Stat row */}
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-          {STATS.map((stat) => (
+          {stats.map((stat) => (
             <Card key={stat.label} className="group relative overflow-hidden">
-              <span
-                aria-hidden
-                className="brand-rule absolute inset-x-0 top-0 h-[3px] opacity-0 transition-opacity group-hover:opacity-100"
-              />
               <CardContent className="p-5">
                 <div className="flex items-start justify-between">
                   <p className="text-sm text-muted-foreground">{stat.label}</p>
@@ -131,25 +178,8 @@ export default async function DashboardPage() {
                     <stat.icon className="size-4" />
                   </span>
                 </div>
-                <p className="mt-3 text-3xl font-semibold tabular-nums tracking-tight">
-                  {stat.value}
-                </p>
-                <p className="mt-1.5 flex items-center gap-1.5 text-xs">
-                  <span
-                    className={cn(
-                      "inline-flex items-center gap-0.5 font-medium",
-                      stat.trend === "up" ? "text-success" : "text-sand-foreground",
-                    )}
-                  >
-                    {stat.trend === "up" ? (
-                      <TrendingUp className="size-3" />
-                    ) : (
-                      <TrendingDown className="size-3" />
-                    )}
-                    {stat.delta}
-                  </span>
-                  <span className="text-muted-foreground">{stat.sub}</span>
-                </p>
+                <p className="mt-3 text-3xl font-semibold tabular-nums tracking-tight">{stat.value}</p>
+                <p className="mt-1.5 text-xs text-muted-foreground">{stat.sub}</p>
               </CardContent>
             </Card>
           ))}
@@ -158,43 +188,25 @@ export default async function DashboardPage() {
         <div className="grid gap-6 lg:grid-cols-3">
           {/* Funnel */}
           <Card className="lg:col-span-2">
-            <CardHeader className="flex-row items-center justify-between space-y-0">
-              <div>
-                <CardTitle className="text-base">Pipeline funnel</CardTitle>
-                <p className="mt-1 text-sm text-muted-foreground">
-                  All open positions · last 30 days
-                </p>
-              </div>
-              <Badge variant="outline">Sample data</Badge>
+            <CardHeader className="space-y-0">
+              <CardTitle className="text-base">Pipeline funnel</CardTitle>
+              <p className="mt-1 text-sm text-muted-foreground">All open positions · current stages</p>
             </CardHeader>
             <CardContent className="space-y-3.5">
-              {FUNNEL.map((row, i) => {
-                const pct = Math.round((row.count / funnelMax) * 100);
-                const prev = i === 0 ? null : FUNNEL[i - 1].count;
-                const conversion = prev ? Math.round((row.count / prev) * 100) : null;
-
-                return (
-                  <div key={row.stage}>
-                    <div className="mb-1.5 flex items-baseline justify-between text-sm">
-                      <span className="font-medium">{row.stage}</span>
-                      <span className="flex items-baseline gap-2">
-                        <span className="font-semibold tabular-nums">{row.count}</span>
-                        {conversion !== null && (
-                          <span className="text-xs tabular-nums text-muted-foreground">
-                            {conversion}% ↓
-                          </span>
-                        )}
-                      </span>
-                    </div>
-                    <div className="h-2.5 overflow-hidden rounded-full bg-muted">
-                      <div
-                        className={cn("h-full rounded-full", row.tone)}
-                        style={{ width: `${pct}%` }}
-                      />
-                    </div>
+              {funnel.map((row) => (
+                <div key={row.label}>
+                  <div className="mb-1.5 flex items-baseline justify-between text-sm">
+                    <span className="font-medium">{row.label}</span>
+                    <span className="font-semibold tabular-nums">{row.count}</span>
                   </div>
-                );
-              })}
+                  <div className="h-2.5 overflow-hidden rounded-full bg-muted">
+                    <div
+                      className={cn("h-full rounded-full", row.tone)}
+                      style={{ width: `${Math.round((row.count / funnelMax) * 100)}%` }}
+                    />
+                  </div>
+                </div>
+              ))}
             </CardContent>
           </Card>
 
@@ -209,97 +221,58 @@ export default async function DashboardPage() {
               </Button>
             </CardHeader>
             <CardContent className="space-y-1">
-              {INTERVIEWS.map((item) => (
-                <div
-                  key={item.name}
-                  className="flex items-center gap-3 rounded-lg p-2 transition-colors hover:bg-muted"
-                >
-                  <Avatar name={item.name} />
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-medium">{item.name}</p>
-                    <p className="truncate text-xs text-muted-foreground">{item.round}</p>
-                  </div>
-                  <span className="shrink-0 text-xs text-muted-foreground">{item.when}</span>
-                </div>
-              ))}
-            </CardContent>
-          </Card>
-        </div>
-
-        <div className="grid gap-6 lg:grid-cols-3">
-          {/* Top candidates */}
-          <Card className="lg:col-span-2">
-            <CardHeader className="flex-row items-center justify-between space-y-0">
-              <div>
-                <CardTitle className="text-base">Top ranked candidates</CardTitle>
-                <p className="mt-1 text-sm text-muted-foreground">
-                  Scored by the screening agent against role requirements
+              {(interviews ?? []).length === 0 && (
+                <p className="px-2 py-6 text-center text-sm text-muted-foreground">
+                  No interviews scheduled.
                 </p>
-              </div>
-              <Button variant="ghost" size="sm" className="text-muted-foreground" asChild>
-                <Link href="/candidates">
-                  All <ArrowUpRight />
-                </Link>
-              </Button>
-            </CardHeader>
-            <CardContent className="px-2 pb-3">
-              {CANDIDATES.map((candidate) => (
-                <div
-                  key={candidate.name}
-                  className="flex items-center gap-4 rounded-lg px-3 py-2.5 transition-colors hover:bg-muted"
-                >
-                  <ScoreRing score={candidate.score} />
-                  <div className="min-w-0 flex-1">
-                    <p className="flex items-center gap-2 truncate text-sm font-medium">
-                      {candidate.name}
-                      {candidate.flagged && (
-                        <Flag className="size-3.5 shrink-0 text-warning" aria-label="Flagged" />
-                      )}
-                    </p>
-                    <p className="truncate text-xs text-muted-foreground">{candidate.role}</p>
+              )}
+              {(interviews ?? []).map((item) => {
+                const name = nameOf.get(item.candidate_id) ?? "Candidate";
+                return (
+                  <div key={item.id} className="flex items-center gap-3 rounded-lg p-2 transition-colors hover:bg-muted">
+                    <Avatar name={name} />
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-sm font-medium">{name}</p>
+                      <p className="truncate text-xs text-muted-foreground">{item.title ?? "Interview"}</p>
+                    </div>
+                    <span className="shrink-0 text-xs text-muted-foreground">{whenLabel(item.scheduled_at)}</span>
                   </div>
-                  <Badge variant={candidate.variant} dot>
-                    {candidate.status}
-                  </Badge>
-                </div>
-              ))}
-            </CardContent>
-          </Card>
-
-          {/* Activity */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-base">Recent activity</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {ACTIVITY.map((item, i) => (
-                <div key={i} className="flex gap-3">
-                  <span className="relative flex flex-col items-center">
-                    <span
-                      className={cn(
-                        "flex size-7 shrink-0 items-center justify-center rounded-full bg-muted",
-                        item.tone,
-                      )}
-                    >
-                      <item.icon className="size-3.5" />
-                    </span>
-                    {i < ACTIVITY.length - 1 && (
-                      <span aria-hidden className="mt-1 w-px flex-1 bg-border" />
-                    )}
-                  </span>
-                  <div className="pb-1">
-                    <p className="text-sm leading-snug">{item.text}</p>
-                    <p className="mt-0.5 text-xs text-muted-foreground">{item.time}</p>
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </CardContent>
           </Card>
         </div>
 
-        <p className="text-center text-xs text-muted-foreground">
-          Figures above are sample data — the dashboard is wired to live queries from CP-6.
-        </p>
+        {/* Recent activity */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">Recent activity</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-1">
+            {(recentApps ?? []).length === 0 && (
+              <p className="px-2 py-6 text-center text-sm text-muted-foreground">
+                No applications yet. They&apos;ll show up here as candidates apply.
+              </p>
+            )}
+            {(recentApps ?? []).map((item, i) => {
+              const name = nameOf.get(item.candidate_id) ?? "A candidate";
+              const title = titleOf.get(item.job_opening_id) ?? "an opening";
+              return (
+                <div key={i} className="flex items-center gap-3 rounded-lg p-2">
+                  <Avatar name={name} />
+                  <p className="min-w-0 flex-1 truncate text-sm">
+                    <span className="font-medium">{name}</span> applied to{" "}
+                    <span className="font-medium">{title}</span>
+                    <Badge variant="secondary" className="ml-2 align-middle">
+                      {STAGE_LABEL[item.stage] ?? item.stage}
+                    </Badge>
+                  </p>
+                  <span className="shrink-0 text-xs text-muted-foreground">{ago(item.applied_at)}</span>
+                </div>
+              );
+            })}
+          </CardContent>
+        </Card>
       </PageBody>
     </>
   );
