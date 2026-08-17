@@ -225,6 +225,72 @@ export async function createEmbeddedCheckoutSessionAction(
 }
 
 /**
+ * Reconcile the org's plan from Stripe directly (CP-27). Called when Checkout
+ * returns, so the plan flips immediately without waiting on — or depending on —
+ * webhook delivery (which can't reach localhost). Reads the customer's active
+ * subscription and mirrors it into org_subscriptions.
+ */
+export async function reconcileSubscriptionAction(): Promise<ActionResult> {
+  const session = await getSessionContext();
+  if (!session) return { ok: false, error: "Your session has expired." };
+  const auth = await authorize("administration.manage_billing");
+  if (!auth.ok) return { ok: false, error: auth.error };
+  if (!isStripeConfigured()) return { ok: true };
+
+  const admin = createAdminClient();
+  const { data: sub } = await admin
+    .from("org_subscriptions")
+    .select("stripe_customer_id")
+    .eq("organization_id", session.organizationId)
+    .maybeSingle();
+  if (!sub?.stripe_customer_id) return { ok: true };
+
+  const list = await getStripe().subscriptions.list({
+    customer: sub.stripe_customer_id,
+    status: "all",
+    limit: 10,
+  });
+  const active = list.data.find((s) => s.status === "active" || s.status === "trialing");
+  if (!active) return { ok: true };
+
+  const priceIds = active.items.data.map((i) => i.price?.id).filter((id): id is string => Boolean(id));
+  const { data: plan } = await admin
+    .from("plans")
+    .select("key, seat_cap, stripe_seat_price_id")
+    .in("stripe_price_id", priceIds)
+    .maybeSingle();
+  const planKey = plan?.key ?? (active.metadata?.plan_key || "free");
+
+  let addonSeats = 0;
+  if (plan?.stripe_seat_price_id) {
+    const seatItem = active.items.data.find((i) => i.price?.id === plan.stripe_seat_price_id);
+    addonSeats = seatItem?.quantity ?? 0;
+  }
+
+  const item = active.items.data[0] as { current_period_end?: number } | undefined;
+  const secs = item?.current_period_end ?? (active as unknown as { current_period_end?: number }).current_period_end;
+  const periodEnd = typeof secs === "number" ? new Date(secs * 1000).toISOString() : null;
+
+  const { error } = await admin.from("org_subscriptions").upsert(
+    {
+      organization_id: session.organizationId,
+      plan_key: planKey,
+      status: active.status === "trialing" ? "trialing" : "active",
+      stripe_customer_id: sub.stripe_customer_id,
+      stripe_subscription_id: active.id,
+      current_period_end: periodEnd,
+      addon_seats: addonSeats,
+      base_seats: plan?.seat_cap ?? 1,
+    },
+    { onConflict: "organization_id" },
+  );
+  if (error) return { ok: false, error: error.message };
+
+  revalidatePath("/admin/billing");
+  return { ok: true, message: "Your plan is now active." };
+}
+
+/**
  * Cancel the subscription IN-APP (no Stripe redirect). Cancels the Stripe
  * subscription immediately, drops the org to Free, and returns the caller to the
  * dashboard. The webhook confirms, but we apply it synchronously for instant

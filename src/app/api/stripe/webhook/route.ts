@@ -67,6 +67,15 @@ async function syncSubscription(admin: Admin, sub: Stripe.Subscription, opts?: {
     return;
   }
 
+  // The org may not exist in THIS database — e.g. a checkout done against dev
+  // whose events also fan out to the prod webhook endpoint. Skip cleanly (200)
+  // rather than failing the FK and returning 500.
+  const { data: orgExists } = await admin.from("organizations").select("id").eq("id", orgId).maybeSingle();
+  if (!orgExists) {
+    console.warn(`stripe webhook: org ${orgId} not in this database (cross-environment event) — skipping`);
+    return;
+  }
+
   const items = sub.items?.data ?? [];
   const priceIds = items.map((i) => i.price?.id).filter((id): id is string => Boolean(id));
 

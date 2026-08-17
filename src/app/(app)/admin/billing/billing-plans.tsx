@@ -13,6 +13,7 @@ import { cn } from "@/lib/utils";
 import {
   cancelSubscriptionAction,
   changePlanAction,
+  reconcileSubscriptionAction,
   switchPlanStripeAction,
   updateSeatsAction,
 } from "@/server/billing/actions";
@@ -119,14 +120,31 @@ export function BillingPlans({
   const [checkoutPlan, setCheckoutPlan] = React.useState<string | null>(null);
   const current = PLANS.find((p) => p.key === currentPlan);
 
-  // Toast the outcome of a returning (embedded) Stripe Checkout, then scrub the query.
+  // Over-limit state: more members/openings than the plan allows (e.g. after a
+  // downgrade). Existing data keeps working, but new invites/openings are blocked
+  // server-side — surface it with a path forward instead of a bare red bar.
+  const overSeats = usage.seatCap != null && usage.seatsUsed > usage.seatCap;
+  const overOpenings = usage.openingCap != null && usage.openingsUsed > usage.openingCap;
+  const overLimit = overSeats || overOpenings;
+
+  // On a returning (embedded) Checkout, reconcile the plan from Stripe directly
+  // so it flips immediately — without depending on webhook delivery (which can't
+  // reach localhost). Then scrub the query.
   const checkout = searchParams.get("checkout");
   React.useEffect(() => {
     if (!checkout) return;
-    if (checkout === "success" || checkout === "complete")
-      toast.success("Payment received — your plan is being activated.");
-    else if (checkout === "cancelled") toast.info("Checkout cancelled — no changes made.");
-    router.replace("/admin/billing");
+    if (checkout === "complete" || checkout === "success") {
+      void (async () => {
+        const r = await reconcileSubscriptionAction();
+        if (r.ok) toast.success("Payment received — your plan is now active.");
+        else toast.error(r.error);
+        router.replace("/admin/billing");
+        router.refresh();
+      })();
+    } else if (checkout === "cancelled") {
+      toast.info("Checkout cancelled — no changes made.");
+      router.replace("/admin/billing");
+    }
   }, [checkout, router]);
 
   /** Follow a redirect, or toast the result of a direct action. */
@@ -188,6 +206,46 @@ export function BillingPlans({
       {checkoutPlan && (
         <EmbeddedCheckoutModal planKey={checkoutPlan} onClose={() => setCheckoutPlan(null)} />
       )}
+
+      {overLimit && (
+        <div className="rounded-lg border border-destructive/30 bg-destructive-soft/50 p-4">
+          <div className="flex items-start gap-3">
+            <span className="mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full bg-destructive/15 text-destructive">
+              <X className="size-3.5" />
+            </span>
+            <div className="min-w-0 flex-1">
+              <p className="text-sm font-medium text-destructive">
+                You&apos;re over your {current?.name ?? currentPlan} plan limits
+              </p>
+              <p className="mt-0.5 text-sm text-muted-foreground">
+                {overSeats && (
+                  <>
+                    You have <strong>{usage.seatsUsed}</strong> members but this plan includes{" "}
+                    <strong>{usage.seatCap}</strong> seat{usage.seatCap === 1 ? "" : "s"}.{" "}
+                  </>
+                )}
+                {overOpenings && (
+                  <>
+                    You have <strong>{usage.openingsUsed}</strong> active openings but this plan
+                    allows <strong>{usage.openingCap}</strong>.{" "}
+                  </>
+                )}
+                Everyone keeps working, but you can&apos;t add more until you upgrade
+                {overSeats ? " or remove members" : " or close some openings"}.
+              </p>
+              <div className="mt-3">
+                <Button
+                  size="sm"
+                  onClick={() => document.getElementById("change-plan")?.scrollIntoView({ behavior: "smooth" })}
+                >
+                  <Sparkles /> Upgrade plan
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {stripeEnabled && testMode && (
         <div className="flex items-center gap-2 rounded-lg border border-warning/30 bg-warning-soft px-4 py-2.5 text-sm text-warning-foreground">
           <CreditCard className="size-4 shrink-0" />
@@ -260,7 +318,7 @@ export function BillingPlans({
       </Card>
 
       {/* Plan grid */}
-      <div>
+      <div id="change-plan">
         <h2 className="text-sm font-semibold">Change plan</h2>
         <p className="mt-0.5 text-sm text-muted-foreground">
           Upgrade any time. Prorated, no lock-in — billing secured by Stripe.
