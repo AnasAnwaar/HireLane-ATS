@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { headers } from "next/headers";
 
 import { createAdminClient } from "@/lib/supabase/server";
 import type { ActionResult } from "@/lib/validation/auth";
@@ -8,7 +9,21 @@ import { authorize } from "@/server/auth/authorize";
 import { getSessionContext } from "@/server/auth/session";
 import { getStripe, isStripeConfigured } from "@/server/billing/stripe";
 
-function appUrl(): string {
+/**
+ * Absolute base URL to send Stripe redirects back to. Derived from the actual
+ * request (origin / forwarded host) so checkout always returns to the domain the
+ * user is on — not whatever NEXT_PUBLIC_APP_URL happens to be set to. Falls back
+ * to the env var, then localhost.
+ */
+async function appUrl(): Promise<string> {
+  const h = await headers();
+  const origin = h.get("origin");
+  if (origin) return origin.replace(/\/$/, "");
+  const host = h.get("x-forwarded-host") ?? h.get("host");
+  if (host) {
+    const proto = h.get("x-forwarded-proto") ?? "https";
+    return `${proto}://${host}`;
+  }
   return process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "") ?? "http://localhost:3000";
 }
 
@@ -94,7 +109,7 @@ export async function createCheckoutSessionAction(planKey: string): Promise<Acti
     );
   }
 
-  const base = appUrl();
+  const base = await appUrl();
   const checkout = await stripe.checkout.sessions.create({
     mode: "subscription",
     customer: customerId,
@@ -137,9 +152,10 @@ export async function createBillingPortalSessionAction(): Promise<ActionResult> 
     return { ok: false, error: "No billing account yet — start a paid plan first." };
   }
 
+  const base = await appUrl();
   const portal = await getStripe().billingPortal.sessions.create({
     customer: sub.stripe_customer_id,
-    return_url: `${appUrl()}/admin/billing`,
+    return_url: `${base}/admin/billing`,
   });
   return { ok: true, redirectTo: portal.url };
 }
