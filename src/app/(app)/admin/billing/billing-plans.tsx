@@ -103,6 +103,7 @@ export function BillingPlans({
   addonSeats,
   seatsSupported,
   hasSubscription,
+  status,
 }: {
   currentPlan: string;
   organization: string;
@@ -113,6 +114,7 @@ export function BillingPlans({
   addonSeats: number;
   seatsSupported: boolean;
   hasSubscription: boolean;
+  status: string;
 }) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -205,6 +207,28 @@ export function BillingPlans({
     <div className="space-y-8">
       {checkoutPlan && (
         <EmbeddedCheckoutModal planKey={checkoutPlan} onClose={() => setCheckoutPlan(null)} />
+      )}
+
+      {status === "past_due" && (
+        <div className="rounded-lg border border-destructive/40 bg-destructive-soft p-4">
+          <div className="flex items-start gap-3">
+            <span className="mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full bg-destructive/15 text-destructive">
+              <CreditCard className="size-3.5" />
+            </span>
+            <div className="min-w-0 flex-1">
+              <p className="text-sm font-medium text-destructive">Your last payment failed</p>
+              <p className="mt-0.5 text-sm text-muted-foreground">
+                We couldn&apos;t charge your card, so your subscription is past due. Update your
+                payment method to keep your plan active — otherwise it may be cancelled.
+              </p>
+              {stripeEnabled && current && !current.custom && current.key !== "free" && (
+                <Button size="sm" className="mt-3" onClick={() => setCheckoutPlan(current.key)}>
+                  <CreditCard /> Update payment
+                </Button>
+              )}
+            </div>
+          </div>
+        </div>
       )}
 
       {overLimit && (

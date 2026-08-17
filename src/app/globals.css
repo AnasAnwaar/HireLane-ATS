@@ -414,3 +414,8 @@
     animation: none;
   }
 }
+
+/* Skeleton shimmer sweep (loaders) */
+@keyframes shimmer {
+  100% { transform: translateX(100%); }
+}

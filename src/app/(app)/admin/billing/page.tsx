@@ -50,6 +50,7 @@ export default async function BillingPage() {
           addonSeats={ent.addonSeats}
           seatsSupported={isStripeConfigured() && ent.allowAddonSeats}
           hasSubscription={hasSubscription}
+          status={ent.status}
         />
       </PageBody>
     </>
