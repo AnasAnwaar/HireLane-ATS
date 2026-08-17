@@ -7,6 +7,7 @@ import { Alert } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { ensureOrganization } from "@/server/auth/actions";
 import { getCurrentUser, getSessionContext } from "@/server/auth/session";
+import { getPlatformAdmin } from "@/server/platform/auth";
 
 export const metadata = { title: "Finishing setup" };
 
@@ -22,6 +23,10 @@ export const metadata = { title: "Finishing setup" };
 export default async function SetupPage() {
   const user = await getCurrentUser();
   if (!user) redirect("/login");
+
+  // A pure platform super-admin has no company — send them to the portal rather
+  // than provisioning a workspace for them.
+  if (await getPlatformAdmin()) redirect("/platform");
 
   const existing = await getSessionContext();
   if (existing) redirect("/dashboard");
