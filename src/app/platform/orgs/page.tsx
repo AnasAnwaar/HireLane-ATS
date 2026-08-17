@@ -11,7 +11,7 @@ export default async function PlatformOrgsPage() {
   const admin = createAdminClient();
 
   const [{ data: orgs }, { data: subs }, { data: plans }] = await Promise.all([
-    admin.from("organizations").select("id, name, slug, created_at").order("created_at", { ascending: false }),
+    admin.from("organizations").select("id, name, slug, created_at, suspended_at").order("created_at", { ascending: false }),
     admin.from("org_subscriptions").select("organization_id, plan_key, status"),
     admin.from("plans").select("key, name, is_public").order("sort_order"),
   ]);
@@ -26,6 +26,7 @@ export default async function PlatformOrgsPage() {
       createdAt: o.created_at,
       planKey: sub?.plan_key ?? "free",
       status: sub?.status ?? "active",
+      suspended: Boolean(o.suspended_at),
     };
   });
 

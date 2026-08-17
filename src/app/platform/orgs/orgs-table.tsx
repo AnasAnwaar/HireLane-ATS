@@ -1,6 +1,6 @@
 "use client";
 
-import { Loader2, Search } from "lucide-react";
+import { Ban, Loader2, RotateCcw, Search } from "lucide-react";
 import { useRouter } from "next/navigation";
 import * as React from "react";
 import { toast } from "sonner";
@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { assignPlanToOrgAction } from "@/server/platform/org-actions";
+import { assignPlanToOrgAction, setOrgSuspendedAction } from "@/server/platform/org-actions";
 
 type Row = {
   id: string;
@@ -18,6 +18,7 @@ type Row = {
   createdAt: string;
   planKey: string;
   status: string;
+  suspended: boolean;
 };
 type PlanOpt = { key: string; name: string; isPublic: boolean };
 
@@ -39,6 +40,17 @@ export function OrgsTable({ rows, plans }: { rows: Row[]; plans: PlanOpt[] }) {
     setBusy(null);
     if (r.ok) {
       toast.success(r.message ?? "Assigned.");
+      router.refresh();
+    } else toast.error(r.error);
+  }
+
+  async function toggleSuspend(row: Row) {
+    if (!row.suspended && !confirm(`Suspend ${row.name}? Its members will be locked out until reactivated.`)) return;
+    setBusy(row.id);
+    const r = await setOrgSuspendedAction(row.id, !row.suspended);
+    setBusy(null);
+    if (r.ok) {
+      toast.success(r.message ?? "Done.");
       router.refresh();
     } else toast.error(r.error);
   }
@@ -67,7 +79,8 @@ export function OrgsTable({ rows, plans }: { rows: Row[]; plans: PlanOpt[] }) {
               </div>
               <div className="flex items-center gap-1.5">
                 <Badge variant={r.planKey === "free" ? "secondary" : "success"}>{planName}</Badge>
-                {r.status !== "active" && <Badge variant="warning">{r.status}</Badge>}
+                {r.suspended && <Badge variant="destructive">Suspended</Badge>}
+                {!r.suspended && r.status !== "active" && <Badge variant="warning">{r.status}</Badge>}
               </div>
               <select
                 value={selected}
@@ -88,6 +101,17 @@ export function OrgsTable({ rows, plans }: { rows: Row[]; plans: PlanOpt[] }) {
                 onClick={() => assign(r.id)}
               >
                 {busy === r.id ? <Loader2 className="animate-spin" /> : "Assign"}
+              </Button>
+              <Button
+                size="sm"
+                variant={r.suspended ? "outline" : "ghost"}
+                className={r.suspended ? "" : "text-destructive hover:text-destructive"}
+                disabled={busy !== null}
+                onClick={() => toggleSuspend(r)}
+                title={r.suspended ? "Reactivate" : "Suspend"}
+              >
+                {r.suspended ? <RotateCcw /> : <Ban />}
+                {r.suspended ? "Reactivate" : "Suspend"}
               </Button>
             </li>
           );

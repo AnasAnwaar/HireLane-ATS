@@ -1,7 +1,9 @@
+import { LifeBuoy, ShieldAlert } from "lucide-react";
 import { redirect } from "next/navigation";
 
 import { AppShell } from "@/components/layout/app-shell";
 import { PermissionProvider } from "@/components/permissions/permission-provider";
+import { SignOutButton } from "@/components/layout/sign-out-button";
 import { brandThemeCss } from "@/lib/brand-theme";
 import { createClient } from "@/lib/supabase/server";
 import { getMyPermissions } from "@/server/auth/authorize";
@@ -16,6 +18,33 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   // Without this gate an aal1 session could browse the whole product.
   const mfa = await getMfaStatus();
   if (mfa.needsChallenge) redirect("/mfa");
+
+  // Suspended tenant — block the whole app shell (CP-28 platform admin).
+  if (session.orgSuspended) {
+    return (
+      <div className="flex min-h-dvh items-center justify-center bg-muted/30 p-6">
+        <div className="w-full max-w-md rounded-2xl border border-border bg-background p-8 text-center shadow-card">
+          <span className="mx-auto flex size-12 items-center justify-center rounded-full bg-destructive/10 text-destructive">
+            <ShieldAlert className="size-6" />
+          </span>
+          <h1 className="mt-4 text-lg font-semibold">This workspace is suspended</h1>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Access to <strong>{session.organizationName}</strong> is currently paused. Please contact
+            support to restore it.
+          </p>
+          <a
+            href="mailto:support@hirelane.app"
+            className="mt-5 inline-flex items-center gap-2 rounded-lg border border-border px-4 py-2 text-sm font-medium hover:bg-muted"
+          >
+            <LifeBuoy className="size-4" /> Contact support
+          </a>
+          <div className="mt-3">
+            <SignOutButton className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground" />
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   // Resolve the viewer's permissions once, here, and hand them to the client
   // provider as a serialisable array. Every in-app component can then gate UI

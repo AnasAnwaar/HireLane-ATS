@@ -1,4 +1,15 @@
-import { Building2, CreditCard, DollarSign, Users } from "lucide-react";
+import {
+  Briefcase,
+  Building2,
+  CalendarClock,
+  CreditCard,
+  DollarSign,
+  FileText,
+  Sparkles,
+  TrendingDown,
+  UserRound,
+  Users,
+} from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
@@ -18,10 +29,29 @@ export default async function PlatformOverview() {
   await requirePlatformAccess();
   const admin = createAdminClient();
 
-  const [{ count: orgCount }, { data: subs }, { data: plans }] = await Promise.all([
-    admin.from("organizations").select("id", { count: "exact", head: true }),
+  const head = { count: "exact" as const, head: true };
+  const [
+    { count: orgCount },
+    { data: subs },
+    { data: plans },
+    { count: seatsInUse },
+    { count: openings },
+    { count: applicants },
+    { count: candidates },
+    { count: interviews },
+    { count: aiPosts },
+    { count: aiTests },
+  ] = await Promise.all([
+    admin.from("organizations").select("id", head),
     admin.from("org_subscriptions").select("plan_key, status, addon_seats"),
     admin.from("plans").select("key, name, monthly_cents, per_seat_cents, is_public").order("sort_order"),
+    admin.from("memberships").select("id", head).eq("status", "active"),
+    admin.from("job_openings").select("id", head),
+    admin.from("applications").select("id", head),
+    admin.from("candidates").select("id", head),
+    admin.from("interviews").select("id", head),
+    admin.from("job_postings").select("id", head),
+    admin.from("tests").select("id", head),
   ]);
 
   const subRows = (subs ?? []) as SubRow[];
@@ -43,11 +73,26 @@ export default async function PlatformOverview() {
     count: subRows.filter((s) => s.plan_key === p.key).length,
   }));
 
+  const churned = subRows.filter((s) => s.status === "canceled").length;
+  const seatsSold = subRows.reduce((n, s) => n + (s.addon_seats ?? 0), 0);
+
   const stats = [
     { label: "Organizations", value: orgCount ?? 0, icon: Building2 },
     { label: "Active subscriptions", value: active.length, icon: CreditCard },
     { label: "Paying orgs", value: paidActive.length, icon: Users },
     { label: "Est. MRR", value: usd(mrrCents), icon: DollarSign },
+    { label: "Seats in use", value: seatsInUse ?? 0, icon: Users },
+    { label: "Add-on seats sold", value: seatsSold, icon: Users },
+    { label: "Job openings", value: openings ?? 0, icon: Briefcase },
+    { label: "Churned subs", value: churned, icon: TrendingDown },
+  ];
+
+  const activity = [
+    { label: "Applicants", value: applicants ?? 0, icon: FileText },
+    { label: "Candidates", value: candidates ?? 0, icon: UserRound },
+    { label: "Interviews", value: interviews ?? 0, icon: CalendarClock },
+    { label: "AI posts generated", value: aiPosts ?? 0, icon: Sparkles },
+    { label: "AI tests created", value: aiTests ?? 0, icon: Sparkles },
   ];
 
   return (
@@ -69,6 +114,21 @@ export default async function PlatformOverview() {
             <p className="mt-2 text-2xl font-semibold tabular-nums">{s.value}</p>
           </Card>
         ))}
+      </div>
+
+      <div>
+        <h2 className="mb-3 text-sm font-semibold">Activity &amp; AI usage</h2>
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+          {activity.map((s) => (
+            <Card key={s.label} className="p-5">
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-muted-foreground">{s.label}</span>
+                <s.icon className="size-4 text-muted-foreground" />
+              </div>
+              <p className="mt-2 text-2xl font-semibold tabular-nums">{s.value}</p>
+            </Card>
+          ))}
+        </div>
       </div>
 
       <Card className="p-5">

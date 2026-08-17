@@ -859,7 +859,12 @@ watch tuned LinkedIn/Indeed/Rozee/Careers posts appear; edit and regenerate them
 - [ ] A separate **cross-tenant** super-admin area for platform staff — hard-gated behind a dedicated super-admin capability (not a normal org role), bypassing org RLS only through an audited service path — **foundation done (Phase 1)**; cross-tenant admin actions land in Phases 2–5
 - [ ] Manage **plans & pricing** globally: create/edit tiers, limits, the feature matrix and per-seat pricing — kept in sync with Stripe Products/Prices
 - [ ] **Private / custom plans**: create a bespoke plan (custom limits + full feature access, e.g. an all-features demo) that is **not publicly listed**, and **assign it to specific organisations** from the super-admin portal — only the super-admin can grant it; assigned orgs get the plan's entitlements without it appearing on public pricing or being self-serve
-- [ ] Platform **analytics**: organisations, active subscriptions, plan distribution, MRR, seats sold, AI usage, openings/applicants volume, churn
+- [x] Global **plans & pricing** management (Phase 2): `/platform/plans` editor — name, limits, feature matrix, per-seat pricing, visibility, sort; create private plans; "Sync price to Stripe" mints new Prices. Audited
+- [x] **Private / custom plans** + assign to orgs (Phase 3): create `is_public=false` plans; `/platform/orgs` assigns ANY plan (incl. private) to a specific org — comp/custom grant, no payment. Audited
+- [x] Platform **analytics** (Phase 4): `/platform` overview — orgs, active subs, paying orgs, est. MRR, seats in use, add-on seats sold, openings, churn, applicants/candidates/interviews, AI posts & tests generated, plan distribution
+- [x] **Org administration** (Phase 5): `/platform/orgs` suspend/reactivate (enforced in the app shell via `organizations.suspended_at`); `/platform/audit` shows the full `platform_audit_log`. Plan adjust/comp = the assign flow above
+- [ ] **Impersonation** (audited support login-as) — deferred: minting another user's session safely (scoped, bannered, one-click exit) is security-sensitive; do it deliberately, not rushed
+- [ ] **API & integrations management** (platform API keys, OAuth app creds, webhook endpoints, integration health) — deferred to a later pass
 - [ ] **API & integrations** management: platform API keys, channel/OAuth app credentials, webhook endpoints, and integration health
 - [ ] Org administration: view / suspend / comp / trial an organisation, adjust its plan, and audited impersonation for support
 

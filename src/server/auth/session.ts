@@ -16,6 +16,7 @@ export type SessionContext = {
   roleName: string;
   isOwner: boolean;
   onboardingCompleted: boolean;
+  orgSuspended: boolean;
 };
 
 /**
@@ -57,7 +58,7 @@ export const getSessionContext = cache(async (): Promise<SessionContext | null> 
       is_owner,
       organization_id,
       department_id,
-      organizations ( name, onboarding_completed_at ),
+      organizations ( name, onboarding_completed_at, suspended_at ),
       roles ( name ),
       profiles ( full_name, email )
     `,
@@ -89,6 +90,7 @@ export const getSessionContext = cache(async (): Promise<SessionContext | null> 
     roleName: role?.name ?? "Member",
     isOwner: data.is_owner,
     onboardingCompleted: Boolean(org.onboarding_completed_at),
+    orgSuspended: Boolean(org.suspended_at),
   };
 });
 

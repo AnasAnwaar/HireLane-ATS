@@ -113,6 +113,7 @@ export type Organization = Timestamps & {
   email_from_name: string | null;
   email_reply_to: string | null;
   careers_url: string | null;
+  suspended_at: string | null;
 };
 
 export type Profile = Timestamps & {

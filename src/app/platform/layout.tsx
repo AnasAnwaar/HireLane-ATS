@@ -16,6 +16,7 @@ const NAV = [
   { href: "/platform", label: "Overview" },
   { href: "/platform/plans", label: "Plans" },
   { href: "/platform/orgs", label: "Organizations" },
+  { href: "/platform/audit", label: "Audit" },
 ];
 
 export default async function PlatformLayout({ children }: { children: ReactNode }) {
