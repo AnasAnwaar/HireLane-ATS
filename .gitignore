@@ -44,3 +44,6 @@ next-env.d.ts
 
 # marketing / generated mockups (kept local, not in the repo)
 mockups/
+
+# Pitch-deck intermediate screenshots (the built .pptx IS committed)
+pitch/shots/
