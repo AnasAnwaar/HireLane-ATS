@@ -45,3 +45,6 @@ next-env.d.ts
 # marketing / generated mockups (kept local, not in the repo)
 mockups/
 
+
+# Office lock/temp files
+~$*
