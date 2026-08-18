@@ -181,11 +181,17 @@ export function TwoFactorCard({
                   Or any TOTP app — Authy, 1Password, Microsoft Authenticator.
                 </p>
                 <div className="mt-3 inline-block rounded-xl border border-border bg-white p-3">
-                  {/* Supabase returns the QR as an SVG string from our own backend. */}
-                  <div
-                    className="[&>svg]:size-40"
-                    dangerouslySetInnerHTML={{ __html: enrollment.qrCode }}
-                  />
+                  {/* Supabase may return the QR as raw <svg> markup OR as a data:
+                      URI — handle both so it always renders (and scans). */}
+                  {enrollment.qrCode.trim().startsWith("<svg") ? (
+                    <div
+                      className="[&>svg]:size-40"
+                      dangerouslySetInnerHTML={{ __html: enrollment.qrCode }}
+                    />
+                  ) : (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={enrollment.qrCode} alt="Authenticator QR code" className="size-40" />
+                  )}
                 </div>
               </li>
 
