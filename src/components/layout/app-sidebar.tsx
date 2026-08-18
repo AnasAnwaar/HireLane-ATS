@@ -30,10 +30,13 @@ function initialsOf(name: string): string {
 export function AppSidebar({
   className,
   organization,
+  plan,
   onNavigate,
 }: {
   className?: string;
   organization: string;
+  /** Human-readable current plan name (e.g. "Premium"). */
+  plan?: string;
   /** Called when a link is followed — the mobile drawer uses it to close. */
   onNavigate?: () => void;
 }) {
@@ -152,7 +155,7 @@ export function AppSidebar({
             <span className="block truncate text-sm font-medium text-sidebar-foreground">
               {organization}
             </span>
-            <span className="block truncate text-xs text-sidebar-muted">Free plan</span>
+            <span className="block truncate text-xs text-sidebar-muted">{plan ? `${plan} plan` : " "}</span>
           </span>
           <ChevronRight className="size-4 shrink-0 text-sidebar-muted" />
         </Link>

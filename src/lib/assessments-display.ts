@@ -131,5 +131,7 @@ export const PROCTORING_SIGNALS: Record<ProctoringLevel, string[]> = {
 };
 
 /** Whether the level needs a camera / mic at system-check time. */
-export const proctoringNeedsCamera = (l: ProctoringLevel) => l === "standard" || l === "strict";
+// Camera check-in (photo capture) is disabled — no webcam pictures are taken.
+// Tab-switch/copy/blur detection and mic sampling still apply per level.
+export const proctoringNeedsCamera = (_l: ProctoringLevel) => false;
 export const proctoringNeedsMic = (l: ProctoringLevel) => l === "strict";

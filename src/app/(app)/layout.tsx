@@ -9,6 +9,7 @@ import { createAdminClient, createClient } from "@/lib/supabase/server";
 import { getMyPermissions } from "@/server/auth/authorize";
 import { getMfaStatus } from "@/server/auth/mfa-status";
 import { requireSession } from "@/server/auth/session";
+import { getEntitlements } from "@/server/billing/entitlements";
 
 /** Layout for all authenticated in-app routes. */
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
@@ -91,6 +92,8 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     .maybeSingle();
   const themeCss = brandThemeCss(org?.brand_color);
 
+  const ent = await getEntitlements(session.organizationId);
+
   return (
     <PermissionProvider permissions={permissions}>
       {themeCss && <style dangerouslySetInnerHTML={{ __html: themeCss }} />}
@@ -101,6 +104,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
           role: session.roleName,
           organization: session.organizationName,
         }}
+        plan={ent.planName}
       >
         {children}
       </AppShell>

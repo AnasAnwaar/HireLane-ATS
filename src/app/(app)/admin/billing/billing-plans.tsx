@@ -43,7 +43,6 @@ const PLANS: Plan[] = [
       { t: "1 user (admin only)", ok: true },
       { t: "Up to 5 job openings", ok: true },
       { t: "Applicant tracking & pipeline", ok: true },
-      { t: "Channel / account integrations", ok: false },
       { t: "AI features", ok: false },
     ],
   },
@@ -56,7 +55,6 @@ const PLANS: Plan[] = [
     features: [
       { t: "3 seats (admin + 2)", ok: true },
       { t: "Unlimited job openings", ok: true },
-      { t: "Channel & account integrations", ok: true },
       { t: "AI job-post generation", ok: true },
       { t: "AI screening & assessments", ok: false },
     ],
@@ -197,7 +195,6 @@ export function BillingPlans({
   const cap = (n: number | null) => (n == null ? "∞" : n);
   type Feat = "integrations" | "ai_posts" | "ai_screening" | "ai_assessments";
   const FEATURE_ROWS: { key: Feat; label: string }[] = [
-    { key: "integrations", label: "Channel integrations" },
     { key: "ai_posts", label: "AI job-post generation" },
     { key: "ai_screening", label: "AI screening & match reports" },
     { key: "ai_assessments", label: "AI assessments & grading" },

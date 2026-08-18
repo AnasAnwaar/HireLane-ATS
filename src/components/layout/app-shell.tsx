@@ -8,9 +8,11 @@ import { cn } from "@/lib/utils";
 
 export function AppShell({
   user,
+  plan,
   children,
 }: {
   user: TopbarUser;
+  plan?: string;
   children: React.ReactNode;
 }) {
   const [mobileNavOpen, setMobileNavOpen] = React.useState(false);
@@ -23,7 +25,7 @@ export function AppShell({
       >
         Skip to content
       </a>
-      <AppSidebar className="hidden lg:flex" organization={user.organization} />
+      <AppSidebar className="hidden lg:flex" organization={user.organization} plan={plan} />
 
       {/* Mobile drawer */}
       {mobileNavOpen && (
@@ -36,6 +38,7 @@ export function AppShell({
           <AppSidebar
             className="relative z-10"
             organization={user.organization}
+            plan={plan}
             onNavigate={() => setMobileNavOpen(false)}
           />
         </div>

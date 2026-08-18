@@ -145,7 +145,12 @@ export function TestRunner({ token, data }: { token: string; data: ActiveRunner 
   const sr = data.screenReaderMode;
 
   return (
-    <div className={cn("fixed inset-0 z-50 flex flex-col bg-background", sr && "text-[1.0625rem]")}>
+    <div
+      className={cn("fixed inset-0 z-50 flex select-none flex-col bg-background", sr && "text-[1.0625rem]")}
+      onCopy={(e) => e.preventDefault()}
+      onCut={(e) => e.preventDefault()}
+      onContextMenu={(e) => e.preventDefault()}
+    >
       {/* In-test integrity warning */}
       {proctor.warning && (
         <div className="absolute inset-x-0 top-0 z-[60] flex justify-center px-4 pt-3">
@@ -248,7 +253,7 @@ export function TestRunner({ token, data }: { token: string; data: ActiveRunner 
                   onBlur={flushText}
                   rows={8}
                   placeholder="Type your answer…"
-                  className="w-full rounded-lg border border-input bg-background px-4 py-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  className="w-full select-text rounded-lg border border-input bg-background px-4 py-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 />
               )}
           </div>

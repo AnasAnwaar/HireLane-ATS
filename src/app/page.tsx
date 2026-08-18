@@ -83,7 +83,6 @@ const PRICING = [
       { t: "1 user (admin only)", ok: true },
       { t: "Up to 5 job openings", ok: true },
       { t: "Applicant tracking & pipeline", ok: true },
-      { t: "Channel / account integrations", ok: false },
       { t: "AI features", ok: false },
     ],
   },
@@ -96,7 +95,6 @@ const PRICING = [
     features: [
       { t: "3 seats (admin + 2)", ok: true },
       { t: "Unlimited job openings", ok: true },
-      { t: "Channel & account integrations", ok: true },
       { t: "AI job-post generation", ok: true },
       { t: "AI screening & assessments", ok: false },
     ],
