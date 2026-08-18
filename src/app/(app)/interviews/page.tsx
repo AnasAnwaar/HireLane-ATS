@@ -58,7 +58,7 @@ export default async function InterviewsPage() {
       supabase
         .from("applications")
         .select("id, candidate_id, candidates(full_name), job_openings(title)")
-        .order("created_at", { ascending: false })
+        .order("applied_at", { ascending: false })
         .limit(200),
       supabase
         .from("memberships")
