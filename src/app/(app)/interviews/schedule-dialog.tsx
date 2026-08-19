@@ -133,7 +133,7 @@ export function ScheduleDialog({
               </select>
             </Field>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <Field id="title" label="Title">
                 <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Interview" />
               </Field>
@@ -142,7 +142,7 @@ export function ScheduleDialog({
               </Field>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <Field id="when" label="Date & time" required>
                 <Input type="datetime-local" value={when} onChange={(e) => setWhen(e.target.value)} />
               </Field>
